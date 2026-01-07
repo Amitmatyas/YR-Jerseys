@@ -472,12 +472,6 @@
 firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // רשימת המשתמשים המורשים
-    const ALLOWED_USERS = [
-        { user: 'Yair', pass: '1234' },
-        { user: 'Ron', pass: '1234' }
-    ];
-
     const loginOverlay = document.getElementById('login-overlay');
     const usernameInput = document.getElementById('username');
     const passwordInput = document.getElementById('password');
@@ -485,35 +479,60 @@ firebase.initializeApp(firebaseConfig);
     const loginErrorMessage = document.getElementById('login-error-message');
     const adminPanelContent = document.getElementById('admin-panel-content');
 
-    // פונקציית הלוגיקה המאוחדת
+    // פונקציית הלוגיקה המעודכנת מול המסד
     loginButton.addEventListener('click', async () => {
-        const u = usernameInput.value;
+        const u = usernameInput.value.trim();
         const p = passwordInput.value;
 
-        // בדיקה אם המשתמש קיים ברשימה
-        const isAuthorized = ALLOWED_USERS.some(account => account.user === u && account.pass === p);
+        if (!u || !p) {
+            loginErrorMessage.textContent = 'נא להזין שם משתמש וסיסמה.';
+            loginErrorMessage.style.display = 'block';
+            return;
+        }
 
-        if (isAuthorized) {
-            // כניסה מוצלחת
-            loginOverlay.style.display = 'none';
-            adminPanelContent.style.display = 'block';
-            loginErrorMessage.style.display = 'none';
+        try {
+            // בדיקה מול אוסף המשתמשים ב-Firestore
+            const userDoc = await db.collection('users').doc(u).get();
 
-            // טעינת כל הנתונים מה-Firebase
-            try {
-                await initializeSettings();
-                await fetchProducts();
-                await loadShippingSettings();
-                await loadCoupons();
-                await fetchContactLeads();
-                await fetchOrders();
-                console.log("All data loaded successfully");
-            } catch (error) {
-                console.error("Error loading data:", error);
+            if (userDoc.exists) {
+                const userData = userDoc.data();
+
+                // אימות סיסמה מהמסד
+                if (userData.password === p) {
+                    // כניסה מוצלחת
+                    loginOverlay.style.display = 'none';
+                    adminPanelContent.style.display = 'block';
+                    loginErrorMessage.style.display = 'none';
+
+                    // שימוש בשם בעברית אם קיים, אחרת בשם המשתמש
+                    const displayName = userData.hebrewName || u;
+                    console.log(`ברוך הבא, ${displayName}`);
+
+                    // טעינת כל הנתונים מה-Firebase
+                    try {
+                        await initializeSettings();
+                        await fetchProducts();
+                        await loadShippingSettings();
+                        await loadCoupons();
+                        await fetchContactLeads();
+                        await fetchOrders();
+                        console.log("All data loaded successfully");
+                    } catch (error) {
+                        console.error("Error loading data:", error);
+                    }
+                } else {
+                    // סיסמה לא תואמת
+                    loginErrorMessage.textContent = 'סיסמה שגויה.';
+                    loginErrorMessage.style.display = 'block';
+                }
+            } else {
+                // שם משתמש לא קיים במסמכים
+                loginErrorMessage.textContent = 'שם משתמש לא נמצא.';
+                loginErrorMessage.style.display = 'block';
             }
-        } else {
-            // פרטים שגויים
-            loginErrorMessage.textContent = 'שם משתמש או סיסמה שגויים.';
+        } catch (error) {
+            console.error("Login error:", error);
+            loginErrorMessage.textContent = 'שגיאה בחיבור למסד הנתונים.';
             loginErrorMessage.style.display = 'block';
         }
     });
