@@ -1333,84 +1333,87 @@
                             select.appendChild(opt);
                         });
                         
-                        select.addEventListener('change', (e) => {
-                            currentProductOptions[field.name] = e.target.value;
-                            const selectedOption = field.options.find(o => o.value === e.target.value);
-                            if (selectedOption && selectedOption.image) {
-                                modalProductImage.src = selectedOption.image;
-                            } else {
-                                modalProductImage.src = product.image;
-                            }
-                            updateModalPrice();
-                        });
-                        
-                        optionGroup.appendChild(select);
-                    } else if (field.type === 'text') {
-                        const input = document.createElement('input');
-                        input.type = 'text';
-                        input.id = `custom-field-${index}`;
-                        input.placeholder = 'הזן ' + field.name;
-                        input.dataset.fieldExtraPrice = field.extraPrice || 0;
-                        
-                        input.addEventListener('input', (e) => {
-                            currentProductOptions[field.name] = e.target.value;
-                            updateModalPrice();
-                        });
-                        
-                        optionGroup.appendChild(input);
-                    }
-                    
-                    customOptionsContainer.appendChild(optionGroup);
-                });
-            }
-            
-            productModal.style.display = 'flex';
-            currentModalProductId = product.id;
-        }
+select.addEventListener('change', (e) => {
+    currentProductOptions[field.name] = e.target.value;
+    const selectedOption = field.options.find(o => o.value === e.target.value);
+    if (selectedOption && selectedOption.image) {
+        modalProductImage.src = selectedOption.image;
+    } else {
+        modalProductImage.src = product.image;
+    }
+    updateModalPrice();
+});
 
-        function updateModalPrice() {
-            const product = products.find(p => p.id === currentModalProductId);
-            if (!product) return;
-            
-            let totalPrice = product.price;
-            
-            // חישוב תוספות מחיר מהשדות
-            if (product.customFields) {
-                product.customFields.forEach((field, index) => {
-                    const fieldElement = document.getElementById(`custom-field-${index}`);
-                    if (!fieldElement) return;
-                    
-                    const fieldExtraPrice = parseFloat(fieldElement.dataset.fieldExtraPrice) || 0;
-                    
-                    if (field.type === 'select' && fieldElement.value) {
-                        // תוספת מחיר מהאופציה שנבחרה
-                        const selectedOption = fieldElement.options[fieldElement.selectedIndex];
-                        const optionExtraPrice = parseFloat(selectedOption.dataset.extraPrice) || 0;
-                        totalPrice += optionExtraPrice;
-                    } else if (field.type === 'text' && fieldElement.value) {
-                        // תוספת מחיר מהשדה עצמו
-                        totalPrice += fieldExtraPrice;
-                    }
-                });
-            }
-            
-            currentProductPrice = totalPrice;
-            modalProductPrice.textContent = `${totalPrice.toFixed(2)} ₪`;
-        }
+optionGroup.appendChild(select);
+} else if (field.type === 'text') {
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.id = `custom-field-${index}`;
+    input.placeholder = 'הזן ' + field.name;
+    input.dataset.fieldExtraPrice = field.extraPrice || 0;
+    
+    input.addEventListener('input', (e) => {
+        currentProductOptions[field.name] = e.target.value;
+        updateModalPrice();
+    });
+    
+    optionGroup.appendChild(input);
+}
 
-        modalAddToCartBtn.addEventListener('click', function() {
-            const product = products.find(p => p.id === currentModalProductId);
-            if (!product) return;
+customOptionsContainer.appendChild(optionGroup);
+});
+}
+
+productModal.style.display = 'flex';
+currentModalProductId = product.id;
+}
+
+function updateModalPrice() {
+    const product = products.find(p => p.id === currentModalProductId);
+    if (!product) return;
+    
+    let totalPrice = product.price;
+    
+    // חישוב תוספות מחיר מהשדות
+    if (product.customFields) {
+        product.customFields.forEach((field, index) => {
+            const fieldElement = document.getElementById(`custom-field-${index}`);
+            if (!fieldElement) return;
             
-            if (product.customFields && product.customFields.length > 0) {
-                for (let i = 0; i < product.customFields.length; i++) {
-                    const field = product.customFields[i];
-                    if (field.required && !currentProductOptions[field.name]) {
-                        alert('אנא מלא את השדה: ' + field.name);
-                        return;
-                    }
-                }
+            const fieldExtraPrice = parseFloat(field.extraPrice) || 0;
+            
+            if (field.type === 'select' && fieldElement.value) {
+                // קודם מוסיפים את התוספת הכללית של השדה
+                totalPrice += fieldExtraPrice;
+                
+                // ואז מוסיפים את תוספת המחיר של האופציה הספציפית
+                const selectedOption = fieldElement.options[fieldElement.selectedIndex];
+                const optionExtraPrice = parseFloat(selectedOption.dataset.extraPrice) || 0;
+                totalPrice += optionExtraPrice;
+            } else if (field.type === 'text' && fieldElement.value) {
+                // תוספת מחיר מהשדה עצמו
+                totalPrice += fieldExtraPrice;
             }
+        });
+    }
+    
+    currentProductPrice = totalPrice;
+    modalProductPrice.textContent = `${totalPrice.toFixed(2)} ₪`;
+}
+
+modalAddToCartBtn.addEventListener('click', function() {
+    const product = products.find(p => p.id === currentModalProductId);
+    if (!product) return;
+    
+    if (product.customFields && product.customFields.length > 0) {
+        for (let i = 0; i < product.customFields.length; i++) {
+            const field = product.customFields[i];
+            if (field.required && !currentProductOptions[field.name]) {
+                alert('אנא מלא את השדה: ' + field.name);
+                return;
+            }
+        }
+    }
             
             const currentDisplayImage = modalProductImage.src;
             addToCart(currentModalProductId, {...currentProductOptions}, currentDisplayImage, currentProductPrice);
