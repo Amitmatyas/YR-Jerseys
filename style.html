@@ -38,18 +38,29 @@
             letter-spacing: 1px;
         }
         
-        header {
-            background: #fff;
-            color: #000;
-            padding: 1.5em 0;
-            text-align: center;
-            font-size: 3.5em;
-            letter-spacing: -2px;
-            border-bottom: var(--border-val);
-            font-weight: 900;
-            text-transform: uppercase;
-            line-height: 0.9;
-        }
+header {
+    background: #fff;
+    color: #000;
+    padding: 1.5em 0;
+    text-align: center;
+    font-size: 3.5em;
+    letter-spacing: -2px;
+    border-bottom: var(--border-val);
+    
+    /* פונט ומשקל */
+    font-family: 'Heebo', sans-serif;
+    font-weight: 900; /* משקל Black */
+    
+    text-transform: uppercase;
+    line-height: 0.9;
+    transition: all 0.3s ease; /* אנימציה חלקה למעבר של הצל */
+    cursor: default;
+}
+
+/* אפקט צל אדום במעבר עכבר */
+header:hover {
+    text-shadow: 5px 5px 0px var(--accent-color); /* משתמש במשתנה האדום שלך */
+}
 
         #cart-toggle-button {
             position: fixed;
@@ -143,47 +154,34 @@
             color: white;
         }
 
-/* חפש את זה בקוד הקיים */
+/* הגדרת הקונטיינר - תמיד ימלא את השורה, מקסימום 3 בשורה */
 main#products-container {
     max-width: 1200px;
     margin: 60px auto;
     padding: 20px;
     display: grid;
-    /* שינוי: הגדרה שמאפשרת לכרטיסים להיות גמישים יותר */
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
-    gap: 30px; /* צמצום קל של הרווח ביניהם למראה הדוק יותר */
-    align-items: start; /* זה מבטיח שכל כרטיס יקבל את הגובה שלו ולא יימתח לגובה של הכרטיס הכי גבוה בשורה */
+    /* כאן הקסם: אם יש 1 הוא יתפוס הכל, אם 2 חצי חצי, אם 3 שליש כל אחד */
+    grid-template-columns: repeat(auto-fit, minmax(30%, 1fr)); 
+    gap: 40px;
 }
 
-        .product-card {
-            background: #fff;
-            border: var(--border-val);
-            box-shadow: var(--hard-shadow);
-            padding: 0;
-            text-align: center;
-            transition: all 0.2s ease-in-out;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-        }
-        .product-card:hover {
-            transform: translate(-4px, -4px);
-            box-shadow: var(--hard-shadow-hover);
-        }
-        .product-card:active {
-            transform: translate(4px, 4px);
-            box-shadow: 2px 2px 0px #000;
-        }
+/* כרטיס המוצר - גובה אחיד לכולם */
+.product-card {
+    background: #fff;
+    border: var(--border-val);
+    box-shadow: var(--hard-shadow);
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* מתיחה לגובה אחיד של כל הכרטיסים בשורה */
+}
 
-/* חפש את זה בקוד הקיים */
+/* התמונה - תמיד נכנסת למלבן בלי להיחתך */
 .product-card img {
     width: 100%;
-    height: auto; /* שנה מ-350px ל-auto */
-    aspect-ratio: auto; /* מבטיח שהתמונה תשמור על הפרופורציות המקוריות שלה */
-    object-fit: contain; /* או cover, תלוי אם תרצה שהתמונה תיחתך או תוצג במלואה */
+    height: 300px; /* גובה קבוע למלבן התמונה */
+    object-fit: contain; /* מבטיח שהתמונה לא תיחתך לעולם */
+    background: #f0f0f0; /* רקע אפור למקומות שהתמונה לא ממלאת */
     border-bottom: var(--border-val);
-    background: #f0f0f0;
-    cursor: pointer;
 }
 
         .product-card:hover img {
