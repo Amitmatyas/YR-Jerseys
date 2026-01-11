@@ -143,14 +143,17 @@
             color: white;
         }
 
-        main#products-container {
-            max-width: 1200px;
-            margin: 60px auto;
-            padding: 20px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 40px;
-        }
+/* חפש את זה בקוד הקיים */
+main#products-container {
+    max-width: 1200px;
+    margin: 60px auto;
+    padding: 20px;
+    display: grid;
+    /* שינוי: הגדרה שמאפשרת לכרטיסים להיות גמישים יותר */
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+    gap: 30px; /* צמצום קל של הרווח ביניהם למראה הדוק יותר */
+    align-items: start; /* זה מבטיח שכל כרטיס יקבל את הגובה שלו ולא יימתח לגובה של הכרטיס הכי גבוה בשורה */
+}
 
         .product-card {
             background: #fff;
@@ -172,15 +175,17 @@
             box-shadow: 2px 2px 0px #000;
         }
 
-        .product-card img {
-            width: 100%;
-            height: 350px;
-            object-fit: cover;
-            border-bottom: var(--border-val);
-            background: #f0f0f0;
-            transition: transform 0.5s;
-            cursor: pointer;
-        }
+/* חפש את זה בקוד הקיים */
+.product-card img {
+    width: 100%;
+    height: auto; /* שנה מ-350px ל-auto */
+    aspect-ratio: auto; /* מבטיח שהתמונה תשמור על הפרופורציות המקוריות שלה */
+    object-fit: contain; /* או cover, תלוי אם תרצה שהתמונה תיחתך או תוצג במלואה */
+    border-bottom: var(--border-val);
+    background: #f0f0f0;
+    transition: transform 0.5s;
+    cursor: pointer;
+}
         .product-card:hover img {
             transform: scale(1.05) rotate(-2deg);
         }
