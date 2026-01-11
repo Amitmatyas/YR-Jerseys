@@ -760,24 +760,33 @@ main#products-container {
             }
         }
 
+/* הגדרת ה-body לשליטה בסדר */
 body {
     display: flex;
     flex-direction: column;
 }
 
-/* הצבת "צור קשר" אחרי הכל */
-.contact-section {
-    order: 10;
-}
-
-/* הצבת "אודות" לפני "צור קשר" */
+/* תיקון "אודות" - מניעת כיווץ ומיקום */
 .my-about-card {
     order: 9;
+    align-self: center; /* שומר על המרכז בלי להימתח לכל הרוחב אם לא צריך */
+    width: calc(100% - 40px); /* שומר על הרוחב המקורי שהגדרת */
+    flex-shrink: 0; /* מונע מהאלמנט להתכווץ */
 }
 
-/* הצבת התקנון בסוף */
+/* תיקון "צור קשר" - מניעת כיווץ ומיקום */
+.contact-section {
+    order: 10;
+    width: calc(100% - 80px); /* שומר על הרוחב המקורי */
+    max-width: 600px;
+    margin: 50px auto;
+    flex-shrink: 0; /* מונע מהאלמנט להתכווץ */
+}
+
+/* התקנון תמיד אחרון */
 .terms-section {
     order: 11;
+    flex-shrink: 0;
 }
         
     </style>
