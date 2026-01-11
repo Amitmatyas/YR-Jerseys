@@ -759,6 +759,27 @@ main#products-container {
                 left: 20px;
             }
         }
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+/* הצבת "צור קשר" אחרי הכל */
+.contact-section {
+    order: 10;
+}
+
+/* הצבת "אודות" לפני "צור קשר" */
+.my-about-card {
+    order: 9;
+}
+
+/* הצבת התקנון בסוף */
+.terms-section {
+    order: 11;
+}
+        
     </style>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
