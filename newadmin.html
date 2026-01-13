@@ -1,0 +1,2253 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>פאנל ניהול - YR Jerseys</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚽</text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+            direction: rtl;
+        }
+        
+        #login-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.75);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+        
+        #login-form-container {
+            background: #fff;
+            padding: 40px 30px;
+            border-radius: 10px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            text-align: center;
+            width: 90%;
+            max-width: 380px;
+        }
+        
+        #login-form-container h2 {
+            margin-top: 0;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            font-weight: 600;
+        }
+        
+        #login-form-container input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #cce0ff;
+            border-radius: 6px;
+            font-size: 1em;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        #login-form-container input:focus {
+            border-color: #000;
+        }
+        
+        #login-button {
+            background: #000;
+            color: #fff;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 500;
+            width: 100%;
+            transition: background 0.3s;
+        }
+        
+        #login-button:hover {
+            background: #333;
+        }
+        
+        #login-error-message {
+            color: #e74c3c;
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 0.95em;
+        }
+        
+        .admin-layout {
+            display: none;
+            min-height: 100vh;
+        }
+        
+        .admin-layout.active {
+            display: flex;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background: #2c3e50;
+            min-height: 100vh;
+            padding: 0;
+            position: fixed;
+            right: 0;
+            top: 0;
+        }
+        
+        .sidebar-header {
+            padding: 30px 20px;
+            text-align: center;
+            background: #34495e;
+            border-bottom: 2px solid #1a252f;
+        }
+        
+        .sidebar-header img {
+            width: 120px;
+            height: auto;
+        }
+        
+        .sidebar-header h1 {
+            color: #fff;
+            font-size: 1.2em;
+            margin-top: 15px;
+            font-weight: 600;
+        }
+        
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+        
+        .menu-item {
+            padding: 15px 25px;
+            color: #ecf0f1;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.05em;
+            position: relative;
+            border-right: 4px solid transparent;
+        }
+        
+        .menu-item:hover {
+            background: #34495e;
+            color: #fff;
+        }
+        
+        .menu-item.active {
+            background: #1a252f;
+            color: #fff;
+            border-right-color: #3498db;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+        }
+        
+        .menu-item.active::before {
+            content: '';
+            position: absolute;
+            right: -20px;
+            top: 0;
+            bottom: 0;
+            width: 40px;
+            background: #1a252f;
+            border-radius: 0 50px 50px 0;
+            z-index: 1;
+        }
+        
+        .main-content {
+            margin-right: 250px;
+            padding: 40px;
+            width: calc(100% - 250px);
+        }
+        
+        .content-section {
+            display: none;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        .content-header {
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+        
+        .content-header h2 {
+            font-size: 2em;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        .search-container {
+            margin-bottom: 25px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .search-container input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        
+        .search-container input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+        
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #229954;
+        }
+        
+        .btn-dark {
+            background: #2c3e50;
+            color: white;
+        }
+        
+        .btn-dark:hover {
+            background: #1a252f;
+        }
+        
+        .categories-grid {
+            display: grid;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .category-box {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 25px;
+        }
+        
+        .category-box-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .category-box-header h3 {
+            font-size: 1.5em;
+            color: #2c3e50;
+        }
+        
+        .category-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .category-actions button {
+            padding: 8px 16px;
+            font-size: 0.9em;
+        }
+        
+        .products-in-category {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .product-mini-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 12px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .product-mini-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .product-mini-card img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+        
+        .product-mini-card h4 {
+            font-size: 0.95em;
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+        
+        .product-mini-card .product-price {
+            color: #27ae60;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .product-mini-actions {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+        }
+        
+        .product-mini-actions button {
+            padding: 6px 12px;
+            font-size: 0.85em;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group input[type="date"],
+        .form-group input[type="url"],
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .image-upload-container {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 25px;
+            text-align: center;
+            background: #fafafa;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .image-upload-container:hover {
+            border-color: #3498db;
+            background: #f0f8ff;
+        }
+        
+        .image-upload-container.uploading {
+            border-color: #27ae60;
+            background: #e8f5e9;
+        }
+        
+        .image-upload-container input[type="file"] {
+            display: none;
+        }
+        
+        .image-preview {
+            max-width: 200px;
+            max-height: 200px;
+            margin: 10px auto;
+            border-radius: 6px;
+        }
+        
+        .custom-field-container {
+            border: 2px solid #e9ecef;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+        
+        .custom-field-header {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .custom-field-options {
+            margin-top: 15px;
+        }
+        
+        .option-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .option-item input[type="text"],
+        .option-item input[type="number"] {
+            flex: 1;
+            min-width: 150px;
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .option-item .image-upload-mini {
+            border: 1px dashed #ddd;
+            padding: 8px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            background: white;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+        
+        .option-item .image-upload-mini:hover {
+            border-color: #3498db;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.75);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: #fff;
+            border-radius: 10px;
+            padding: 35px 30px;
+            min-width: 300px;
+            max-width: 700px;
+            box-shadow: 0 4px 25px rgba(0,0,0,0.2);
+            position: relative;
+            max-height: 85vh;
+            overflow-y: auto;
+            margin: 20px;
+        }
+        
+        .modal-content h3 {
+            margin: 0 0 20px 0;
+            color: #2c3e50;
+            font-size: 1.8em;
+        }
+        
+        .modal-content .close-button {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            background: none;
+            border: none;
+            font-size: 1.6em;
+            cursor: pointer;
+            color: #888;
+            transition: color 0.3s;
+        }
+        
+        .modal-content .close-button:hover {
+            color: #000;
+        }
+        
+        .settings-grid {
+            display: grid;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        
+        .settings-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .settings-section h3 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+            font-size: 1.4em;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .item-list {
+            margin-top: 20px;
+        }
+        
+        .list-item {
+            background: white;
+            padding: 15px 20px;
+            margin-bottom: 12px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+        
+        .list-item:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .list-item-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .list-item-actions button {
+            padding: 6px 14px;
+            font-size: 0.9em;
+        }
+        
+        .order-card, .contact-lead-item {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .order-card:hover, .contact-lead-item:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .order-status-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #dee2e6;
+        }
+        
+        .order-status-section textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            min-height: 70px;
+            font-family: inherit;
+            resize: vertical;
+        }
+        
+        .order-status-section button {
+            margin-top: 12px;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+            
+            .main-content {
+                margin-right: 200px;
+                width: calc(100% - 200px);
+                padding: 20px;
+            }
+            
+            .products-in-category {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <div id="login-overlay">
+        <div id="login-form-container">
+            <img src="https://i.postimg.cc/brSRNJm1/7D29AA03-1C4F-4578-85D5-F3A23D3D84EC.png" alt="YR Jerseys" style="width: 200px; height: auto; display: block; margin: 0 auto 20px;">
+            <h2>פאנל ניהול YR Jerseys</h2>
+            <input type="text" id="username" placeholder="שם משתמש" autofocus>
+            <input type="password" id="password" placeholder="סיסמה">
+            <button id="login-button">התחבר</button>
+            <p id="login-error-message" style="display: none;"></p>
+        </div>
+    </div>
+
+    <div class="admin-layout" id="admin-layout">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <img src="https://i.postimg.cc/brSRNJm1/7D29AA03-1C4F-4578-85D5-F3A23D3D84EC.png" alt="YR Jerseys">
+                <h1>פאנל ניהול</h1>
+            </div>
+            <div class="sidebar-menu">
+                <div class="menu-item active" data-section="categories">קטגוריות</div>
+                <div class="menu-item" data-section="add-product">הוסף מוצר</div>
+                <div class="menu-item" data-section="orders">הזמנות</div>
+                <div class="menu-item" data-section="leads">פניות</div>
+                <div class="menu-item" data-section="settings">הגדרות</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- קטגוריות -->
+            <div class="content-section active" id="categories-section">
+                <div class="content-header">
+                    <h2>ניהול קטגוריות</h2>
+                </div>
+                
+                <div class="form-group">
+                    <label for="category-name">הוסף קטגוריה חדשה:</label>
+                    <input type="text" id="category-name" placeholder="שם הקטגוריה">
+                </div>
+                <button class="btn btn-success" id="add-category-btn">הוסף קטגוריה</button>
+                
+                <div class="categories-grid" id="categories-grid"></div>
+            </div>
+
+            <!-- הוספת מוצר -->
+            <div class="content-section" id="add-product-section">
+                <div class="content-header">
+                    <h2>הוסף מוצר חדש</h2>
+                </div>
+                
+                <form id="add-product-form">
+                    <div class="form-group">
+                        <label for="product-name">שם המוצר:</label>
+                        <input type="text" id="product-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-description">תיאור המוצר:</label>
+                        <textarea id="product-description" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-price">מחיר:</label>
+                        <input type="number" id="product-price" step="0.01" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-category">קטגוריה:</label>
+                        <select id="product-category" required>
+                            <option value="">בחר קטגוריה</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>תמונת המוצר:</label>
+                        <div class="image-upload-container" id="product-image-upload">
+                            <input type="file" id="product-image-file" accept="image/*">
+                            <div class="upload-content">
+                                <p>לחץ להעלאת תמונה</p>
+                                <img id="product-image-preview" class="image-preview" style="display: none;">
+                                <div class="upload-status" id="product-upload-status"></div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="product-image-url">
+                    </div>
+                    <div class="form-group">
+                        <label>שדות מותאמים אישית:</label>
+                        <button type="button" class="btn btn-success" id="add-custom-field">הוסף שדה חדש</button>
+                        <div id="custom-fields-container"></div>
+                    </div>
+                    <button type="submit" class="btn btn-dark">הוסף מוצר</button>
+                </form>
+            </div>
+
+            <!-- הזמנות -->
+            <div class="content-section" id="orders-section">
+                <div class="content-header">
+                    <h2>הזמנות</h2>
+                </div>
+                
+                <div class="search-container">
+                    <input type="text" id="order-search" placeholder="חיפוש לפי שם, טלפון, אימייל או כתובת...">
+                    <button class="btn btn-primary" id="search-btn">חפש</button>
+                    <button class="btn btn-secondary" id="clear-search-btn">נקה</button>
+                </div>
+                
+                <div id="orders-list">
+                    <p>טוען הזמנות...</p>
+                </div>
+            </div>
+
+            <!-- פניות -->
+            <div class="content-section" id="leads-section">
+                <div class="content-header">
+                    <h2>פניות לקוחות</h2>
+                </div>
+                
+                <div class="search-container">
+                    <input type="text" id="lead-search" placeholder="חיפוש לפי שם, טלפון או אימייל...">
+                    <button class="btn btn-primary" id="search-lead-btn">חפש</button>
+                    <button class="btn btn-secondary" id="clear-lead-search-btn">נקה</button>
+                </div>
+                
+                <div id="contact-leads-list">
+                    <p>טוען פניות...</p>
+                </div>
+            </div>
+
+            <!-- הגדרות -->
+            <div class="content-section" id="settings-section">
+                <div class="content-header">
+                    <h2>הגדרות</h2>
+                </div>
+                
+                <div class="settings-grid">
+                    <!-- קופונים -->
+                    <div class="settings-section">
+                        <h3>קופונים</h3>
+                        <div class="form-group">
+                            <label for="coupon-code">קוד קופון:</label>
+                            <input type="text" id="coupon-code">
+                        </div>
+                        <div class="form-group">
+                            <label for="coupon-type">סוג הטבה:</label>
+                            <select id="coupon-type">
+                                <option value="free_product">מוצר חינם</option>
+                                <option value="fixed_discount">הנחה בשקלים</option>
+                                <option value="percentage_discount">הנחה באחוזים</option>
+                                <option value="free_shipping">משלוח חינם</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="coupon-value-group">
+                            <label for="coupon-value">ערך הטבה:</label>
+                            <input type="number" id="coupon-value" step="0.01" min="0">
+                        </div>
+                        <div class="form-group" id="coupon-product-group" style="display: none;">
+                            <label for="coupon-product">בחר מוצר:</label>
+                            <select id="coupon-product"></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="coupon-expiry">תאריך תפוגה:</label>
+                            <input type="date" id="coupon-expiry">
+                        </div>
+                        <button class="btn btn-success" id="add-coupon-btn">הוסף קופון</button>
+                        <div class="item-list" id="coupons-list"></div>
+                    </div>
+
+                    <!-- הודעות -->
+                    <div class="settings-section">
+                        <h3>הודעות (שורת הודעות)</h3>
+                        <div class="form-group">
+                            <label for="announcement-text">הודעה חדשה:</label>
+                            <input type="text" id="announcement-text" placeholder="הזן הודעה...">
+                        </div>
+                        <button class="btn btn-success" id="add-announcement-btn">הוסף הודעה</button>
+                        <div class="item-list" id="announcements-list"></div>
+                    </div>
+
+                    <!-- משלוח -->
+                    <div class="settings-section">
+                        <h3>הגדרות משלוח</h3>
+                        <div class="form-group">
+                            <label for="shipping-method">שיטת חישוב משלוח:</label>
+                            <select id="shipping-method">
+                                <option value="percentage">אחוז מסך כולל (%)</option>
+                                <option value="per_item">לכל מוצר (₪)</option>
+                                <option value="fixed">מחיר קבוע (₪)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="shipping-value">ערך:</label>
+                            <input type="number" id="shipping-value" step="0.01" min="0" placeholder="הזן ערך">
+                        </div>
+                        <div class="form-group">
+                            <label for="free-threshold">משלוח חינם מעל (₪):</label>
+                            <input type="number" id="free-threshold" step="0.01" min="0" placeholder="השאר ריק אם אין">
+                        </div>
+                        <button class="btn btn-success" id="save-shipping-btn">שמור הגדרות</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- מודאל הזמנה -->
+    <div id="order-details-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3>פרטי הזמנה</h3>
+            <p><strong>שם לקוח:</strong> <span id="modal-customer-name"></span></p>
+            <p><strong>אימייל:</strong> <span id="modal-customer-email"></span></p>
+            <p><strong>טלפון:</strong> <span id="modal-customer-phone"></span></p>
+            <p><strong>כתובת:</strong> <span id="modal-customer-address"></span></p>
+            <p><strong>סה"כ מוצרים:</strong> <span id="modal-subtotal"></span> ₪</p>
+            <p><strong>דמי משלוח:</strong> <span id="modal-shipping"></span> ₪</p>
+            <p><strong>קופון:</strong> <span id="modal-coupon"></span></p>
+            <p><strong>סה"כ כולל משלוח:</strong> <span id="modal-total-amount"></span> ₪</p>
+            <p><strong>תאריך הזמנה:</strong> <span id="modal-order-date"></span></p>
+            <h4>פרטי פריטים:</h4>
+            <ul id="modal-order-items"></ul>
+        </div>
+    </div>
+
+    <!-- מודאל פנייה -->
+    <div id="lead-details-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3>פרטי פנייה</h3>
+            <p><strong>שם:</strong> <span id="modal-lead-name"></span></p>
+            <p><strong>טלפון:</strong> <span id="modal-lead-phone"></span></p>
+            <p><strong>אימייל:</strong> <span id="modal-lead-email"></span></p>
+            <p><strong>הודעה:</strong></p>
+            <p id="modal-lead-message" style="white-space: pre-wrap; background: #f9f9f9; padding: 12px; border-radius: 6px;"></p>
+            <p><strong>תאריך:</strong> <span id="modal-lead-date"></span></p>
+            <div id="modal-lead-order" style="margin-top: 20px;"></div>
+            <div style="margin-top: 20px; display: flex; gap: 10px;">
+                <button id="link-order-btn" class="btn btn-primary">קשר להזמנה</button>
+                <button id="close-lead-btn" class="btn btn-success">סגור פנייה</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- מודאל קישור הזמנה -->
+    <div id="link-order-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3>חיפוש הזמנה לקישור</h3>
+            <div class="form-group">
+                <input type="text" id="order-link-search" placeholder="חפש לפי שם, טלפון או אימייל">
+            </div>
+            <div id="order-search-results"></div>
+        </div>
+    </div>
+
+    <!-- מודאל עריכת מוצר -->
+    <div id="edit-product-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3>עריכת מוצר</h3>
+            <div id="edit-form-container"></div>
+        </div>
+    </div>
+
+    <!-- מודאל העברת קטגוריה -->
+    <div id="change-category-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3>העבר מוצר לקטגוריה אחרת</h3>
+            <div class="form-group">
+                <label>בחר קטגוריה חדשה:</label>
+                <select id="new-category-select"></select>
+            </div>
+            <button class="btn btn-primary" id="confirm-category-change">העבר לקטגוריה</button>
+        </div>
+    </div>
+
+    <script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyDLHENaXTeorjL87sExB1EJrH7mrEnNYOA",
+        authDomain: "timetable-titus.firebaseapp.com",
+        projectId: "timetable-titus",
+        storageBucket: "timetable-titus.appspot.com",
+        messagingSenderId: "199146911555",
+        appId: "1:199146911555:web:5d9436d716dfc6de7361f6",
+        measurementId: "G-JQ02VEC325"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const IMGBB_API_KEY = '949918f473144748f8dea05705ac165a';
+
+    async function uploadImageToImgBB(file) {
+        const formData = new FormData();
+        formData.append('image', file);
+        
+        try {
+            const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                method: 'POST',
+                body: formData
+            });
+            
+            const data = await response.json();
+            if (data.success) {
+                return data.data.url;
+            } else {
+                throw new Error('Upload failed');
+            }
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            throw error;
+        }
+    }
+
+    // התחברות
+    const loginOverlay = document.getElementById('login-overlay');
+    const adminLayout = document.getElementById('admin-layout');
+    const loginButton = document.getElementById('login-button');
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    const loginErrorMessage = document.getElementById('login-error-message');
+
+    loginButton.addEventListener('click', async () => {
+        const u = usernameInput.value.trim();
+        const p = passwordInput.value;
+
+        if (!u || !p) {
+            loginErrorMessage.textContent = 'נא להזין שם משתמש וסיסמה.';
+            loginErrorMessage.style.display = 'block';
+            return;
+        }
+
+        try {
+            const userDoc = await db.collection('users').doc(u).get();
+
+            if (userDoc.exists) {
+                const userData = userDoc.data();
+
+                if (userData.password === p) {
+                    loginOverlay.style.display = 'none';
+                    adminLayout.classList.add('active');
+                    loginErrorMessage.style.display = 'none';
+
+                    await initializeSettings();
+                    await loadCategories();
+                    await fetchOrders();
+                    await fetchContactLeads();
+                    await loadShippingSettings();
+                    await loadCoupons();
+                    await loadAnnouncements();
+                } else {
+                    loginErrorMessage.textContent = 'סיסמה שגויה.';
+                    loginErrorMessage.style.display = 'block';
+                }
+            } else {
+                loginErrorMessage.textContent = 'שם משתמש לא נמצא.';
+                loginErrorMessage.style.display = 'block';
+            }
+        } catch (error) {
+            console.error("Login error:", error);
+            loginErrorMessage.textContent = 'שגיאה בחיבור למסד הנתונים.';
+            loginErrorMessage.style.display = 'block';
+        }
+    });
+
+    // ניווט תפריט צד
+    const menuItems = document.querySelectorAll('.menu-item');
+    const contentSections = document.querySelectorAll('.content-section');
+
+    menuItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const section = item.dataset.section;
+            
+            menuItems.forEach(mi => mi.classList.remove('active'));
+            item.classList.add('active');
+            
+            contentSections.forEach(cs => cs.classList.remove('active'));
+            document.getElementById(`${section}-section`).classList.add('active');
+        });
+    });
+
+    let products = [];
+    let categories = [];
+    let settings = null;
+    let currentLeadId = null;
+    let currentProductToMove = null;
+
+    async function initializeSettings() {
+        try {
+            const settingsDoc = await db.collection('yr_settings').doc('main').get();
+            if (!settingsDoc.exists) {
+                await db.collection('yr_settings').doc('main').set({
+                    Shipping: { Method: 'fixed', Value: 30, FreeThreshold: 0 },
+                    Coupons: [],
+                    Categories: [],
+                    Announcements: []
+                });
+            }
+        } catch (error) {
+            console.error('Error initializing settings:', error);
+        }
+    }
+
+    // ניהול קטגוריות
+    async function loadCategories() {
+        try {
+            const settingsDoc = await db.collection('yr_settings').doc('main').get();
+            if (settingsDoc.exists) {
+                const data = settingsDoc.data();
+                categories = data.Categories || [];
+                
+                await displayCategoriesWithProducts();
+                updateCategorySelects();
+            }
+        } catch (error) {
+            console.error('Error loading categories:', error);
+        }
+    }
+
+    async function displayCategoriesWithProducts() {
+        const categoriesGrid = document.getElementById('categories-grid');
+        categoriesGrid.innerHTML = '';
+        
+        const productsSnapshot = await db.collection('yr_jerseys').get();
+        products = productsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        if (categories.length === 0) {
+            categoriesGrid.innerHTML = '<p>אין קטגוריות. הוסף קטגוריה חדשה למעלה.</p>';
+            return;
+        }
+        
+        for (const category of categories) {
+            const categoryProducts = products.filter(p => p.category === category);
+            
+            const categoryBox = document.createElement('div');
+            categoryBox.className = 'category-box';
+            
+            categoryBox.innerHTML = `
+                <div class="category-box-header">
+                    <h3>${category}</h3>
+                    <div class="category-actions">
+                        <button class="btn btn-primary btn-edit-category" data-category="${category}">ערוך שם</button>
+                        <button class="btn btn-danger btn-delete-category" data-category="${category}">מחק</button>
+                    </div>
+                </div>
+                <div class="products-in-category" id="products-${category}"></div>
+            `;
+            
+            categoriesGrid.appendChild(categoryBox);
+            
+            const productsContainer = document.getElementById(`products-${category}`);
+            
+            if (categoryProducts.length === 0) {
+                productsContainer.innerHTML = '<p style="color: #666;">אין מוצרים בקטגוריה זו</p>';
+            } else {
+                categoryProducts.forEach(product => {
+                    const productCard = document.createElement('div');
+                    productCard.className = 'product-mini-card';
+                    
+                    productCard.innerHTML = `
+                        <img src="${product.image}" alt="${product.name}">
+                        <h4>${product.name}</h4>
+                        <div class="product-price">${product.price ? product.price.toFixed(2) : '0.00'} ₪</div>
+                        <div class="product-mini-actions">
+                            <button class="btn btn-primary btn-change-category" data-product-id="${product.id}">העבר</button>
+                            <button class="btn btn-dark btn-edit-product" data-product-id="${product.id}">ערוך</button>
+                        </div>
+                    `;
+                    
+                    productsContainer.appendChild(productCard);
+                });
+            }
+        }
+        
+        // מאזינים לכפתורי קטגוריה
+        document.querySelectorAll('.btn-edit-category').forEach(btn => {
+            btn.addEventListener('click', () => editCategoryName(btn.dataset.category));
+        });
+        
+        document.querySelectorAll('.btn-delete-category').forEach(btn => {
+            btn.addEventListener('click', () => deleteCategory(btn.dataset.category));
+        });
+        
+        // מאזינים לכפתורי מוצר
+        document.querySelectorAll('.btn-change-category').forEach(btn => {
+            btn.addEventListener('click', () => openChangeCategoryModal(btn.dataset.productId));
+        });
+        
+        document.querySelectorAll('.btn-edit-product').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const product = products.find(p => p.id === btn.dataset.productId);
+                openEditProductModal(btn.dataset.productId, product);
+            });
+        });
+    }
+
+    async function editCategoryName(oldName) {
+        const newName = prompt('הזן שם חדש לקטגוריה:', oldName);
+        if (newName && newName.trim() && newName !== oldName) {
+            const trimmedName = newName.trim();
+            const index = categories.indexOf(oldName);
+            categories[index] = trimmedName;
+            
+            try {
+                await db.collection('yr_settings').doc('main').update({ Categories: categories });
+                
+                const productsSnapshot = await db.collection('yr_jerseys').where('category', '==', oldName).get();
+                const batch = db.batch();
+                productsSnapshot.forEach(doc => {
+                    batch.update(doc.ref, { category: trimmedName });
+                });
+                await batch.commit();
+                
+                alert('קטגוריה עודכנה בהצלחה!');
+                await loadCategories();
+            } catch (error) {
+                console.error('Error editing category:', error);
+                alert('שגיאה בעדכון קטגוריה');
+            }
+        }
+    }
+
+    async function deleteCategory(categoryName) {
+        const productsInCategory = products.filter(p => p.category === categoryName);
+        
+        if (productsInCategory.length > 0) {
+            const confirmMsg = `קטגוריה זו מכילה ${productsInCategory.length} מוצרים. מחיקת הקטגוריה תמחק גם את כל המוצרים שבה. האם אתה בטוח?`;
+            if (!confirm(confirmMsg)) return;
+        } else {
+            if (!confirm('האם אתה בטוח שברצונך למחוק קטגוריה זו?')) return;
+        }
+        
+        try {
+            const index = categories.indexOf(categoryName);
+            categories.splice(index, 1);
+            
+            await db.collection('yr_settings').doc('main').update({ Categories: categories });
+            
+            // מחיקת כל המוצרים בקטגוריה
+            const productsSnapshot = await db.collection('yr_jerseys').where('category', '==', categoryName).get();
+            const batch = db.batch();
+            productsSnapshot.forEach(doc => {
+                batch.delete(doc.ref);
+            });
+            await batch.commit();
+            
+            alert('קטגוריה ומוצריה נמחקו בהצלחה!');
+            await loadCategories();
+            await loadCoupons();
+        } catch (error) {
+            console.error('Error deleting category:', error);
+            alert('שגיאה במחיקת קטגוריה');
+        }
+    }
+
+    function updateCategorySelects() {
+        const productCategorySelect = document.getElementById('product-category');
+        const newCategorySelect = document.getElementById('new-category-select');
+        
+        productCategorySelect.innerHTML = '<option value="">בחר קטגוריה</option>';
+        newCategorySelect.innerHTML = '<option value="">בחר קטגוריה</option>';
+        
+        categories.forEach(cat => {
+            const option1 = document.createElement('option');
+            option1.value = cat;
+            option1.textContent = cat;
+            productCategorySelect.appendChild(option1);
+            
+            const option2 = document.createElement('option');
+            option2.value = cat;
+            option2.textContent = cat;
+            newCategorySelect.appendChild(option2);
+        });
+        
+        const couponProductSelect = document.getElementById('coupon-product');
+        couponProductSelect.innerHTML = '<option value="">בחר מוצר</option>';
+        products.forEach(product => {
+            const option = document.createElement('option');
+            option.value = product.id;
+            option.textContent = product.name;
+            couponProductSelect.appendChild(option);
+        });
+    }
+
+    document.getElementById('add-category-btn').addEventListener('click', async () => {
+        const categoryName = document.getElementById('category-name').value.trim();
+        
+        if (!categoryName) {
+            alert('אנא הזן שם קטגוריה');
+            return;
+        }
+        
+        if (categories.includes(categoryName)) {
+            alert('קטגוריה זו כבר קיימת');
+            return;
+        }
+        
+        try {
+            categories.push(categoryName);
+            await db.collection('yr_settings').doc('main').update({ Categories: categories });
+            
+            alert('קטגוריה נוספה בהצלחה!');
+            document.getElementById('category-name').value = '';
+            await loadCategories();
+        } catch (error) {
+            console.error('Error adding category:', error);
+            alert('שגיאה בהוספת קטגוריה');
+        }
+    });
+
+    // מודאל העברת קטגוריה
+    const changeCategoryModal = document.getElementById('change-category-modal');
+    
+    function openChangeCategoryModal(productId) {
+        currentProductToMove = productId;
+        changeCategoryModal.classList.add('active');
+    }
+
+    document.getElementById('confirm-category-change').addEventListener('click', async () => {
+        const newCategory = document.getElementById('new-category-select').value;
+        
+        if (!newCategory) {
+            alert('אנא בחר קטגוריה');
+            return;
+        }
+        
+        try {
+            await db.collection('yr_jerseys').doc(currentProductToMove).update({
+                category: newCategory
+            });
+            
+            alert('המוצר הועבר בהצלחה!');
+            changeCategoryModal.classList.remove('active');
+            await loadCategories();
+        } catch (error) {
+            console.error('Error changing category:', error);
+            alert('שגיאה בהעברת מוצר');
+        }
+    });
+
+    // העלאת תמונה למוצר חדש
+    const productImageUpload = document.getElementById('product-image-upload');
+    const productImageFile = document.getElementById('product-image-file');
+    const productImagePreview = document.getElementById('product-image-preview');
+    const productUploadStatus = document.getElementById('product-upload-status');
+    const productImageUrl = document.getElementById('product-image-url');
+
+    productImageUpload.addEventListener('click', () => {
+        productImageFile.click();
+    });
+
+    productImageFile.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        productImageUpload.classList.add('uploading');
+        productUploadStatus.textContent = 'מעלה תמונה...';
+        
+        try {
+            const url = await uploadImageToImgBB(file);
+            productImageUrl.value = url;
+            productImagePreview.src = url;
+            productImagePreview.style.display = 'block';
+            productUploadStatus.textContent = 'תמונה הועלתה בהצלחה!';
+            productUploadStatus.style.color = '#27ae60';
+        } catch (error) {
+            productUploadStatus.textContent = 'שגיאה בהעלאת תמונה';
+            productUploadStatus.style.color = '#e74c3c';
+        } finally {
+            productImageUpload.classList.remove('uploading');
+        }
+    });
+
+    // שדות מותאמים אישית
+    const customFieldsContainer = document.getElementById('custom-fields-container');
+    const addCustomFieldBtn = document.getElementById('add-custom-field');
+    let customFieldsCount = 0;
+    
+    function addOptionItem(optionsList, optionData = null) {
+        const optionItem = document.createElement('div');
+        optionItem.className = 'option-item';
+        
+        optionItem.innerHTML = `
+            <input type="text" placeholder="ערך האפשרות" class="option-value" value="${optionData?.value || ''}">
+            <input type="number" placeholder="תוספת מחיר" class="option-price" value="${optionData?.extraPrice || ''}" step="0.01" min="0" style="width: 120px;">
+            <div class="image-upload-mini">${optionData?.image ? 'תמונה הועלתה' : 'העלה תמונה'}</div>
+            <input type="file" accept="image/*" style="display: none;" class="option-image-file">
+            <input type="hidden" class="option-image-url" value="${optionData?.image || ''}">
+            <button type="button" class="btn btn-danger" style="padding: 6px 12px; font-size: 0.85em;">X</button>
+        `;
+        
+        const imageUploadBtn = optionItem.querySelector('.image-upload-mini');
+        const imageInput = optionItem.querySelector('.option-image-file');
+        const imageUrlInput = optionItem.querySelector('.option-image-url');
+        
+        if (optionData?.image) {
+            imageUploadBtn.style.color = '#27ae60';
+        }
+        
+        imageUploadBtn.addEventListener('click', () => imageInput.click());
+        
+        imageInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            imageUploadBtn.textContent = 'מעלה...';
+            
+            try {
+                const url = await uploadImageToImgBB(file);
+                imageUrlInput.value = url;
+                imageUploadBtn.textContent = 'תמונה הועלתה';
+                imageUploadBtn.style.color = '#27ae60';
+            } catch (error) {
+                imageUploadBtn.textContent = 'שגיאה';
+                imageUploadBtn.style.color = '#e74c3c';
+            }
+        });
+        
+        optionItem.querySelector('button').addEventListener('click', () => {
+            optionItem.remove();
+        });
+        
+        optionsList.appendChild(optionItem);
+    }
+        
+    function createCustomFieldUI(fieldData = null, container) {
+        const fieldContainer = document.createElement('div');
+        fieldContainer.className = 'custom-field-container';
+        
+        const isSelectType = fieldData?.type === 'select' || !fieldData;
+        
+        fieldContainer.innerHTML = `
+            <div class="custom-field-header">
+                <input type="text" placeholder="שם השדה" class="field-name" value="${fieldData?.name || ''}" style="padding: 8px; border: 2px solid #ddd; border-radius: 4px; width: 200px;">
+                <select class="field-type" style="padding: 8px; border: 2px solid #ddd; border-radius: 4px;">
+                    <option value="select" ${isSelectType ? 'selected' : ''}>בחירה מרשימה</option>
+                    <option value="text" ${fieldData?.type === 'text' ? 'selected' : ''}>כתיבה חופשית</option>
+                </select>
+                <label style="margin-left: 10px; white-space: nowrap;">
+                    <input type="checkbox" class="field-required" ${fieldData?.required ? 'checked' : ''}> שדה חובה
+                </label>
+                <input type="number" placeholder="תוספת מחיר" class="field-extra-price" value="${fieldData?.extraPrice || ''}" step="0.01" min="0" style="width: 140px; padding: 8px; border: 2px solid #ddd; border-radius: 4px;">
+                <button type="button" class="btn btn-secondary" style="padding: 8px 14px;">הסר</button>
+            </div>
+            <div class="custom-field-options" style="display: ${isSelectType ? 'block' : 'none'};">
+                <button type="button" class="btn btn-success add-option-btn" style="padding: 8px 14px; margin-top: 10px;">הוסף אפשרות</button>
+                <div class="options-list"></div>
+            </div>
+        `;
+        
+        const typeSelect = fieldContainer.querySelector('.field-type');
+        const optionsDiv = fieldContainer.querySelector('.custom-field-options');
+        
+        typeSelect.addEventListener('change', (e) => {
+            optionsDiv.style.display = e.target.value === 'select' ? 'block' : 'none';
+        });
+        
+        const addOptionBtn = fieldContainer.querySelector('.add-option-btn');
+        const optionsList = fieldContainer.querySelector('.options-list');
+        
+        addOptionBtn.addEventListener('click', () => {
+            addOptionItem(optionsList, null);
+        });
+        
+        if (fieldData?.options && Array.isArray(fieldData.options)) {
+            fieldData.options.forEach(opt => {
+                addOptionItem(optionsList, opt);
+            });
+        }
+        
+        fieldContainer.querySelector('button[type="button"]').addEventListener('click', () => {
+            fieldContainer.remove();
+        });
+        
+        container.appendChild(fieldContainer);
+    }
+    
+    addCustomFieldBtn.addEventListener('click', () => {
+        createCustomFieldUI(null, customFieldsContainer);
+    });
+    
+    function extractCustomFields(container) {
+        const customFields = [];
+        const fieldContainers = container.querySelectorAll('.custom-field-container');
+        
+        fieldContainers.forEach(fieldContainer => {
+            const fieldName = fieldContainer.querySelector('.field-name').value.trim();
+            const fieldType = fieldContainer.querySelector('.field-type').value;
+            const fieldRequired = fieldContainer.querySelector('.field-required').checked;
+            const fieldExtraPrice = parseFloat(fieldContainer.querySelector('.field-extra-price').value) || 0;
+            
+            if (!fieldName) return;
+            
+            const field = {
+                name: fieldName,
+                type: fieldType,
+                required: fieldRequired,
+                extraPrice: fieldExtraPrice > 0 ? fieldExtraPrice : null
+            };
+            
+            if (fieldType === 'select') {
+                field.options = [];
+                const optionItems = fieldContainer.querySelectorAll('.option-item');
+                optionItems.forEach(optionItem => {
+                    const value = optionItem.querySelector('.option-value').value.trim();
+                    const extraPrice = parseFloat(optionItem.querySelector('.option-price').value) || 0;
+                    const imageUrl = optionItem.querySelector('.option-image-url').value.trim();
+                    if (value) {
+                        field.options.push({
+                            value: value,
+                            extraPrice: extraPrice > 0 ? extraPrice : null,
+                            image: imageUrl || null
+                        });
+                    }
+                });
+            }
+            
+            customFields.push(field);
+        });
+        return customFields;
+    }
+    
+    // הוספת מוצר חדש
+    document.getElementById('add-product-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('product-name').value.trim();
+        const description = document.getElementById('product-description').value.trim();
+        const price = parseFloat(document.getElementById('product-price').value);
+        const category = document.getElementById('product-category').value;
+        const image = document.getElementById('product-image-url').value.trim();
+        
+        if (!name || !description || isNaN(price) || price < 0 || !image || !category) {
+            alert('אנא מלא את כל השדות בצורה תקינה.'); 
+            return;
+        }
+        
+        const customFields = extractCustomFields(customFieldsContainer);
+        
+        try {
+            await db.collection('yr_jerseys').add({
+                name, 
+                description, 
+                price, 
+                category,
+                image,
+                customFields: customFields.length > 0 ? customFields : null,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            alert('המוצר נוסף בהצלחה!');
+            document.getElementById('add-product-form').reset();
+            customFieldsContainer.innerHTML = '';
+            productImagePreview.style.display = 'none';
+            productUploadStatus.textContent = '';
+            await loadCategories();
+            await loadCoupons();
+        } catch (error) {
+            alert('שגיאה בהוספת המוצר. נסה שוב.');
+            console.error(error);
+        }
+    });
+
+    // עריכת מוצר
+    const editProductModal = document.getElementById('edit-product-modal');
+    const editFormContainer = document.getElementById('edit-form-container');
+    
+    function openEditProductModal(productId, product) {
+        editFormContainer.innerHTML = `
+            <form id="edit-product-form">
+                <div class="form-group">
+                    <label for="edit-product-name">שם המוצר:</label>
+                    <input type="text" id="edit-product-name" value="${product.name}" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-product-description">תיאור המוצר:</label>
+                    <textarea id="edit-product-description" required>${product.description}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="edit-product-price">מחיר:</label>
+                    <input type="number" id="edit-product-price" step="0.01" min="0" value="${product.price}" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-product-category">קטגוריה:</label>
+                    <select id="edit-product-category" required>
+                        <option value="">בחר קטגוריה</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>תמונת המוצר:</label>
+                    <div class="image-upload-container" id="edit-product-image-upload">
+                        <input type="file" id="edit-product-image-file" accept="image/*">
+                        <div class="upload-content">
+                            <p>לחץ להעלאת תמונה חדשה</p>
+                            <img src="${product.image}" class="image-preview" style="display: block; max-width: 150px;">
+                            <div class="upload-status" id="edit-product-upload-status"></div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="edit-product-image-url" value="${product.image}">
+                </div>
+                <div class="form-group">
+                    <label>שדות מותאמים אישית:</label>
+                    <button type="button" class="btn btn-success" id="edit-add-custom-field">הוסף שדה חדש</button>
+                    <div id="edit-custom-fields-container"></div>
+                </div>
+                <button type="submit" class="btn btn-dark">שמור שינויים</button>
+                <button type="button" id="delete-product-btn" class="btn btn-danger" style="width: 100%; margin-top: 10px;">מחק מוצר</button>
+            </form>
+        `;
+        
+        const editCategorySelect = document.getElementById('edit-product-category');
+        editCategorySelect.innerHTML = '<option value="">בחר קטגוריה</option>';
+        categories.forEach(cat => {
+            const option = document.createElement('option');
+            option.value = cat;
+            option.textContent = cat;
+            if (cat === product.category) option.selected = true;
+            editCategorySelect.appendChild(option);
+        });
+        
+        const editImageUpload = document.getElementById('edit-product-image-upload');
+        const editImageFile = document.getElementById('edit-product-image-file');
+        const editImageUrl = document.getElementById('edit-product-image-url');
+        const editUploadStatus = document.getElementById('edit-product-upload-status');
+        
+        editImageUpload.addEventListener('click', () => editImageFile.click());
+        
+        editImageFile.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            editImageUpload.classList.add('uploading');
+            editUploadStatus.textContent = 'מעלה תמונה...';
+            
+            try {
+                const url = await uploadImageToImgBB(file);
+                editImageUrl.value = url;
+                editImageUpload.querySelector('.image-preview').src = url;
+                editUploadStatus.textContent = 'תמונה הועלתה בהצלחה!';
+                editUploadStatus.style.color = '#27ae60';
+            } catch (error) {
+                editUploadStatus.textContent = 'שגיאה בהעלאת תמונה';
+                editUploadStatus.style.color = '#e74c3c';
+            } finally {
+                editImageUpload.classList.remove('uploading');
+            }
+        });
+        
+        const editCustomFieldsContainer = document.getElementById('edit-custom-fields-container');
+        
+        if (product.customFields && product.customFields.length > 0) {
+            product.customFields.forEach(field => {
+                createCustomFieldUI(field, editCustomFieldsContainer);
+            });
+        }
+        
+        document.getElementById('edit-add-custom-field').addEventListener('click', () => {
+            createCustomFieldUI(null, editCustomFieldsContainer);
+        });
+        
+        document.getElementById('edit-product-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('edit-product-name').value.trim();
+            const description = document.getElementById('edit-product-description').value.trim();
+            const price = parseFloat(document.getElementById('edit-product-price').value);
+            const category = document.getElementById('edit-product-category').value;
+            const image = document.getElementById('edit-product-image-url').value.trim();
+            
+            if (!name || !description || isNaN(price) || price < 0 || !image || !category) {
+                alert('אנא מלא את כל השדות בצורה תקינה.'); 
+                return;
+            }
+            
+            const customFields = extractCustomFields(editCustomFieldsContainer);
+            
+            try {
+                await db.collection('yr_jerseys').doc(productId).update({
+                    name, 
+                    description, 
+                    price, 
+                    category,
+                    image,
+                    customFields: customFields.length > 0 ? customFields : null
+                });
+                alert('המוצר עודכן בהצלחה!');
+                editProductModal.classList.remove('active');
+                await loadCategories();
+                await loadCoupons();
+            } catch (error) {
+                alert('שגיאה בעדכון המוצר. נסה שוב.');
+                console.error(error);
+            }
+        });
+        
+        document.getElementById('delete-product-btn').addEventListener('click', async () => {
+            if (confirm('האם אתה בטוח שברצונך למחוק מוצר זה?')) {
+                try {
+                    await db.collection('yr_jerseys').doc(productId).delete();
+                    alert('המוצר נמחק בהצלחה!');
+                    editProductModal.classList.remove('active');
+                    await loadCategories();
+                    await loadCoupons();
+                } catch (error) {
+                    alert('שגיאה במחיקת המוצר. נסה שוב.');
+                    console.error(error);
+                }
+            }
+        });
+        
+        editProductModal.classList.add('active');
+    }
+
+    // הזמנות
+    const orderSearchInput = document.getElementById('order-search');
+    const searchBtn = document.getElementById('search-btn');
+    const clearSearchBtn = document.getElementById('clear-search-btn');
+    let currentSearchTerm = '';
+
+    searchBtn.addEventListener('click', () => {
+        currentSearchTerm = orderSearchInput.value.trim().toLowerCase();
+        fetchOrders(currentSearchTerm);
+    });
+
+    clearSearchBtn.addEventListener('click', () => {
+        orderSearchInput.value = '';
+        currentSearchTerm = '';
+        fetchOrders();
+    });
+
+    orderSearchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            currentSearchTerm = orderSearchInput.value.trim().toLowerCase();
+            fetchOrders(currentSearchTerm);
+        }
+    });
+
+    async function fetchOrders(searchTerm = '') {
+        const ordersList = document.getElementById('orders-list');
+        ordersList.innerHTML = '<p>טוען הזמנות...</p>';
+        
+        try {
+            const ordersSnapshot = await db.collection('yr_orders').orderBy('orderDate', 'desc').get();
+            
+            let orders = ordersSnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+
+            if (searchTerm) {
+                orders = orders.filter(order => {
+                    const name = (order.customerName || '').toLowerCase();
+                    const email = (order.customerEmail || '').toLowerCase();
+                    const phone = (order.customerPhone || '').toLowerCase();
+                    const address = (order.customerAddress || '').toLowerCase();
+                    return name.includes(searchTerm) || email.includes(searchTerm) || 
+                           phone.includes(searchTerm) || address.includes(searchTerm);
+                });
+            } else {
+                orders = orders.filter(order => !order.completed);
+            }
+
+            if (orders.length === 0) {
+                ordersList.innerHTML = searchTerm ? 
+                    '<p>לא נמצאו הזמנות התואמות לחיפוש.</p>' : 
+                    '<p>אין הזמנות פעילות.</p>';
+                return;
+            }
+
+            ordersList.innerHTML = '';
+            orders.forEach(order => {
+                const orderDate = order.orderDate ? new Date(order.orderDate.toDate()).toLocaleString('he-IL') : 'לא ידוע';
+                const orderCard = document.createElement('div');
+                orderCard.classList.add('order-card');
+                orderCard.innerHTML = `
+                    <div>
+                        <strong style="font-size: 1.1em;">הזמנה #${order.id.substring(0, 8)}...</strong> 
+                        ${order.completed ? '<span style="color: #27ae60; font-weight: bold;">(הושלם)</span>' : ''}
+                        <p style="margin-top: 8px;"><strong>לקוח:</strong> ${order.customerName || 'אנונימי'}</p>
+                        <p><strong>סה"כ:</strong> ${order.totalAmount ? order.totalAmount.toFixed(2) : '0.00'} ₪</p>
+                        <p><strong>תאריך:</strong> ${orderDate}</p>
+                    </div>
+                    <div class="order-status-section" onclick="event.stopPropagation();">
+                        <label style="font-weight: bold; display: block; margin-bottom: 8px;">מצב ההזמנה (רק למנהל):</label>
+                        <textarea class="order-status-text" data-order-id="${order.id}">${order.adminStatus || ''}</textarea>
+                        <button class="btn btn-success complete-order-btn" data-order-id="${order.id}">סמן כהושלם</button>
+                    </div>
+                `;
+                
+                orderCard.addEventListener('click', (e) => {
+                    if (!e.target.classList.contains('order-status-text') && 
+                        !e.target.classList.contains('complete-order-btn')) {
+                        showOrderDetails(order);
+                    }
+                });
+
+                const statusTextarea = orderCard.querySelector('.order-status-text');
+                statusTextarea.addEventListener('blur', async () => {
+                    try {
+                        await db.collection('yr_orders').doc(order.id).update({
+                            adminStatus: statusTextarea.value
+                        });
+                    } catch (error) {
+                        console.error('Error updating status:', error);
+                    }
+                });
+
+                const completeBtn = orderCard.querySelector('.complete-order-btn');
+                completeBtn.addEventListener('click', async () => {
+                    if (confirm('האם לסמן הזמנה זו כהושלמה? היא תוסר מהרשימה הראשית.')) {
+                        try {
+                            await db.collection('yr_orders').doc(order.id).update({
+                                completed: true,
+                                completedAt: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                            fetchOrders(searchTerm);
+                        } catch (error) {
+                            alert('שגיאה בעדכון ההזמנה');
+                            console.error(error);
+                        }
+                    }
+                });
+
+                ordersList.appendChild(orderCard);
+            });
+        } catch (error) {
+            ordersList.innerHTML = '<p style="color: red;">שגיאה בטעינת הזמנות.</p>';
+            console.error(error);
+        }
+    }
+
+    const orderDetailsModal = document.getElementById('order-details-modal');
+    
+    function showOrderDetails(order) {
+        document.getElementById('modal-customer-name').textContent = order.customerName || 'לא ידוע';
+        document.getElementById('modal-customer-email').textContent = order.customerEmail || 'לא ידוע';
+        document.getElementById('modal-customer-phone').textContent = order.customerPhone || 'לא ידוע';
+        document.getElementById('modal-customer-address').textContent = order.customerAddress || 'לא ידוע';
+        document.getElementById('modal-subtotal').textContent = order.subtotal ? order.subtotal.toFixed(2) : '0.00';
+        document.getElementById('modal-shipping').textContent = order.shippingCost ? order.shippingCost.toFixed(2) : '0.00';
+        document.getElementById('modal-coupon').textContent = order.appliedCoupon || 'אין';
+        document.getElementById('modal-total-amount').textContent = order.totalAmount ? order.totalAmount.toFixed(2) : '0.00';
+        document.getElementById('modal-order-date').textContent = order.orderDate ? new Date(order.orderDate.toDate()).toLocaleString('he-IL') : 'לא ידוע';
+        
+        const modalOrderItems = document.getElementById('modal-order-items');
+        modalOrderItems.innerHTML = '';
+        if (order.items && order.items.length > 0) {
+            order.items.forEach(item => {
+                const listItem = document.createElement('li');
+                let optionsInfo = '';
+                if (item.selectedOptions) {
+                    Object.keys(item.selectedOptions).forEach(key => {
+                        if (item.selectedOptions[key]) {
+                            optionsInfo += `<br>${key}: ${item.selectedOptions[key]}`;
+                        }
+                    });
+                }
+                
+                const freebieTag = item.isFreebie ? ' <strong style="color: #27ae60;">(מתנה)</strong>' : '';
+                
+                listItem.innerHTML = `
+                    <strong>${item.productName}</strong>${freebieTag} (כמות: ${item.quantity})
+                    ${optionsInfo}
+                `;
+                modalOrderItems.appendChild(listItem);
+            });
+        } else {
+            modalOrderItems.innerHTML = '<li>אין פרטי פריטים עבור הזמנה זו.</li>';
+        }
+        orderDetailsModal.classList.add('active');
+    }
+
+    // פניות לקוחות
+    const leadSearchInput = document.getElementById('lead-search');
+    const searchLeadBtn = document.getElementById('search-lead-btn');
+    const clearLeadSearchBtn = document.getElementById('clear-lead-search-btn');
+    let currentLeadSearchTerm = '';
+
+    searchLeadBtn.addEventListener('click', () => {
+        currentLeadSearchTerm = leadSearchInput.value.trim().toLowerCase();
+        fetchContactLeads(currentLeadSearchTerm);
+    });
+
+    clearLeadSearchBtn.addEventListener('click', () => {
+        leadSearchInput.value = '';
+        currentLeadSearchTerm = '';
+        fetchContactLeads();
+    });
+
+    async function fetchContactLeads(searchTerm = '') {
+        const leadsList = document.getElementById('contact-leads-list');
+        leadsList.innerHTML = '<p>טוען פניות...</p>';
+        
+        try {
+            const leadsSnapshot = await db.collection('yr_contact_leads').orderBy('createdAt', 'desc').get();
+            
+            let leads = leadsSnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+
+            if (searchTerm) {
+                leads = leads.filter(lead => {
+                    const name = (lead.name || '').toLowerCase();
+                    const email = (lead.email || '').toLowerCase();
+                    const phone = (lead.phone || '').toLowerCase();
+                    return name.includes(searchTerm) || email.includes(searchTerm) || phone.includes(searchTerm);
+                });
+            } else {
+                leads = leads.filter(lead => lead.status !== 'closed');
+            }
+
+            if (leads.length === 0) {
+                leadsList.innerHTML = searchTerm ? 
+                    '<p>לא נמצאו פניות התואמות לחיפוש.</p>' : 
+                    '<p>אין פניות פעילות.</p>';
+                return;
+            }
+
+            leadsList.innerHTML = '';
+            leads.forEach(lead => {
+                const leadDate = lead.createdAt ? new Date(lead.createdAt.toDate()).toLocaleString('he-IL') : 'לא ידוע';
+                const leadItem = document.createElement('div');
+                leadItem.className = 'contact-lead-item';
+                if (lead.status === 'closed') leadItem.style.opacity = '0.6';
+                
+                leadItem.innerHTML = `
+                    <div>
+                        <strong style="font-size: 1.1em;">${lead.name}</strong> 
+                        ${lead.status === 'closed' ? '<span style="color: #27ae60; font-weight: bold;">(סגור)</span>' : ''}
+                        <p style="margin-top: 8px;"><strong>טלפון:</strong> ${lead.phone} | <strong>אימייל:</strong> ${lead.email}</p>
+                        <p style="color: #666; font-size: 0.9em;">תאריך: ${leadDate}</p>
+                        ${lead.linkedOrderId ? '<p style="color: #27ae60; font-weight: bold;">✓ מקושר להזמנה</p>' : ''}
+                    </div>
+                `;
+                
+                leadItem.addEventListener('click', () => showLeadDetails(lead));
+                leadsList.appendChild(leadItem);
+            });
+        } catch (error) {
+            leadsList.innerHTML = '<p style="color: red;">שגיאה בטעינת פניות.</p>';
+            console.error(error);
+        }
+    }
+
+    const leadDetailsModal = document.getElementById('lead-details-modal');
+    const linkOrderModal = document.getElementById('link-order-modal');
+
+    async function showLeadDetails(lead) {
+        currentLeadId = lead.id;
+        
+        document.getElementById('modal-lead-name').textContent = lead.name || 'לא ידוע';
+        document.getElementById('modal-lead-phone').textContent = lead.phone || 'לא ידוע';
+        document.getElementById('modal-lead-email').textContent = lead.email || 'לא ידוע';
+        document.getElementById('modal-lead-message').textContent = lead.message || '';
+        document.getElementById('modal-lead-date').textContent = lead.createdAt ? 
+            new Date(lead.createdAt.toDate()).toLocaleString('he-IL') : 'לא ידוע';
+        
+        const orderDiv = document.getElementById('modal-lead-order');
+        orderDiv.innerHTML = '';
+        
+        if (lead.linkedOrderId) {
+            try {
+                const orderDoc = await db.collection('yr_orders').doc(lead.linkedOrderId).get();
+                if (orderDoc.exists) {
+                    const order = orderDoc.data();
+                    orderDiv.innerHTML = `
+                        <h4>הזמנה מקושרת:</h4>
+                        <p><strong>מספר הזמנה:</strong> ${lead.linkedOrderId.substring(0, 8)}...</p>
+                        <p><strong>סה"כ:</strong> ${order.totalAmount?.toFixed(2) || '0.00'} ₪</p>
+                        <h5>פריטים:</h5>
+                        <ul>
+                            ${order.items?.map(item => `
+                                <li>${item.productName} (כמות: ${item.quantity})</li>
+                            `).join('') || ''}
+                        </ul>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading linked order:', error);
+            }
+        }
+        
+        leadDetailsModal.classList.add('active');
+    }
+
+    document.getElementById('link-order-btn').addEventListener('click', () => {
+        linkOrderModal.classList.add('active');
+        document.getElementById('order-search-results').innerHTML = '';
+    });
+
+    document.getElementById('order-link-search').addEventListener('input', async (e) => {
+        const searchTerm = e.target.value.trim().toLowerCase();
+        if (searchTerm.length < 2) {
+            document.getElementById('order-search-results').innerHTML = '';
+            return;
+        }
+        
+        try {
+            const ordersSnapshot = await db.collection('yr_orders').get();
+            const orders = ordersSnapshot.docs
+                .map(doc => ({ id: doc.id, ...doc.data() }))
+                .filter(order => {
+                    const name = (order.customerName || '').toLowerCase();
+                    const email = (order.customerEmail || '').toLowerCase();
+                    const phone = (order.customerPhone || '').toLowerCase();
+                    return name.includes(searchTerm) || email.includes(searchTerm) || phone.includes(searchTerm);
+                });
+            
+            const resultsDiv = document.getElementById('order-search-results');
+            resultsDiv.innerHTML = '';
+            
+            orders.forEach(order => {
+                const orderItem = document.createElement('div');
+                orderItem.className = 'list-item';
+                orderItem.style.cursor = 'pointer';
+                orderItem.innerHTML = `
+                    <div>
+                        <strong>${order.customerName}</strong><br>
+                        הזמנה: ${order.id.substring(0, 8)}... | סה"כ: ${order.totalAmount?.toFixed(2) || '0.00'} ₪
+                    </div>
+                `;
+                orderItem.addEventListener('click', () => linkLeadToOrder(order.id));
+                resultsDiv.appendChild(orderItem);
+            });
+        } catch (error) {
+            console.error('Error searching orders:', error);
+        }
+    });
+
+    async function linkLeadToOrder(orderId) {
+        try {
+            await db.collection('yr_contact_leads').doc(currentLeadId).update({
+                linkedOrderId: orderId
+            });
+            alert('פנייה קושרה להזמנה בהצלחה!');
+            linkOrderModal.classList.remove('active');
+            leadDetailsModal.classList.remove('active');
+            await fetchContactLeads(currentLeadSearchTerm);
+        } catch (error) {
+            console.error('Error linking order:', error);
+            alert('שגיאה בקישור הזמנה');
+        }
+    }
+
+    document.getElementById('close-lead-btn').addEventListener('click', async () => {
+        if (!confirm('האם לסגור פנייה זו?')) return;
+        
+        try {
+            await db.collection('yr_contact_leads').doc(currentLeadId).update({
+                status: 'closed',
+                closedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            alert('פנייה נסגרה בהצלחה!');
+            leadDetailsModal.classList.remove('active');
+            await fetchContactLeads(currentLeadSearchTerm);
+        } catch (error) {
+            console.error('Error closing lead:', error);
+            alert('שגיאה בסגירת פנייה');
+        }
+    });
+
+    // הגדרות - קופונים
+    document.getElementById('coupon-type').addEventListener('change', (e) => {
+        const valueGroup = document.getElementById('coupon-value-group');
+        const productGroup = document.getElementById('coupon-product-group');
+        
+        if (e.target.value === 'free_product') {
+            valueGroup.style.display = 'none';
+            productGroup.style.display = 'block';
+        } else if (e.target.value === 'free_shipping') {
+            valueGroup.style.display = 'none';
+            productGroup.style.display = 'none';
+        } else {
+            valueGroup.style.display = 'block';
+            productGroup.style.display = 'none';
+        }
+    });
+
+    async function loadCoupons() {
+        try {
+            const settingsDoc = await db.collection('yr_settings').doc('main').get();
+            if (settingsDoc.exists) {
+                const data = settingsDoc.data();
+                const coupons = data.Coupons || [];
+                
+                const couponsList = document.getElementById('coupons-list');
+                couponsList.innerHTML = '';
+                
+                if (coupons.length === 0) {
+                    couponsList.innerHTML = '<p style="color: #666;">אין קופונים.</p>';
+                    return;
+                }
+                
+                coupons.forEach((coupon, index) => {
+                    const couponItem = document.createElement('div');
+                    couponItem.className = 'list-item';
+                    
+                    let typeText = '';
+                    switch(coupon.Type) {
+                        case 'free_product': typeText = 'מוצר חינם'; break;
+                        case 'fixed_discount': typeText = `הנחה ${coupon.Value}₪`; break;
+                        case 'percentage_discount': typeText = `הנחה ${coupon.Value}%`; break;
+                        case 'free_shipping': typeText = 'משלוח חינם'; break;
+                    }
+                    
+                    const expiryText = coupon.ExpiryDate ? ` | תוקף עד: ${coupon.ExpiryDate}` : '';
+                    
+                    couponItem.innerHTML = `
+                        <div>
+                            <strong>${coupon.Code}</strong> - ${typeText}${expiryText}
+                        </div>
+                        <button class="btn btn-danger" onclick="deleteCoupon(${index})">מחק</button>
+                    `;
+                    couponsList.appendChild(couponItem);
+                });
+            }
+        } catch (error) {
+            console.error('Error loading coupons:', error);
+        }
+    }
+
+    document.getElementById('add-coupon-btn').addEventListener('click', async () => {
+        const code = document.getElementById('coupon-code').value.trim();
+        const type = document.getElementById('coupon-type').value;
+        const value = parseFloat(document.getElementById('coupon-value').value) || 0;
+        const productId = document.getElementById('coupon-product').value;
+        const expiry = document.getElementById('coupon-expiry').value;
+
+        if (!code) {
+            alert('אנא הזן קוד קופון');
+            return;
+        }
+
+        const newCoupon = {
+            Code: code,
+            Type: type,
+            Value: type === 'free_shipping' ? 0 : value,
+            ProductId: type === 'free_product' ? productId : null,
+            ExpiryDate: expiry || null
+        };
+
+        try {
+            const settingsDoc = await db.collection('yr_settings').doc('main').get();
+            const coupons = settingsDoc.exists ? (settingsDoc.data().Coupons || []) : [];
+            coupons.push(newCoupon);
+            
+            await db.collection('yr_settings').doc('main').update({ Coupons: coupons });
+            
+            alert('קופון נוסף בהצלחה!');
+            document.getElementById('coupon-code').value = '';
+            document.getElementById('coupon-value').value = '';
+            document.getElementById('coupon-expiry').value = '';
+            await loadCoupons();
+        } catch (error) {
+            console.error('Error adding coupon:', error);
+            alert('שגיאה בהוספת קופון');
+        }
+    });
+
+    window.deleteCoupon = async function(index) {
+        if (!confirm('האם למחוק קופון זה?')) return;
+        
+        try {
+            const settingsDoc = await db.collection('yr_settings').doc('main').get();
+            const coupons = settingsDoc.data().Coupons || [];
+            coupons.splice(index, 1);
+            
+            await db.collection('yr_settings').doc('main').update({ Coupons: coupons });
+            alert('קופון נמחק בהצלחה!');
+            await loadCoupons();
+        } catch (error) {
+            console.error('Error deleting coupon:', error);
+            alert('שגיאה במחיקת קופון');
+        }
+    };
+
+    // הגדרות - הודעות
+    let announcements = [];
+
+    async function loadAnnouncements() {
+        try {
+            const settingsDoc = await db.collection('yr_settings').doc('main').get();
+            if (settingsDoc.exists) {
+                const data = settingsDoc.data();
+                announcements = data.Announcements || [];
+                
+                const announcementsList = document.getElementById('announcements-list');
+                announcementsList.innerHTML = '';
+                
+                if (announcements.length === 0) {
+                    announcementsList.innerHTML = '<p style="color: #666;">אין הודעות.</p>';
+                    return;
+                }
+                
+                announcements.forEach((announcement, index) => {
+                    const announcementItem = document.createElement('div');
+                    announcementItem.className = 'list-item';
+                    
+                    announcementItem.innerHTML = `
+                        <div>
+                            <strong>הודעה ${index + 1}:</strong> ${announcement}
+                        </div>
+                        <div class="list-item-actions">
+                            <button class="btn btn-primary" onclick="editAnnouncement(${index})">ערוך</button>
+                            <button class="btn btn-danger" onclick="deleteAnnouncement(${index})">מחק</button>
+                        </div>
+                    `;
+                    announcementsList.appendChild(announcementItem);
+                });
+            }
+        } catch (error) {
+            console.error('Error loading announcements:', error);
+        }
+    }
+
+    document.getElementById('add-announcement-btn').addEventListener('click', async () => {
+        const text = document.getElementById('announcement-text').value.trim();
+        
+        if (!text) {
+            alert('אנא הזן הודעה');
+            return;
+        }
+        
+        try {
+            announcements.push(text);
+            await db.collection('yr_settings').doc('main').update({ Announcements: announcements });
+            
+            alert('הודעה נוספה בהצלחה!');
+            document.getElementById('announcement-text').value = '';
+            await loadAnnouncements();
+        } catch (error) {
+            console.error('Error adding announcement:', error);
+            alert('שגיאה בהוספת הודעה');
+        }
+    });
+
+    window.editAnnouncement = async function(index) {
+        const newText = prompt('ערוך הודעה:', announcements[index]);
+        if (newText && newText.trim() && newText !== announcements[index]) {
+            announcements[index] = newText.trim();
+            
+            try {
+                await db.collection('yr_settings').doc('main').update({ Announcements: announcements });
+                alert('הודעה עודכנה בהצלחה!');
+                await loadAnnouncements();
+            } catch (error) {
+                console.error('Error editing announcement:', error);
+                alert('שגיאה בעדכון הודעה');
+            }
+        }
+    };
+
+    window.deleteAnnouncement = async function(index) {
+        if (!confirm('האם למחוק הודעה זו?')) return;
+        
+        try {
+            announcements.splice(index, 1);
+            await db.collection('yr_settings').doc('main').update({ Announcements: announcements });
+            alert('הודעה נמחקה בהצלחה!');
+            await loadAnnouncements();
+        } catch (error) {
+            console.error('Error deleting announcement:', error);
+            alert('שגיאה במחיקת הודעה');
+        }
+    };
+
+    // הגדרות - משלוח
+    async function loadShippingSettings() {
+        try {
+            const settingsDoc = await db.collection('yr_settings').doc('main').get();
+            if (settingsDoc.exists) {
+                const data = settingsDoc.data();
+                settings = data;
+                if (data.Shipping) {
+                    document.getElementById('shipping-method').value = data.Shipping.Method || 'fixed';
+                    document.getElementById('shipping-value').value = data.Shipping.Value || 0;
+                    document.getElementById('free-threshold').value = data.Shipping.FreeThreshold || '';
+                }
+            }
+        } catch (error) {
+            console.error('Error loading shipping settings:', error);
+        }
+    }
+
+    document.getElementById('save-shipping-btn').addEventListener('click', async () => {
+        const method = document.getElementById('shipping-method').value;
+        const value = parseFloat(document.getElementById('shipping-value').value) || 0;
+        const freeThreshold = parseFloat(document.getElementById('free-threshold').value) || 0;
+
+        try {
+            await db.collection('yr_settings').doc('main').update({
+                Shipping: { Method: method, Value: value, FreeThreshold: freeThreshold }
+            });
+            alert('הגדרות המשלוח נשמרו בהצלחה!');
+            await loadShippingSettings();
+        } catch (error) {
+            console.error('Error saving shipping settings:', error);
+            alert('שגיאה בשמירת הגדרות המשלוח');
+        }
+    });
+
+    // סגירת מודלים
+    const modalCloseButtons = document.querySelectorAll('.close-button');
+    
+    modalCloseButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            orderDetailsModal.classList.remove('active');
+            leadDetailsModal.classList.remove('active');
+            linkOrderModal.classList.remove('active');
+            editProductModal.classList.remove('active');
+            changeCategoryModal.classList.remove('active');
+        });
+    });
+    
+    window.addEventListener('click', (event) => {
+        if (event.target === orderDetailsModal) orderDetailsModal.classList.remove('active');
+        if (event.target === leadDetailsModal) leadDetailsModal.classList.remove('active');
+        if (event.target === linkOrderModal) linkOrderModal.classList.remove('active');
+        if (event.target === editProductModal) editProductModal.classList.remove('active');
+        if (event.target === changeCategoryModal) changeCategoryModal.classList.remove('active');
+    });
+    </script>
+</body>
+</html>
