@@ -151,18 +151,6 @@
             box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
         }
         
-        .menu-item.active::before {
-            content: '';
-            position: absolute;
-            right: -20px;
-            top: 0;
-            bottom: 0;
-            width: 40px;
-            background: #1a252f;
-            border-radius: 0 50px 50px 0;
-            z-index: 1;
-        }
-        
         .main-content {
             margin-right: 250px;
             padding: 40px;
@@ -356,6 +344,66 @@
         .product-mini-actions button {
             padding: 6px 12px;
             font-size: 0.85em;
+        }
+        
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .product-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        
+        .product-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+        
+        .product-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+        
+        .product-card h3 {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .product-card .product-category {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            margin-bottom: 10px;
+        }
+        
+        .product-card .product-price {
+            font-size: 1.4em;
+            color: #27ae60;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .product-card-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .product-card-actions button {
+            flex: 1;
         }
         
         .form-group {
@@ -615,6 +663,30 @@
         .order-status-section button {
             margin-top: 12px;
         }
+
+        .coupon-options-display {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f0f8ff;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .coupon-option-field {
+            margin-bottom: 10px;
+        }
+
+        .coupon-option-field label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .section-divider {
+            border-top: 2px solid #e9ecef;
+            margin: 40px 0 30px 0;
+            padding-top: 30px;
+        }
         
         @media (max-width: 768px) {
             .sidebar {
@@ -629,6 +701,10 @@
             
             .products-in-category {
                 grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             }
         }
     </style>
@@ -655,7 +731,7 @@
             </div>
             <div class="sidebar-menu">
                 <div class="menu-item active" data-section="categories">קטגוריות</div>
-                <div class="menu-item" data-section="add-product">הוסף מוצר</div>
+                <div class="menu-item" data-section="products">מוצרים</div>
                 <div class="menu-item" data-section="orders">הזמנות</div>
                 <div class="menu-item" data-section="leads">פניות</div>
                 <div class="menu-item" data-section="settings">הגדרות</div>
@@ -678,13 +754,14 @@
                 <div class="categories-grid" id="categories-grid"></div>
             </div>
 
-            <!-- הוספת מוצר -->
-            <div class="content-section" id="add-product-section">
+            <!-- מוצרים -->
+            <div class="content-section" id="products-section">
                 <div class="content-header">
-                    <h2>הוסף מוצר חדש</h2>
+                    <h2>ניהול מוצרים</h2>
                 </div>
                 
                 <form id="add-product-form">
+                    <h3 style="margin-bottom: 20px; color: #2c3e50;">הוסף מוצר חדש</h3>
                     <div class="form-group">
                         <label for="product-name">שם המוצר:</label>
                         <input type="text" id="product-name" required>
@@ -722,6 +799,11 @@
                     </div>
                     <button type="submit" class="btn btn-dark">הוסף מוצר</button>
                 </form>
+
+                <div class="section-divider"></div>
+                
+                <h3 style="margin-bottom: 20px; color: #2c3e50;">כל המוצרים</h3>
+                <div class="products-grid" id="all-products-grid"></div>
             </div>
 
             <!-- הזמנות -->
@@ -789,6 +871,7 @@
                             <label for="coupon-product">בחר מוצר:</label>
                             <select id="coupon-product"></select>
                         </div>
+                        <div id="coupon-custom-fields-container"></div>
                         <div class="form-group">
                             <label for="coupon-expiry">תאריך תפוגה:</label>
                             <input type="date" id="coupon-expiry">
@@ -906,6 +989,15 @@
         </div>
     </div>
 
+    <!-- מודאל עריכת קופון -->
+    <div id="edit-coupon-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3>עריכת קופון</h3>
+            <div id="edit-coupon-container"></div>
+        </div>
+    </div>
+
     <script>
     const firebaseConfig = {
         apiKey: "AIzaSyDLHENaXTeorjL87sExB1EJrH7mrEnNYOA",
@@ -974,6 +1066,7 @@
 
                     await initializeSettings();
                     await loadCategories();
+                    await loadAllProducts();
                     await fetchOrders();
                     await fetchContactLeads();
                     await loadShippingSettings();
@@ -1015,6 +1108,7 @@
     let settings = null;
     let currentLeadId = null;
     let currentProductToMove = null;
+    let currentEditingCouponIndex = null;
 
     async function initializeSettings() {
         try {
@@ -1103,7 +1197,6 @@
             }
         }
         
-        // מאזינים לכפתורי קטגוריה
         document.querySelectorAll('.btn-edit-category').forEach(btn => {
             btn.addEventListener('click', () => editCategoryName(btn.dataset.category));
         });
@@ -1112,7 +1205,6 @@
             btn.addEventListener('click', () => deleteCategory(btn.dataset.category));
         });
         
-        // מאזינים לכפתורי מוצר
         document.querySelectorAll('.btn-change-category').forEach(btn => {
             btn.addEventListener('click', () => openChangeCategoryModal(btn.dataset.productId));
         });
@@ -1144,6 +1236,7 @@
                 
                 alert('קטגוריה עודכנה בהצלחה!');
                 await loadCategories();
+                await loadAllProducts();
             } catch (error) {
                 console.error('Error editing category:', error);
                 alert('שגיאה בעדכון קטגוריה');
@@ -1167,7 +1260,6 @@
             
             await db.collection('yr_settings').doc('main').update({ Categories: categories });
             
-            // מחיקת כל המוצרים בקטגוריה
             const productsSnapshot = await db.collection('yr_jerseys').where('category', '==', categoryName).get();
             const batch = db.batch();
             productsSnapshot.forEach(doc => {
@@ -1177,6 +1269,7 @@
             
             alert('קטגוריה ומוצריה נמחקו בהצלחה!');
             await loadCategories();
+            await loadAllProducts();
             await loadCoupons();
         } catch (error) {
             console.error('Error deleting category:', error);
@@ -1263,11 +1356,72 @@
             alert('המוצר הועבר בהצלחה!');
             changeCategoryModal.classList.remove('active');
             await loadCategories();
+            await loadAllProducts();
         } catch (error) {
             console.error('Error changing category:', error);
             alert('שגיאה בהעברת מוצר');
         }
     });
+
+    // טעינת כל המוצרים לדף מוצרים
+    async function loadAllProducts() {
+        const allProductsGrid = document.getElementById('all-products-grid');
+        allProductsGrid.innerHTML = '';
+        
+        const productsSnapshot = await db.collection('yr_jerseys').get();
+        products = productsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        if (products.length === 0) {
+            allProductsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #666;">אין מוצרים. הוסף מוצר חדש למעלה.</p>';
+            return;
+        }
+        
+        products.forEach(product => {
+            const productCard = document.createElement('div');
+            productCard.className = 'product-card';
+            
+            productCard.innerHTML = `
+                <img src="${product.image}" alt="${product.name}">
+                <div class="product-category">${product.category}</div>
+                <h3>${product.name}</h3>
+                <div class="product-price">${product.price ? product.price.toFixed(2) : '0.00'} ₪</div>
+                <div class="product-card-actions">
+                    <button class="btn btn-dark btn-edit-product-main" data-product-id="${product.id}">ערוך</button>
+                    <button class="btn btn-danger btn-delete-product-main" data-product-id="${product.id}">מחק</button>
+                </div>
+            `;
+            
+            allProductsGrid.appendChild(productCard);
+        });
+        
+        document.querySelectorAll('.btn-edit-product-main').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const product = products.find(p => p.id === btn.dataset.productId);
+                openEditProductModal(btn.dataset.productId, product);
+            });
+        });
+        
+        document.querySelectorAll('.btn-delete-product-main').forEach(btn => {
+            btn.addEventListener('click', () => deleteProductDirect(btn.dataset.productId));
+        });
+        
+        updateCategorySelects();
+    }
+
+    async function deleteProductDirect(productId) {
+        if (!confirm('האם אתה בטוח שברצונך למחוק מוצר זה?')) return;
+        
+        try {
+            await db.collection('yr_jerseys').doc(productId).delete();
+            alert('המוצר נמחק בהצלחה!');
+            await loadCategories();
+            await loadAllProducts();
+            await loadCoupons();
+        } catch (error) {
+            alert('שגיאה במחיקת המוצר. נסה שוב.');
+            console.error(error);
+        }
+    }
 
     // העלאת תמונה למוצר חדש
     const productImageUpload = document.getElementById('product-image-upload');
@@ -1305,7 +1459,6 @@
     // שדות מותאמים אישית
     const customFieldsContainer = document.getElementById('custom-fields-container');
     const addCustomFieldBtn = document.getElementById('add-custom-field');
-    let customFieldsCount = 0;
     
     function addOptionItem(optionsList, optionData = null) {
         const optionItem = document.createElement('div');
@@ -1483,6 +1636,7 @@
             productImagePreview.style.display = 'none';
             productUploadStatus.textContent = '';
             await loadCategories();
+            await loadAllProducts();
             await loadCoupons();
         } catch (error) {
             alert('שגיאה בהוספת המוצר. נסה שוב.');
@@ -1614,6 +1768,7 @@
                 alert('המוצר עודכן בהצלחה!');
                 editProductModal.classList.remove('active');
                 await loadCategories();
+                await loadAllProducts();
                 await loadCoupons();
             } catch (error) {
                 alert('שגיאה בעדכון המוצר. נסה שוב.');
@@ -1628,6 +1783,7 @@
                     alert('המוצר נמחק בהצלחה!');
                     editProductModal.classList.remove('active');
                     await loadCategories();
+                    await loadAllProducts();
                     await loadCoupons();
                 } catch (error) {
                     alert('שגיאה במחיקת המוצר. נסה שוב.');
@@ -1989,6 +2145,8 @@
     });
 
     // הגדרות - קופונים
+    const couponCustomFieldsContainer = document.getElementById('coupon-custom-fields-container');
+
     document.getElementById('coupon-type').addEventListener('change', (e) => {
         const valueGroup = document.getElementById('coupon-value-group');
         const productGroup = document.getElementById('coupon-product-group');
@@ -1996,14 +2154,66 @@
         if (e.target.value === 'free_product') {
             valueGroup.style.display = 'none';
             productGroup.style.display = 'block';
+            couponCustomFieldsContainer.style.display = 'block';
         } else if (e.target.value === 'free_shipping') {
             valueGroup.style.display = 'none';
             productGroup.style.display = 'none';
+            couponCustomFieldsContainer.style.display = 'none';
+            couponCustomFieldsContainer.innerHTML = '';
         } else {
             valueGroup.style.display = 'block';
             productGroup.style.display = 'none';
+            couponCustomFieldsContainer.style.display = 'none';
+            couponCustomFieldsContainer.innerHTML = '';
         }
     });
+
+    document.getElementById('coupon-product').addEventListener('change', async (e) => {
+        const productId = e.target.value;
+        couponCustomFieldsContainer.innerHTML = '';
+        
+        if (!productId) return;
+        
+        const product = products.find(p => p.id === productId);
+        if (!product || !product.customFields || product.customFields.length === 0) {
+            couponCustomFieldsContainer.innerHTML = '<p style="color: #666; margin-top: 10px;">למוצר זה אין שדות מותאמים אישית</p>';
+            return;
+        }
+        
+        product.customFields.forEach(field => {
+            if (field.type === 'select' && field.options && field.options.length > 0) {
+                const fieldDiv = document.createElement('div');
+                fieldDiv.className = 'coupon-option-field';
+                
+                let optionsHTML = '<option value="">לא נבחר</option>';
+                field.options.forEach(opt => {
+                    optionsHTML += `<option value="${opt.value}">${opt.value}</option>`;
+                });
+                
+                fieldDiv.innerHTML = `
+                    <label>${field.name}:</label>
+                    <select class="coupon-custom-option" data-field-name="${field.name}" style="width: 100%; padding: 8px; border: 2px solid #ddd; border-radius: 4px;">
+                        ${optionsHTML}
+                    </select>
+                `;
+                
+                couponCustomFieldsContainer.appendChild(fieldDiv);
+            }
+        });
+    });
+
+    function getCouponSelectedOptions() {
+        const options = {};
+        const selects = couponCustomFieldsContainer.querySelectorAll('.coupon-custom-option');
+        selects.forEach(select => {
+            const fieldName = select.dataset.fieldName;
+            const value = select.value;
+            if (value) {
+                options[fieldName] = value;
+            }
+        });
+        return Object.keys(options).length > 0 ? options : null;
+    }
 
     async function loadCoupons() {
         try {
@@ -2023,10 +2233,15 @@
                 coupons.forEach((coupon, index) => {
                     const couponItem = document.createElement('div');
                     couponItem.className = 'list-item';
+                    couponItem.style.flexDirection = 'column';
+                    couponItem.style.alignItems = 'flex-start';
                     
                     let typeText = '';
                     switch(coupon.Type) {
-                        case 'free_product': typeText = 'מוצר חינם'; break;
+                        case 'free_product':
+                            const product = products.find(p => p.id === coupon.ProductId);
+                            typeText = product ? `מוצר חינם: ${product.name}` : 'מוצר חינם';
+                            break;
                         case 'fixed_discount': typeText = `הנחה ${coupon.Value}₪`; break;
                         case 'percentage_discount': typeText = `הנחה ${coupon.Value}%`; break;
                         case 'free_shipping': typeText = 'משלוח חינם'; break;
@@ -2034,11 +2249,26 @@
                     
                     const expiryText = coupon.ExpiryDate ? ` | תוקף עד: ${coupon.ExpiryDate}` : '';
                     
+                    let optionsDisplay = '';
+                    if (coupon.Type === 'free_product' && coupon.SelectedOptions) {
+                        optionsDisplay = '<div class="coupon-options-display">';
+                        Object.keys(coupon.SelectedOptions).forEach(key => {
+                            optionsDisplay += `<div><strong>${key}:</strong> ${coupon.SelectedOptions[key]}</div>`;
+                        });
+                        optionsDisplay += '</div>';
+                    }
+                    
                     couponItem.innerHTML = `
-                        <div>
-                            <strong>${coupon.Code}</strong> - ${typeText}${expiryText}
+                        <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+                            <div>
+                                <strong>${coupon.Code}</strong> - ${typeText}${expiryText}
+                            </div>
+                            <div class="list-item-actions">
+                                <button class="btn btn-primary" onclick="editCoupon(${index})">ערוך</button>
+                                <button class="btn btn-danger" onclick="deleteCoupon(${index})">מחק</button>
+                            </div>
                         </div>
-                        <button class="btn btn-danger" onclick="deleteCoupon(${index})">מחק</button>
+                        ${optionsDisplay}
                     `;
                     couponsList.appendChild(couponItem);
                 });
@@ -2060,11 +2290,17 @@
             return;
         }
 
+        if (type === 'free_product' && !productId) {
+            alert('אנא בחר מוצר');
+            return;
+        }
+
         const newCoupon = {
             Code: code,
             Type: type,
             Value: type === 'free_shipping' ? 0 : value,
             ProductId: type === 'free_product' ? productId : null,
+            SelectedOptions: type === 'free_product' ? getCouponSelectedOptions() : null,
             ExpiryDate: expiry || null
         };
 
@@ -2079,12 +2315,194 @@
             document.getElementById('coupon-code').value = '';
             document.getElementById('coupon-value').value = '';
             document.getElementById('coupon-expiry').value = '';
+            document.getElementById('coupon-product').value = '';
+            couponCustomFieldsContainer.innerHTML = '';
             await loadCoupons();
         } catch (error) {
             console.error('Error adding coupon:', error);
             alert('שגיאה בהוספת קופון');
         }
     });
+
+    const editCouponModal = document.getElementById('edit-coupon-modal');
+    const editCouponContainer = document.getElementById('edit-coupon-container');
+
+    window.editCoupon = async function(index) {
+        currentEditingCouponIndex = index;
+        
+        const settingsDoc = await db.collection('yr_settings').doc('main').get();
+        const coupons = settingsDoc.data().Coupons || [];
+        const coupon = coupons[index];
+        
+        editCouponContainer.innerHTML = `
+            <div class="form-group">
+                <label for="edit-coupon-code">קוד קופון:</label>
+                <input type="text" id="edit-coupon-code" value="${coupon.Code}">
+            </div>
+            <div class="form-group">
+                <label for="edit-coupon-type">סוג הטבה:</label>
+                <select id="edit-coupon-type">
+                    <option value="free_product" ${coupon.Type === 'free_product' ? 'selected' : ''}>מוצר חינם</option>
+                    <option value="fixed_discount" ${coupon.Type === 'fixed_discount' ? 'selected' : ''}>הנחה בשקלים</option>
+                    <option value="percentage_discount" ${coupon.Type === 'percentage_discount' ? 'selected' : ''}>הנחה באחוזים</option>
+                    <option value="free_shipping" ${coupon.Type === 'free_shipping' ? 'selected' : ''}>משלוח חינם</option>
+                </select>
+            </div>
+            <div class="form-group" id="edit-coupon-value-group" style="display: ${coupon.Type !== 'free_product' && coupon.Type !== 'free_shipping' ? 'block' : 'none'}">
+                <label for="edit-coupon-value">ערך הטבה:</label>
+                <input type="number" id="edit-coupon-value" step="0.01" min="0" value="${coupon.Value || 0}">
+            </div>
+            <div class="form-group" id="edit-coupon-product-group" style="display: ${coupon.Type === 'free_product' ? 'block' : 'none'}">
+                <label for="edit-coupon-product">בחר מוצר:</label>
+                <select id="edit-coupon-product">
+                    <option value="">בחר מוצר</option>
+                </select>
+            </div>
+            <div id="edit-coupon-custom-fields-container" style="display: ${coupon.Type === 'free_product' ? 'block' : 'none'}"></div>
+            <div class="form-group">
+                <label for="edit-coupon-expiry">תאריך תפוגה:</label>
+                <input type="date" id="edit-coupon-expiry" value="${coupon.ExpiryDate || ''}">
+            </div>
+            <button class="btn btn-success" id="save-edited-coupon">שמור שינויים</button>
+        `;
+        
+        const editProductSelect = document.getElementById('edit-coupon-product');
+        products.forEach(product => {
+            const option = document.createElement('option');
+            option.value = product.id;
+            option.textContent = product.name;
+            if (product.id === coupon.ProductId) option.selected = true;
+            editProductSelect.appendChild(option);
+        });
+        
+        const editCouponCustomFieldsContainer = document.getElementById('edit-coupon-custom-fields-container');
+        
+        if (coupon.Type === 'free_product' && coupon.ProductId) {
+            await loadCouponCustomFields(coupon.ProductId, editCouponCustomFieldsContainer, coupon.SelectedOptions);
+        }
+        
+        document.getElementById('edit-coupon-type').addEventListener('change', (e) => {
+            const valueGroup = document.getElementById('edit-coupon-value-group');
+            const productGroup = document.getElementById('edit-coupon-product-group');
+            
+            if (e.target.value === 'free_product') {
+                valueGroup.style.display = 'none';
+                productGroup.style.display = 'block';
+                editCouponCustomFieldsContainer.style.display = 'block';
+            } else if (e.target.value === 'free_shipping') {
+                valueGroup.style.display = 'none';
+                productGroup.style.display = 'none';
+                editCouponCustomFieldsContainer.style.display = 'none';
+                editCouponCustomFieldsContainer.innerHTML = '';
+            } else {
+                valueGroup.style.display = 'block';
+                productGroup.style.display = 'none';
+                editCouponCustomFieldsContainer.style.display = 'none';
+                editCouponCustomFieldsContainer.innerHTML = '';
+            }
+        });
+        
+        editProductSelect.addEventListener('change', async (e) => {
+            const productId = e.target.value;
+            await loadCouponCustomFields(productId, editCouponCustomFieldsContainer, null);
+        });
+        
+        document.getElementById('save-edited-coupon').addEventListener('click', async () => {
+            await saveEditedCoupon();
+        });
+        
+        editCouponModal.classList.add('active');
+    };
+
+    async function loadCouponCustomFields(productId, container, selectedOptions = null) {
+        container.innerHTML = '';
+        
+        if (!productId) return;
+        
+        const product = products.find(p => p.id === productId);
+        if (!product || !product.customFields || product.customFields.length === 0) {
+            container.innerHTML = '<p style="color: #666; margin-top: 10px;">למוצר זה אין שדות מותאמים אישית</p>';
+            return;
+        }
+        
+        product.customFields.forEach(field => {
+            if (field.type === 'select' && field.options && field.options.length > 0) {
+                const fieldDiv = document.createElement('div');
+                fieldDiv.className = 'coupon-option-field';
+                
+                let optionsHTML = '<option value="">לא נבחר</option>';
+                field.options.forEach(opt => {
+                    const selected = selectedOptions && selectedOptions[field.name] === opt.value ? 'selected' : '';
+                    optionsHTML += `<option value="${opt.value}" ${selected}>${opt.value}</option>`;
+                });
+                
+                fieldDiv.innerHTML = `
+                    <label>${field.name}:</label>
+                    <select class="coupon-custom-option" data-field-name="${field.name}" style="width: 100%; padding: 8px; border: 2px solid #ddd; border-radius: 4px;">
+                        ${optionsHTML}
+                    </select>
+                `;
+                
+                container.appendChild(fieldDiv);
+            }
+        });
+    }
+
+    function getEditCouponSelectedOptions() {
+        const container = document.getElementById('edit-coupon-custom-fields-container');
+        const options = {};
+        const selects = container.querySelectorAll('.coupon-custom-option');
+        selects.forEach(select => {
+            const fieldName = select.dataset.fieldName;
+            const value = select.value;
+            if (value) {
+                options[fieldName] = value;
+            }
+        });
+        return Object.keys(options).length > 0 ? options : null;
+    }
+
+    async function saveEditedCoupon() {
+        const code = document.getElementById('edit-coupon-code').value.trim();
+        const type = document.getElementById('edit-coupon-type').value;
+        const value = parseFloat(document.getElementById('edit-coupon-value').value) || 0;
+        const productId = document.getElementById('edit-coupon-product').value;
+        const expiry = document.getElementById('edit-coupon-expiry').value;
+
+        if (!code) {
+            alert('אנא הזן קוד קופון');
+            return;
+        }
+
+        if (type === 'free_product' && !productId) {
+            alert('אנא בחר מוצר');
+            return;
+        }
+
+        const updatedCoupon = {
+            Code: code,
+            Type: type,
+            Value: type === 'free_shipping' ? 0 : value,
+            ProductId: type === 'free_product' ? productId : null,
+            SelectedOptions: type === 'free_product' ? getEditCouponSelectedOptions() : null,
+            ExpiryDate: expiry || null
+        };
+
+        try {
+            const settingsDoc = await db.collection('yr_settings').doc('main').get();
+            const coupons = settingsDoc.data().Coupons || [];
+            coupons[currentEditingCouponIndex] = updatedCoupon;
+            
+            await db.collection('yr_settings').doc('main').update({ Coupons: coupons });
+            
+            alert('קופון עודכן בהצלחה!');
+            editCouponModal.classList.remove('active');
+            await loadCoupons();
+        } catch (error) {
+            console.error('Error updating coupon:', error);
+            alert('שגיאה בעדכון קופון');
+        }
+    }
 
     window.deleteCoupon = async function(index) {
         if (!confirm('האם למחוק קופון זה?')) return;
@@ -2238,6 +2656,7 @@
             linkOrderModal.classList.remove('active');
             editProductModal.classList.remove('active');
             changeCategoryModal.classList.remove('active');
+            editCouponModal.classList.remove('active');
         });
     });
     
@@ -2247,6 +2666,7 @@
         if (event.target === linkOrderModal) linkOrderModal.classList.remove('active');
         if (event.target === editProductModal) editProductModal.classList.remove('active');
         if (event.target === changeCategoryModal) changeCategoryModal.classList.remove('active');
+        if (event.target === editCouponModal) editCouponModal.classList.remove('active');
     });
     </script>
 </body>
