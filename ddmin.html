@@ -770,10 +770,20 @@
                         <label for="product-description">תיאור המוצר:</label>
                         <textarea id="product-description" required></textarea>
                     </div>
-                    <div class="form-group">
-                        <label for="product-price">מחיר:</label>
-                        <input type="number" id="product-price" step="0.01" min="0" required>
-                    </div>
+<div class="form-group">
+    <label for="product-price">מחיר:</label>
+    <input type="number" id="product-price" step="0.01" min="0" required>
+</div>
+
+<!-- הוסף את זה כאן: -->
+<div class="form-group">
+    <label for="product-sale-price">מחיר לאחר הנחה (אופציונלי):</label>
+    <input type="number" id="product-sale-price" step="0.01" min="0" placeholder="השאר ריק אם אין הנחה">
+</div>
+<div class="form-group">
+    <label for="product-sale-end">תאריך סיום הנחה (אופציונלי):</label>
+    <input type="date" id="product-sale-end">
+</div>
                     <div class="form-group">
                         <label for="product-category">קטגוריה:</label>
                         <select id="product-category" required>
@@ -1612,6 +1622,8 @@
         const price = parseFloat(document.getElementById('product-price').value);
         const category = document.getElementById('product-category').value;
         const image = document.getElementById('product-image-url').value.trim();
+        const salePrice = parseFloat(document.getElementById('product-sale-price').value) || null;
+const saleEndDate = document.getElementById('product-sale-end').value || null;
         
         if (!name || !description || isNaN(price) || price < 0 || !image || !category) {
             alert('אנא מלא את כל השדות בצורה תקינה.'); 
@@ -1621,17 +1633,21 @@
         const customFields = extractCustomFields(customFieldsContainer);
         
         try {
-            await db.collection('yr_jerseys').add({
-                name, 
-                description, 
-                price, 
-                category,
-                image,
-                customFields: customFields.length > 0 ? customFields : null,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
+await db.collection('yr_jerseys').add({
+    name, 
+    description, 
+    price, 
+    salePrice: salePrice,           // הוסף זה
+    saleEndDate: saleEndDate,       // הוסף זה
+    category,
+    image,
+    customFields: customFields.length > 0 ? customFields : null,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+});
             alert('המוצר נוסף בהצלחה!');
             document.getElementById('add-product-form').reset();
+            document.getElementById('product-sale-price').value = '';
+document.getElementById('product-sale-end').value = '';
             customFieldsContainer.innerHTML = '';
             productImagePreview.style.display = 'none';
             productUploadStatus.textContent = '';
@@ -1663,6 +1679,14 @@
                     <label for="edit-product-price">מחיר:</label>
                     <input type="number" id="edit-product-price" step="0.01" min="0" value="${product.price}" required>
                 </div>
+                <div class="form-group">
+    <label for="edit-product-sale-price">מחיר לאחר הנחה (אופציונלי):</label>
+    <input type="number" id="edit-product-sale-price" step="0.01" min="0" value="${product.salePrice || ''}" placeholder="השאר ריק אם אין הנחה">
+</div>
+<div class="form-group">
+    <label for="edit-product-sale-end">תאריך סיום הנחה (אופציונלי):</label>
+    <input type="date" id="edit-product-sale-end" value="${product.saleEndDate || ''}">
+</div>
                 <div class="form-group">
                     <label for="edit-product-category">קטגוריה:</label>
                     <select id="edit-product-category" required>
@@ -1748,6 +1772,8 @@
             const price = parseFloat(document.getElementById('edit-product-price').value);
             const category = document.getElementById('edit-product-category').value;
             const image = document.getElementById('edit-product-image-url').value.trim();
+            const salePrice = parseFloat(document.getElementById('edit-product-sale-price').value) || null;
+const saleEndDate = document.getElementById('edit-product-sale-end').value || null;
             
             if (!name || !description || isNaN(price) || price < 0 || !image || !category) {
                 alert('אנא מלא את כל השדות בצורה תקינה.'); 
@@ -1757,14 +1783,16 @@
             const customFields = extractCustomFields(editCustomFieldsContainer);
             
             try {
-                await db.collection('yr_jerseys').doc(productId).update({
-                    name, 
-                    description, 
-                    price, 
-                    category,
-                    image,
-                    customFields: customFields.length > 0 ? customFields : null
-                });
+await db.collection('yr_jerseys').doc(productId).update({
+    name, 
+    description, 
+    price, 
+    salePrice: salePrice,           // הוסף זה
+    saleEndDate: saleEndDate,       // הוסף זה
+    category,
+    image,
+    customFields: customFields.length > 0 ? customFields : null
+});
                 alert('המוצר עודכן בהצלחה!');
                 editProductModal.classList.remove('active');
                 await loadCategories();
