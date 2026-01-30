@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>חנות ז'רז'ים</title>
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; font-family: sans-serif; }
+        iframe { border: none; width: 100%; height: 100%; }
+        .blocked { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; text-align: center; background: #eee; }
+    </style>
+</head>
+<body>
+
+<div id="main-container"></div>
+
+<script>
+    const storageKey = 'visited_jerseysu_v2';
+    const container = document.getElementById('main-container');
+
+    if (localStorage.getItem(storageKey)) {
+        // אם המפתח קיים - חוסם גישה
+        container.innerHTML = `
+            <div class="blocked">
+                <h1>הגישה חסומה</h1>
+                <p>כבר ביקרת באתר זה פעם אחת. לא ניתן להיכנס שוב.</p>
+            </div>`;
+    } else {
+        // אם זו פעם ראשונה - מציג את האתר
+        const iframe = document.createElement('iframe');
+        iframe.src = 'https://jerseysu.x.yupoo.com';
+        container.appendChild(iframe);
+
+        // כאן הקסם: אנחנו רושמים את החסימה בזיכרון רק *אחרי* שהדף נטען
+        // כך שתוכל לראות אותו, ורק ברענון הבא תיחסם.
+        localStorage.setItem(storageKey, 'true');
+    }
+</script>
+
+</body>
+</html>
