@@ -3,39 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>חנות ז'רז'ים</title>
+    <title>מעבר לאתר</title>
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; font-family: sans-serif; }
-        iframe { border: none; width: 100%; height: 100%; }
-        .blocked { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; text-align: center; background: #eee; }
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f8f9fa;
+        }
+        .message-box {
+            text-align: center;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            background: white;
+        }
     </style>
 </head>
 <body>
 
-<div id="main-container"></div>
+    <div id="status" class="message-box">
+        <h1>מיד תועבר לאתר...</h1>
+        <p>טוען נתונים, אנא המתן.</p>
+    </div>
 
-<script>
-    const storageKey = 'visited_jerseysu_v2';
-    const container = document.getElementById('main-container');
+    <script>
+        const storageKey = 'has_visited_jerseysu';
+        const targetUrl = 'https://jerseysu.x.yupoo.com';
 
-    if (localStorage.getItem(storageKey)) {
-        // אם המפתח קיים - חוסם גישה
-        container.innerHTML = `
-            <div class="blocked">
-                <h1>הגישה חסומה</h1>
-                <p>כבר ביקרת באתר זה פעם אחת. לא ניתן להיכנס שוב.</p>
-            </div>`;
-    } else {
-        // אם זו פעם ראשונה - מציג את האתר
-        const iframe = document.createElement('iframe');
-        iframe.src = 'https://jerseysu.x.yupoo.com';
-        container.appendChild(iframe);
-
-        // כאן הקסם: אנחנו רושמים את החסימה בזיכרון רק *אחרי* שהדף נטען
-        // כך שתוכל לראות אותו, ורק ברענון הבא תיחסם.
-        localStorage.setItem(storageKey, 'true');
-    }
-</script>
-
+        if (localStorage.getItem(storageKey)) {
+            // אם כבר ביקר - חוסם ומציג הודעה
+            document.getElementById('status').innerHTML = `
+                <h1 style="color: red;">הגישה חסומה</h1>
+                <p>כבר השתמשת בלינק החד-פעמי שלך.</p>
+            `;
+        } else {
+            // אם פעם ראשונה - מסמן שביקר ומפנה
+            localStorage.setItem(storageKey, 'true');
+            
+            // השהיה קלה של שנייה כדי שיספיק להירשם ב-Storage לפני המעבר
+            setTimeout(() => {
+                window.location.href = targetUrl;
+            }, 1000);
+        }
+    </script>
 </body>
 </html>
