@@ -1619,7 +1619,7 @@ function getEffectivePrice(product) {
     }
 
 // ============================================
-// LOGIN & AUTO-AUTH LOGIC
+// LOGIN ELEMENTS
 // ============================================
 const loginOverlay = document.getElementById('login-overlay');
 const adminLayout = document.getElementById('admin-layout');
@@ -1629,11 +1629,14 @@ const usernameInput = document.getElementById('username');
 const passwordInput = document.getElementById('password');
 const loginErrorMessage = document.getElementById('login-error-message');
 
-// פונקציית עזר להרצת כל הטעינות לאחר התחברות מוצלחת
+// ============================================
+// AFTER LOGIN
+// ============================================
 async function onSuccessfulLogin() {
     loginOverlay.style.display = 'none';
     adminLayout.classList.add('active');
     loginErrorMessage.style.display = 'none';
+
     try {
         await initializeSettings();
         await loadAllProducts();
@@ -1644,47 +1647,102 @@ async function onSuccessfulLogin() {
         await loadShippingSettings();
         await loadCoupons();
         await loadAnnouncements();
-        setupImageUpload('product-image-file','product-image-preview','product-upload-status','product-image-url','product-image-upload');
+        setupImageUpload(
+            'product-image-file',
+            'product-image-preview',
+            'product-upload-status',
+            'product-image-url',
+            'product-image-upload'
+        );
     } catch (err) {
         console.error('שגיאה בטעינה:', err);
         alert('שגיאה בטעינת הנתונים: ' + err.message);
     }
 }
 
-// בדיקה האם המשתמש כבר מחובר (Auto-login)
-window.addEventListener('DOMContentLoaded', () => {
+// ============================================
+// AUTO LOGIN
+// ============================================
+window.addEventListener('DOMContentLoaded', async () => {
     const isLogged = localStorage.getItem('vip_admin_logged');
-    if (isLogged === 'true') {
-        onSuccessfulLogin();
+    const user = localStorage.getItem('vip_admin_user');
+
+    if (isLogged === 'true' && user) {
+        try {
+            const docSnap = await getDoc(doc(db, "users", user));
+
+            if (docSnap.exists() && docSnap.data().isAdmin) {
+                onSuccessfulLogin();
+            } else {
+                localStorage.removeItem('vip_admin_logged');
+                localStorage.removeItem('vip_admin_user');
+            }
+        } catch (e) {
+            console.error(e);
+        }
     }
 });
 
+// ============================================
+// LOGIN CLICK
+// ============================================
 loginButton.addEventListener('click', async () => {
     const u = usernameInput.value.trim();
     const p = passwordInput.value;
 
-    if (u === ADMIN_USERNAME && p === ADMIN_PASSWORD) {
-        // שאלה לגבי התחברות אוטומטית
-        const rememberMe = confirm("האם תרצה להיכנס אוטומטית לפאנל הניהול בפעמים הבאות?");
+    if (!u || !p) return;
+
+    try {
+        const docSnap = await getDoc(doc(db, "users", u));
+
+        if (!docSnap.exists()) {
+            throw new Error("user-not-found");
+        }
+
+        const user = docSnap.data();
+
+        if (user.password !== p) {
+            throw new Error("wrong-password");
+        }
+
+        if (!user.isAdmin) {
+            throw new Error("not-admin");
+        }
+
+        const rememberMe = confirm("להישאר מחובר?");
         if (rememberMe) {
             localStorage.setItem('vip_admin_logged', 'true');
+            localStorage.setItem('vip_admin_user', u);
         }
-        
+
         onSuccessfulLogin();
-    } else {
-        loginErrorMessage.textContent = 'שם משתמש או סיסמה שגויים.';
+
+    } catch (err) {
+        let msg = "שגיאה בהתחברות";
+
+        if (err.message === "user-not-found") msg = "משתמש לא קיים";
+        if (err.message === "wrong-password") msg = "סיסמה שגויה";
+        if (err.message === "not-admin") msg = "אין הרשאת אדמין";
+
+        loginErrorMessage.textContent = msg;
         loginErrorMessage.style.display = 'block';
     }
 });
 
-// כפתור התנתקות
+// ============================================
+// LOGOUT
+// ============================================
 logoutButton.addEventListener('click', () => {
     if (confirm("האם אתה בטוח שברצונך להתנתק?")) {
         localStorage.removeItem('vip_admin_logged');
-        location.reload(); // רענון הדף מחזיר למסך ההתחברות
+        localStorage.removeItem('vip_admin_user');
+        location.reload();
     }
 });
 
+// ============================================
+// ENTER KEY SUPPORT
+// ============================================
 [usernameInput, passwordInput].forEach(input => {
     input.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') loginButton.click();
