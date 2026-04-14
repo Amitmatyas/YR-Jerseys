@@ -2243,7 +2243,7 @@ card.innerHTML = `
             const totalsSection = document.getElementById('cart-totals-section');
             let html = `
                 <div class="total-row"><span>סה"כ מוצרים:</span><span>${subtotal.toFixed(2)} ₪</span></div>
-                <div class="total-row"><span>דמי משלוח:${buildShippingBreakdown()}</span><span>${shippingCost.toFixed(2)} ₪</span></div>`;            `;
+                <div class="total-row"><span>דמי משלוח:${buildShippingBreakdown()}</span><span>${shippingCost.toFixed(2)} ₪</span></div>`;
             if (couponDiscount > 0) html += `<div class="total-row" style="color:#28a745;"><span>הנחת קופון:</span><span>-${couponDiscount.toFixed(2)} ₪</span></div>`;
             if (pointsDiscount > 0) html += `<div class="total-row" style="color:#28a745;"><span>הנחת נקודות:</span><span>-${pointsDiscount.toFixed(2)} ₪</span></div>`;
             html += `<div class="total-row grand-total"><span>סה"כ לתשלום:</span><span>${total.toFixed(2)} ₪</span></div>`;
