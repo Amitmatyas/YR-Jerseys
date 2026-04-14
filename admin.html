@@ -1717,18 +1717,19 @@ loginButton.addEventListener('click', async () => {
 
         onSuccessfulLogin();
 
-catch (err) {
-    console.log("LOGIN ERROR:", err); // 👈 חשוב
+    } catch (err) {
+        console.log("LOGIN ERROR:", err);
 
-    let msg = "שגיאה בהתחברות";
+        let msg = "שגיאה בהתחברות";
 
-    if (err.message === "user-not-found") msg = "משתמש לא קיים";
-    if (err.message === "wrong-password") msg = "סיסמה שגויה";
-    if (err.message === "not-admin") msg = "אין הרשאת אדמין";
+        if (err.message === "user-not-found") msg = "משתמש לא קיים";
+        if (err.message === "wrong-password") msg = "סיסמה שגויה";
+        if (err.message === "not-admin") msg = "אין הרשאת אדמין";
 
-    loginErrorMessage.textContent = msg;
-    loginErrorMessage.style.display = 'block';
-}
+        loginErrorMessage.textContent = msg;
+        loginErrorMessage.style.display = 'block';
+    }
+});
 
 // ============================================
 // LOGOUT
