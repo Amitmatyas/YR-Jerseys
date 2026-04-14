@@ -1784,25 +1784,31 @@ logoutButton.addEventListener('click', () => {
 // ============================================
 // CATEGORIES
 // ============================================
+// הוספת הגנה בראש הקובץ (מחוץ לפונקציה)
+if (typeof bulkSelectedIds === 'undefined') {
+    window.bulkSelectedIds = [];
+}
+
 async function displayCategoriesWithProducts() {
     const categoriesGrid = document.getElementById('categories-grid');
     if (!categoriesGrid) return;
 
-    // הצגת Skeleton בזמן הטעינה
+    // skeleton ראשון
     if (typeof showSkeletonCategories === 'function') showSkeletonCategories();
 
-    // בדיקה בסיסית של מערך הקטגוריות (בהנחה ש-categories הוא משתנה גלובלי)
-    if (!Array.isArray(categories) || categories.length === 0) {
-        categoriesGrid.innerHTML = '<p class="empty-msg">אין קטגוריות. הוסף קטגוריה חדשה.</p>';
+    // בדיקה ש-categories ו-products קיימים (מונע קריסה)
+    const currentCategories = (typeof categories !== 'undefined') ? categories : [];
+    const allProducts = (typeof products !== 'undefined') ? products : [];
+
+    if (!Array.isArray(currentCategories) || currentCategories.length === 0) {
+        categoriesGrid.innerHTML = '<p>אין קטגוריות. הוסף קטגוריה חדשה.</p>';
         return;
     }
 
-    // ניקוי הגריד פעם אחת בסיום הבדיקות
     categoriesGrid.innerHTML = '';
 
-    for (const category of categories) {
-        // סינון מוצרים לקטגוריה
-        const categoryProducts = (typeof products !== 'undefined' ? products : []).filter(p => {
+    for (const category of currentCategories) {
+        const categoryProducts = allProducts.filter(p => {
             const cats = typeof getProductCategories === 'function'
                 ? getProductCategories(p)
                 : (p.categories || []);
@@ -1810,10 +1816,9 @@ async function displayCategoriesWithProducts() {
         });
 
         const safeId = encodeURIComponent(category);
-        
-        // יצירת הקופסה של הקטגוריה
         const categoryBox = document.createElement('div');
         categoryBox.className = 'category-box';
+
         categoryBox.innerHTML = `
             <div class="category-box-header">
                 <h3>${category}</h3>
@@ -1826,39 +1831,44 @@ async function displayCategoriesWithProducts() {
                     </button>
                 </div>
             </div>
-            <div class="products-in-category"></div>
+            <div class="products-in-category" id="products-${safeId}"></div>
         `;
 
-        // במקום getElementById, ניגש ישירות לילד שיצרנו
-        const productsContainer = categoryBox.querySelector('.products-in-category');
-        
-        if (categoryProducts.length === 0) {
-            productsContainer.innerHTML = '<p style="color:#666; padding: 10px;">אין מוצרים בקטגוריה זו</p>';
-        } else {
-            // יצירת כרטיסי מוצר
-            categoryProducts.forEach(product => {
-                const onSale = typeof isProductOnSale === 'function' ? isProductOnSale(product) : false;
-                const effectivePrice = typeof getEffectivePrice === 'function' ? getEffectivePrice(product) : (product.price || 0);
-                const productLink = `${window.location.origin}/#${encodeURIComponent(product.name)}`;
+        categoriesGrid.appendChild(categoryBox);
 
-                const card = document.createElement('div');
-                card.className = 'product-mini-card';
-                card.innerHTML = `
-                    ${onSale ? `<div class="sale-badge-mini">SALE</div>` : ''}
-                    <img src="${product.image || 'placeholder.jpg'}" alt="${product.name}" loading="lazy">
-                    <h4>${product.name}</h4>
-                    <div class="product-price">${Number(effectivePrice).toFixed(2)} ₪</div>
-                    <div class="product-mini-actions">
-                        <button class="btn btn-dark btn-edit-product" data-product-id="${product.id}">ערוך</button>
-                        <button class="btn btn-success btn-copy-link" data-product-link="${productLink}">🔗</button>
-                    </div>
-                `;
-                productsContainer.appendChild(card);
-            });
+        const productsContainer = document.getElementById(`products-${safeId}`);
+        if (!productsContainer) continue;
+
+        if (categoryProducts.length === 0) {
+            productsContainer.innerHTML = '<p style="color:#666;">אין מוצרים בקטגוריה זו</p>';
+            continue;
         }
 
-        categoriesGrid.appendChild(categoryBox);
+        for (const product of categoryProducts) {
+            const onSale = typeof isProductOnSale === 'function' ? isProductOnSale(product) : false;
+            const effectivePrice = typeof getEffectivePrice === 'function' ? getEffectivePrice(product) : (product.price || 0);
+            const productLink = `${window.location.origin}/#${encodeURIComponent(product.name)}`;
+            
+            // כאן הייתה השגיאה - הוספנו בדיקה בטוחה
+            const isChecked = (window.bulkSelectedIds && window.bulkSelectedIds.includes(product.id)) ? 'checked' : '';
+
+            const card = document.createElement('div');
+            card.className = 'product-mini-card';
+            card.innerHTML = `
+                ${onSale ? `<div class="sale-badge-mini">SALE</div>` : ''}
+                <input type="checkbox" class="product-bulk-check" data-id="${product.id}" ${isChecked}>
+                <img src="${product.image || ''}" alt="${product.name}">
+                <h4>${product.name}</h4>
+                <div class="product-price">${Number(effectivePrice).toFixed(2)} ₪</div>
+                <div class="product-mini-actions">
+                    <button class="btn btn-dark btn-edit-product" data-product-id="${product.id}">ערוך</button>
+                    <button class="btn btn-success btn-copy-link" data-product-link="${productLink}">🔗</button>
+                </div>
+            `;
+            productsContainer.appendChild(card);
+        }
     }
+}
 
     // הגדרת אירועים (Event Delegation) - רק אם לא הוגדרו כבר
     setupCategoryEventListeners(categoriesGrid);
