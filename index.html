@@ -1956,17 +1956,27 @@
                     if (data.Shipping && data.Shipping.FreeThreshold > 0) {
                         announcements.push(`משלוח חינם על קניות מעל ${data.Shipping.FreeThreshold}₪!`);
                         
-if (announcements.length > 0) {
-    showNextAnnouncement();
-    setInterval(showNextAnnouncement, 5000);
-    const bar = document.getElementById('announcement-bar');
-    if (bar) {
-        document.documentElement.style.setProperty('--announcement-height', bar.offsetHeight + 'px');
-    }
-}
-                }
-            } catch(e) { console.error('Announcements error:', e); }
+try {
+    if (announcements && announcements.length > 0) {
+        showNextAnnouncement();
+        
+        // מומלץ לשמור את ה-Interval במשתנה כדי שתוכל לעצור אותו בעתיד אם תצטרך
+        const announcementInterval = setInterval(showNextAnnouncement, 5000);
+        
+        const bar = document.getElementById('announcement-bar');
+        if (bar) {
+            // עדכון גובה ה-CSS Variable
+            document.documentElement.style.setProperty('--announcement-height', bar.offsetHeight + 'px');
+            
+            // בונוס: עדכון הגובה מחדש אם החלון משתנה (Resize)
+            window.addEventListener('resize', () => {
+                document.documentElement.style.setProperty('--announcement-height', bar.offsetHeight + 'px');
+            });
         }
+    }
+} catch (e) {
+    console.error('Announcements error:', e);
+}
 
         function showNextAnnouncement() {
             if (!announcements.length) return;
