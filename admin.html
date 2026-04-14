@@ -1669,8 +1669,8 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     if (isLogged === 'true' && user) {
         try {
-            const docSnap = await getDoc(doc(db, "users", user));
-
+const docSnap = await db.collection("users").doc(user).get();
+            
             if (docSnap.exists() && docSnap.data().isAdmin) {
                 onSuccessfulLogin();
             } else {
@@ -1693,8 +1693,8 @@ loginButton.addEventListener('click', async () => {
     if (!u || !p) return;
 
     try {
-        const docSnap = await db.collection("users").doc(u).get();
-
+const docSnap = await db.collection("users").doc(u).get();
+        
         if (!docSnap.exists) {
             throw new Error("user-not-found");
         }
