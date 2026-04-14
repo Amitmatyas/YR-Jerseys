@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="he">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YR Jerseys</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚽</text></svg>">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚽</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -15,7 +17,9 @@
             --hard-shadow-hover: 12px 12px 0px #000;
         }
 
-        * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+        }
 
         body {
             font-family: 'Heebo', Arial, sans-serif;
@@ -52,8 +56,15 @@
         }
 
         @keyframes fadeInOut {
-            0% { opacity: 0; transform: translateY(-8px); }
-            100% { opacity: 1; transform: translateY(0); }
+            0% {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         header {
@@ -222,9 +233,13 @@
             color: #000;
         }
 
-        .cart-content { padding: 20px; }
+        .cart-content {
+            padding: 20px;
+        }
 
-        .cart-section { margin-bottom: 20px; }
+        .cart-section {
+            margin-bottom: 20px;
+        }
 
         .cart-section-title {
             font-size: 1em;
@@ -298,7 +313,9 @@
             min-width: 28px;
         }
 
-        .cart-item-quantity button:hover { background: var(--accent-color); }
+        .cart-item-quantity button:hover {
+            background: var(--accent-color);
+        }
 
         .cart-item-quantity span {
             min-width: 22px;
@@ -318,7 +335,9 @@
             flex-shrink: 0;
         }
 
-        .remove-from-cart:hover { background: #000; }
+        .remove-from-cart:hover {
+            background: #000;
+        }
 
         .freebie-badge {
             display: inline-block;
@@ -370,7 +389,9 @@
             transition: background 0.2s;
         }
 
-        .coupon-section button:hover { background: #000; }
+        .coupon-section button:hover {
+            background: #000;
+        }
 
         .coupon-applied {
             color: #28a745;
@@ -438,7 +459,9 @@
             border-bottom: 1px solid #ccc;
         }
 
-        .total-row:last-child { border-bottom: none; }
+        .total-row:last-child {
+            border-bottom: none;
+        }
 
         .total-row.grand-total {
             font-size: 1.2em;
@@ -469,7 +492,9 @@
             border-bottom: var(--border-val);
         }
 
-        .form-group { margin-bottom: 12px; }
+        .form-group {
+            margin-bottom: 12px;
+        }
 
         .form-group label {
             display: block;
@@ -501,8 +526,14 @@
             gap: 10px;
         }
 
-        .address-row .form-group { flex: 1; min-width: 0; }
-        .address-row .form-group.small { flex: 0 0 90px; }
+        .address-row .form-group {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .address-row .form-group.small {
+            flex: 0 0 90px;
+        }
 
         .terms-agreement {
             background: #f0f0f0;
@@ -538,7 +569,9 @@
         }
 
         /* ===== SIZE CHARTS CAROUSEL ===== */
-        .size-charts-carousel { margin-top: 12px; }
+        .size-charts-carousel {
+            margin-top: 12px;
+        }
 
         .size-charts-carousel-title {
             font-weight: 900;
@@ -590,23 +623,37 @@
             transition: background 0.2s;
         }
 
-        .carousel-btn:hover { background: var(--accent-color); }
-        .carousel-btn:disabled { background: #ccc; cursor: default; }
+        .carousel-btn:hover {
+            background: var(--accent-color);
+        }
 
-        .carousel-counter { font-size: 0.85em; font-weight: 700; }
+        .carousel-btn:disabled {
+            background: #ccc;
+            cursor: default;
+        }
+
+        .carousel-counter {
+            font-size: 0.85em;
+            font-weight: 700;
+        }
 
         #size-chart-zoom-modal {
             display: none;
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.9);
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
             z-index: 3000;
             justify-content: center;
             align-items: center;
             padding: 20px;
         }
 
-        #size-chart-zoom-modal.active { display: flex; }
+        #size-chart-zoom-modal.active {
+            display: flex;
+        }
 
         #size-chart-zoom-modal img {
             max-width: 95vw;
@@ -642,7 +689,8 @@
             align-items: center;
         }
 
-        #filters input, #filters select {
+        #filters input,
+        #filters select {
             padding: 12px;
             border: var(--border-val);
             font-size: 1em;
@@ -653,7 +701,8 @@
             transition: all 0.2s;
         }
 
-        #filters input:focus, #filters select:focus {
+        #filters input:focus,
+        #filters select:focus {
             outline: none;
             transform: translate(-2px, -2px);
             box-shadow: 6px 6px 0px #000;
@@ -797,14 +846,19 @@
             transition: background 0.2s;
         }
 
-        .product-card button:hover { background: var(--accent-color); }
+        .product-card button:hover {
+            background: var(--accent-color);
+        }
 
         /* ===== PRODUCT MODAL ===== */
         #product-modal {
             display: none;
             position: fixed;
-            top: 0; right: 0; left: 0; bottom: 0;
-            background: rgba(0,0,0,0.5);
+            top: 0;
+            right: 0;
+            left: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
             z-index: 2000;
             justify-content: center;
             align-items: center;
@@ -867,7 +921,9 @@
             transition: background 0.2s;
         }
 
-        #product-modal .close-product-modal:hover { background: var(--accent-color); }
+        #product-modal .close-product-modal:hover {
+            background: var(--accent-color);
+        }
 
         #product-modal .modal-details h2 {
             margin: 0 0 8px 0;
@@ -909,7 +965,9 @@
             font-weight: 500;
         }
 
-        .option-group { margin: 10px 0; }
+        .option-group {
+            margin: 10px 0;
+        }
 
         .option-group label {
             display: block;
@@ -967,21 +1025,28 @@
             transition: background 0.2s;
         }
 
-        #modal-add-to-cart:hover { background: var(--accent-color); }
+        #modal-add-to-cart:hover {
+            background: var(--accent-color);
+        }
 
         /* ===== CLUB MODAL ===== */
         #club-modal {
             display: none;
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.6);
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
             z-index: 2100;
             justify-content: center;
             align-items: center;
             padding: 20px;
         }
 
-        #club-modal.active { display: flex; }
+        #club-modal.active {
+            display: flex;
+        }
 
         .club-modal-content {
             background: white;
@@ -1027,9 +1092,14 @@
             font-weight: 900;
         }
 
-        .close-club-modal:hover { background: white; color: #000; }
+        .close-club-modal:hover {
+            background: white;
+            color: #000;
+        }
 
-        .club-modal-body { padding: 20px; }
+        .club-modal-body {
+            padding: 20px;
+        }
 
         .club-tabs {
             display: flex;
@@ -1051,19 +1121,30 @@
             transition: all 0.2s;
         }
 
-        .club-tab:first-child { border-left: none; }
+        .club-tab:first-child {
+            border-left: none;
+        }
 
         .club-tab.active {
             background: #000;
             color: white;
         }
 
-        .club-tab:hover:not(.active) { background: #ddd; }
+        .club-tab:hover:not(.active) {
+            background: #ddd;
+        }
 
-        .club-tab-content { display: none; }
-        .club-tab-content.active { display: block; }
+        .club-tab-content {
+            display: none;
+        }
 
-        .club-form-group { margin-bottom: 12px; }
+        .club-tab-content.active {
+            display: block;
+        }
+
+        .club-form-group {
+            margin-bottom: 12px;
+        }
 
         .club-form-group label {
             display: block;
@@ -1101,7 +1182,9 @@
             transition: all 0.2s;
         }
 
-        .club-submit-btn:hover { background: var(--accent-color); }
+        .club-submit-btn:hover {
+            background: var(--accent-color);
+        }
 
         .club-submit-btn:disabled {
             background: #ccc;
@@ -1155,7 +1238,10 @@
             margin-top: 4px;
         }
 
-        .club-orders-list { max-height: 350px; overflow-y: auto; }
+        .club-orders-list {
+            max-height: 350px;
+            overflow-y: auto;
+        }
 
         .club-order-item {
             background: #f0f0f0;
@@ -1171,9 +1257,22 @@
             font-weight: 700;
         }
 
-        .club-order-date { color: #555; font-size: 0.85em; }
-        .club-order-total { color: #28a745; font-size: 1em; font-weight: 900; }
-        .club-order-items { font-size: 0.85em; color: #444; margin-top: 6px; }
+        .club-order-date {
+            color: #555;
+            font-size: 0.85em;
+        }
+
+        .club-order-total {
+            color: #28a745;
+            font-size: 1em;
+            font-weight: 900;
+        }
+
+        .club-order-items {
+            font-size: 0.85em;
+            color: #444;
+            margin-top: 6px;
+        }
 
         .club-order-status {
             display: inline-block;
@@ -1185,8 +1284,15 @@
             margin-top: 6px;
         }
 
-        .club-order-status.completed { background: #d4edda; color: #155724; }
-        .club-order-status.pending { background: #fff3cd; color: #856404; }
+        .club-order-status.completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .club-order-status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
 
         .club-logout-btn {
             width: 100%;
@@ -1202,7 +1308,9 @@
             transition: all 0.2s;
         }
 
-        .club-logout-btn:hover { background: #000; }
+        .club-logout-btn:hover {
+            background: #000;
+        }
 
         /* ===== CONTACT ===== */
         .contact-section {
@@ -1248,7 +1356,9 @@
             box-shadow: 4px 4px 0px #000;
         }
 
-        .contact-section button[type="submit"]:hover { background: #000; }
+        .contact-section button[type="submit"]:hover {
+            background: #000;
+        }
 
         /* ===== ABOUT ===== */
         .my-about-card {
@@ -1284,7 +1394,9 @@
             transform: rotate(-5deg) scale(1.05);
         }
 
-        .my-about-content { flex: 1; }
+        .my-about-content {
+            flex: 1;
+        }
 
         .my-about-title {
             font-size: 2rem;
@@ -1338,20 +1450,23 @@
             transition: all 0.2s;
         }
 
-        #clear-cart-btn:hover { border-color: #000; color: #000; }
+        #clear-cart-btn:hover {
+            border-color: #000;
+            color: #000;
+        }
 
         .product-card .category-badge {
-    display: inline-block;
-    background: var(--accent-color);
-    color: #fff;
-    padding: 4px 10px;
-    font-size: 0.8em;
-    font-weight: 900;
-    border: 2px solid #000;
-    text-transform: uppercase;
-    margin: 8px 20px 0 20px;
-}
-        
+            display: inline-block;
+            background: var(--accent-color);
+            color: #fff;
+            padding: 4px 10px;
+            font-size: 0.8em;
+            font-weight: 900;
+            border: 2px solid #000;
+            text-transform: uppercase;
+            margin: 8px 20px 0 20px;
+        }
+
         /* ===== MOBILE ===== */
         @media (max-width: 800px) {
             main#products-container {
@@ -1360,8 +1475,13 @@
                 gap: 25px;
             }
 
-            #cart-container { width: 90vw; }
-            body.cart-open { margin-right: 90vw; }
+            #cart-container {
+                width: 90vw;
+            }
+
+            body.cart-open {
+                margin-right: 90vw;
+            }
 
             #cart-toggle-button {
                 top: 15px;
@@ -1377,7 +1497,9 @@
                 font-size: 0.85em;
             }
 
-            header h1 { font-size: 2.2em; }
+            header h1 {
+                font-size: 2.2em;
+            }
 
             .my-about-card {
                 flex-direction: column;
@@ -1392,19 +1514,33 @@
                 height: 80px;
             }
 
-            #product-modal .modal-content { flex-direction: column; }
-            #product-modal .modal-image { border-left: none; border-bottom: var(--border-val); }
+            #product-modal .modal-content {
+                flex-direction: column;
+            }
 
-            .address-row { flex-direction: column; gap: 0; }
-            .address-row .form-group.small { flex: 1; }
+            #product-modal .modal-image {
+                border-left: none;
+                border-bottom: var(--border-val);
+            }
+
+            .address-row {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .address-row .form-group.small {
+                flex: 1;
+            }
         }
     </style>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.paypal.com/sdk/js?client-id=AZGFbYTdHsMPlQoJYVYjCjUUKeB83lfi1k5AuDZD_70sr7yHE8Ac247Cv3efDssNxt9g-qNY_uWe54ea&currency=ILS"></script>
+    <script
+        src="https://www.paypal.com/sdk/js?client-id=AZGFbYTdHsMPlQoJYVYjCjUUKeB83lfi1k5AuDZD_70sr7yHE8Ac247Cv3efDssNxt9g-qNY_uWe54ea&currency=ILS"></script>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 </head>
+
 <body>
 
     <div id="announcement-bar">
@@ -1529,7 +1665,9 @@
                                 <label>טלפון:</label>
                                 <input type="tel" id="profile-phone" required>
                             </div>
-                            <div style="font-weight:900; text-transform:uppercase; margin:12px 0 8px 0; font-size:0.9em; border-bottom: 2px solid #000; padding-bottom:6px;">כתובת (אופציונלי)</div>
+                            <div
+                                style="font-weight:900; text-transform:uppercase; margin:12px 0 8px 0; font-size:0.9em; border-bottom: 2px solid #000; padding-bottom:6px;">
+                                כתובת (אופציונלי)</div>
                             <div style="display:flex; gap:10px;">
                                 <div class="club-form-group" style="flex:1;">
                                     <label>שם רחוב:</label>
@@ -1609,7 +1747,8 @@
             <div class="cart-section" id="points-usage-container" style="display:none;">
                 <div class="cart-section-title">שימוש בנקודות מועדון</div>
                 <div class="points-usage-section">
-                    <h4>יתרה: <span id="cart-available-points">0</span> נקודות (<span id="cart-points-value">0.00</span>₪)</h4>
+                    <h4>יתרה: <span id="cart-available-points">0</span> נקודות (<span
+                            id="cart-points-value">0.00</span>₪)</h4>
                     <p style="font-size:0.8em; color:#555; margin:4px 0; font-weight:700;">מינימום שימוש: 10 נקודות</p>
                     <input type="range" min="10" max="0" value="10" class="points-slider" id="points-slider">
                     <div class="points-info">
@@ -1698,7 +1837,8 @@
 
                     <div class="terms-agreement">
                         ⏱️ זמן משלוח מוערך: 3 שבועות<br>
-                        📋 בביצוע התשלום אני מאשר/ת את <a href="terms.html" target="_blank" style="color:var(--accent-color); font-weight:900;">התקנון</a>
+                        📋 בביצוע התשלום אני מאשר/ת את <a href="terms.html" target="_blank"
+                            style="color:var(--accent-color); font-weight:900;">התקנון</a>
                     </div>
 
                     <div id="paypal-button-container"></div>
@@ -1756,10 +1896,13 @@
 
     <!-- About -->
     <div class="my-about-card">
-        <img src="https://i.postimg.cc/brSRNJm1/7D29AA03-1C4F-4578-85D5-F3A23D3D84EC.png" alt="YR Jerseys Logo" class="my-about-logo">
+        <img src="https://i.postimg.cc/brSRNJm1/7D29AA03-1C4F-4578-85D5-F3A23D3D84EC.png" alt="YR Jerseys Logo"
+            class="my-about-logo">
         <div class="my-about-content">
             <h3 class="my-about-title">על YR Jerseys</h3>
-            <p class="my-about-text">האתר שלנו נולד מאהבה אמיתית לכדורגל. כמו הרבה אוהדים, רצינו ללבוש בגאווה את צבעי הקבוצות שאנחנו אוהבים – במחיר הוגן ובלי סיבוכים. אנחנו עובדים מול ספקים נבחרים בחו״ל, וההזמנות נשלחות ישירות מהיצרן ללקוח. יש לנו מטרה אחת: שכל לקוח יקבל חולצה שהוא גאה ללבוש וחוויית קנייה נעימה ופשוטה.</p>
+            <p class="my-about-text">האתר שלנו נולד מאהבה אמיתית לכדורגל. כמו הרבה אוהדים, רצינו ללבוש בגאווה את צבעי
+                הקבוצות שאנחנו אוהבים – במחיר הוגן ובלי סיבוכים. אנחנו עובדים מול ספקים נבחרים בחו״ל, וההזמנות נשלחות
+                ישירות מהיצרן ללקוח. יש לנו מטרה אחת: שכל לקוח יקבל חולצה שהוא גאה ללבוש וחוויית קנייה נעימה ופשוטה.</p>
         </div>
     </div>
 
@@ -1781,7 +1924,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         db.enablePersistence({ synchronizeTabs: true })
-          .catch(err => console.log('Persistence unavailable:', err.code));
+            .catch(err => console.log('Persistence unavailable:', err.code));
 
         // DOM refs
         const productsContainer = document.getElementById('products-container');
@@ -1897,7 +2040,7 @@
             const savedCoupon = localStorage.getItem('yr_jerseys_coupon');
 
             if (savedCart) {
-                try { cart = JSON.parse(savedCart); } catch(e) { cart = []; }
+                try { cart = JSON.parse(savedCart); } catch (e) { cart = []; }
             }
 
             if (savedCoupon) {
@@ -1909,15 +2052,15 @@
                         if (typeof v === 'string') {
                             if (v.includes('-')) return new Date(v);
                             const p = v.split(/[/.]/);
-                            if (p.length === 3) return new Date(p[2], p[1]-1, p[0]);
+                            if (p.length === 3) return new Date(p[2], p[1] - 1, p[0]);
                         }
                         return new Date(v);
                     };
 
                     if (couponData.ExpiryDate) {
                         const expiry = getSafeDate(couponData.ExpiryDate);
-                        const today = new Date(); today.setHours(0,0,0,0);
-                        if (expiry) expiry.setHours(0,0,0,0);
+                        const today = new Date(); today.setHours(0, 0, 0, 0);
+                        if (expiry) expiry.setHours(0, 0, 0, 0);
                         if (expiry && expiry >= today) {
                             appliedCoupon = couponData;
                             couponInput.value = couponData.Code;
@@ -1930,7 +2073,7 @@
                         couponInput.value = couponData.Code;
                         couponMessage.innerHTML = '<span class="coupon-applied">✓ קופון הוחל בהצלחה!</span>';
                     }
-                } catch(e) {
+                } catch (e) {
                     appliedCoupon = null;
                     localStorage.removeItem('yr_jerseys_coupon');
                 }
@@ -1946,149 +2089,157 @@
             }
         }
 
-        // ===== ANNOUNCEMENTS =====
-        async function loadAnnouncements() {
-            try {
-                const doc = await db.collection('yr_settings').doc('main').get();
-                if (doc.exists) {
-                    const data = doc.data();
-                    announcements = data.Announcements || [];
-                    if (data.Shipping && data.Shipping.FreeThreshold > 0) {
-                        announcements.push(`משלוח חינם על קניות מעל ${data.Shipping.FreeThreshold}₪!`);
-                        
-try {
-    if (announcements && announcements.length > 0) {
-        showNextAnnouncement();
+ async function loadAnnouncements() {
+    try {
+        const doc = await db.collection('yr_settings').doc('main').get();
+        const announcementBar = document.getElementById('announcement-bar');
         
-        // מומלץ לשמור את ה-Interval במשתנה כדי שתוכל לעצור אותו בעתיד אם תצטרך
-        const announcementInterval = setInterval(showNextAnnouncement, 5000);
-        
-        const bar = document.getElementById('announcement-bar');
-        if (bar) {
-            // עדכון גובה ה-CSS Variable
-            document.documentElement.style.setProperty('--announcement-height', bar.offsetHeight + 'px');
+        if (doc.exists) {
+            const data = doc.data();
+            announcements = data.Announcements || [];
             
-            // בונוס: עדכון הגובה מחדש אם החלון משתנה (Resize)
-            window.addEventListener('resize', () => {
-                document.documentElement.style.setProperty('--announcement-height', bar.offsetHeight + 'px');
-            });
-        }
-    }
-} catch (e) {
-    console.error('Announcements error:', e);
-}
+            // הוספת הודעת משלוח חינם אם רלוונטי
+            if (data.Shipping && data.Shipping.FreeThreshold > 0) {
+                announcements.push(`משלוח חינם על קניות מעל ${data.Shipping.FreeThreshold}₪!`);
+            }
 
-        function showNextAnnouncement() {
-            if (!announcements.length) return;
-            announcementBar.textContent = announcements[currentAnnouncementIndex];
-            currentAnnouncementIndex = (currentAnnouncementIndex + 1) % announcements.length;
-        }
+            if (announcements.length > 0 && announcementBar) {
+                // הצגת ההודעה הראשונה מיד
+                showNextAnnouncement();
 
-        // ===== SETTINGS =====
-        async function loadSettings() {
-            try {
-                const doc = await db.collection('yr_settings').doc('main').get();
-                if (doc.exists) {
-                    settings = doc.data();
-                    categories = settings.Categories || [];
-                    updateCategoryFilter();
-                } else {
-                    settings = { Shipping: { Method: 'fixed', Value: 30, FreeThreshold: 0 }, Coupons: [], Categories: [] };
-                }
-            } catch(e) {
-                settings = { Shipping: { Method: 'fixed', Value: 30, FreeThreshold: 0 }, Coupons: [], Categories: [] };
+                // הגדרת אינטרוול להחלפת הודעות
+                const announcementInterval = setInterval(showNextAnnouncement, 5000);
+
+                // עדכון גובה הבר ב-CSS
+                updateBarHeight();
+                window.addEventListener('resize', updateBarHeight);
             }
         }
+    } catch (e) {
+        console.error('Announcements error:', e);
+    }
+}
 
-        // ===== PRODUCTS =====
-        async function fetchProducts() {
-            try {
-                const snap = await withTimeout(db.collection('yr_jerseys').get(), 10000);
-                products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                applyFilters();
-                handleDeepLink();
-            } catch(e) {
-                productsContainer.innerHTML = `
+function showNextAnnouncement() {
+    const announcementBar = document.getElementById('announcement-bar');
+    if (!announcements.length || !announcementBar) return;
+    
+    announcementBar.textContent = announcements[currentAnnouncementIndex];
+    currentAnnouncementIndex = (currentAnnouncementIndex + 1) % announcements.length;
+}
+
+function updateBarHeight() {
+    const bar = document.getElementById('announcement-bar');
+    if (bar) {
+        document.documentElement.style.setProperty('--announcement-height', bar.offsetHeight + 'px');
+    }
+}
+
+                        // ===== SETTINGS =====
+                        async function loadSettings() {
+                            try {
+                                const doc = await db.collection('yr_settings').doc('main').get();
+                                if (doc.exists) {
+                                    settings = doc.data();
+                                    categories = settings.Categories || [];
+                                    updateCategoryFilter();
+                                } else {
+                                    settings = { Shipping: { Method: 'fixed', Value: 30, FreeThreshold: 0 }, Coupons: [], Categories: [] };
+                                }
+                            } catch (e) {
+                                settings = { Shipping: { Method: 'fixed', Value: 30, FreeThreshold: 0 }, Coupons: [], Categories: [] };
+                            }
+                        }
+
+                        // ===== PRODUCTS =====
+                        async function fetchProducts() {
+                            try {
+                                const snap = await withTimeout(db.collection('yr_jerseys').get(), 10000);
+                                products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                                applyFilters();
+                                handleDeepLink();
+                            } catch (e) {
+                                productsContainer.innerHTML = `
                     <div style="text-align:center;padding:60px;width:100%;grid-column:1/-1;">
                         <div style="font-size:3em;margin-bottom:15px;font-weight:900;">⚠️</div>
                         <p style="font-size:1.1em;color:var(--accent-color);font-weight:900;">שגיאה בטעינת המוצרים</p>
                         <button onclick="location.reload()" style="background:#000;color:white;border:4px solid #000;padding:12px 24px;cursor:pointer;font-size:1em;font-weight:900;text-transform:uppercase;margin-top:15px;">רענן דף</button>
                     </div>`;
-            }
-        }
+                            }
+                        }
 
-        function getEffectivePrice(product) {
-            if (product.salePrice && product.salePrice > 0) {
-                if (product.saleEndDate) {
-                    if (new Date(product.saleEndDate) >= new Date()) return product.salePrice;
-                } else { return product.salePrice; }
-            }
-            return product.price;
-        }
+                        function getEffectivePrice(product) {
+                            if (product.salePrice && product.salePrice > 0) {
+                                if (product.saleEndDate) {
+                                    if (new Date(product.saleEndDate) >= new Date()) return product.salePrice;
+                                } else { return product.salePrice; }
+                            }
+                            return product.price;
+                        }
 
-        function isProductOnSale(product) {
-            if (!product.salePrice || product.salePrice <= 0) return false;
-            if (product.saleEndDate) return new Date(product.saleEndDate) >= new Date();
-            return true;
-        }
+                        function isProductOnSale(product) {
+                            if (!product.salePrice || product.salePrice <= 0) return false;
+                            if (product.saleEndDate) return new Date(product.saleEndDate) >= new Date();
+                            return true;
+                        }
 
-        function getProductCategories(product) {
-            if (Array.isArray(product.categories) && product.categories.length > 0) return product.categories;
-            if (product.category) return [product.category];
-            return [];
-        }
+                        function getProductCategories(product) {
+                            if (Array.isArray(product.categories) && product.categories.length > 0) return product.categories;
+                            if (product.category) return [product.category];
+                            return [];
+                        }
 
-        function productInCategory(product, cat) {
-            return getProductCategories(product).includes(cat);
-        }
+                        function productInCategory(product, cat) {
+                            return getProductCategories(product).includes(cat);
+                        }
 
-        // ===== FILTERS =====
-        const searchInput = document.getElementById('search-input');
-        const sortSelect = document.getElementById('sort-select');
+                        // ===== FILTERS =====
+                        const searchInput = document.getElementById('search-input');
+                        const sortSelect = document.getElementById('sort-select');
 
-        function applyFilters() {
-            let filtered = [...products];
-            if (currentCategoryFilter !== 'all') {
-                filtered = filtered.filter(p => productInCategory(p, currentCategoryFilter));
-            }
-            const q = searchInput.value.toLowerCase();
-            if (q) filtered = filtered.filter(p => p.name.toLowerCase().includes(q));
-            if (sortSelect.value === 'price-asc') filtered.sort((a,b) => getEffectivePrice(a) - getEffectivePrice(b));
-            else if (sortSelect.value === 'price-desc') filtered.sort((a,b) => getEffectivePrice(b) - getEffectivePrice(a));
-            renderFilteredProducts(filtered);
-        }
+                        function applyFilters() {
+                            let filtered = [...products];
+                            if (currentCategoryFilter !== 'all') {
+                                filtered = filtered.filter(p => productInCategory(p, currentCategoryFilter));
+                            }
+                            const q = searchInput.value.toLowerCase();
+                            if (q) filtered = filtered.filter(p => p.name.toLowerCase().includes(q));
+                            if (sortSelect.value === 'price-asc') filtered.sort((a, b) => getEffectivePrice(a) - getEffectivePrice(b));
+                            else if (sortSelect.value === 'price-desc') filtered.sort((a, b) => getEffectivePrice(b) - getEffectivePrice(a));
+                            renderFilteredProducts(filtered);
+                        }
 
-        function renderFilteredProducts(list) {
-            productsContainer.innerHTML = '';
-            if (!list.length) {
-                productsContainer.innerHTML = '<p style="text-align:center;width:100%;padding:40px;font-weight:900;text-transform:uppercase;">לא נמצאו מוצרים.</p>';
-                return;
-            }
-            list.forEach(product => {
-                const card = document.createElement('div');
-                card.className = 'product-card';
-                const onSale = isProductOnSale(product);
-                const effectivePrice = getEffectivePrice(product);
-                let priceHTML = `<p class="price">${effectivePrice.toFixed(2)} ₪</p>`;
-                let saleBadge = '';
-                if (onSale) {
-                    const pct = Math.round(((product.price - product.salePrice) / product.price) * 100);
-                    saleBadge = `<div class="sale-badge">-${pct}%</div>`;
-                    priceHTML = `<p class="price on-sale">
+                        function renderFilteredProducts(list) {
+                            productsContainer.innerHTML = '';
+                            if (!list.length) {
+                                productsContainer.innerHTML = '<p style="text-align:center;width:100%;padding:40px;font-weight:900;text-transform:uppercase;">לא נמצאו מוצרים.</p>';
+                                return;
+                            }
+                            list.forEach(product => {
+                                const card = document.createElement('div');
+                                card.className = 'product-card';
+                                const onSale = isProductOnSale(product);
+                                const effectivePrice = getEffectivePrice(product);
+                                let priceHTML = `<p class="price">${effectivePrice.toFixed(2)} ₪</p>`;
+                                let saleBadge = '';
+                                if (onSale) {
+                                    const pct = Math.round(((product.price - product.salePrice) / product.price) * 100);
+                                    saleBadge = `<div class="sale-badge">-${pct}%</div>`;
+                                    priceHTML = `<p class="price on-sale">
                         <span class="original-price">${product.price.toFixed(2)} ₪</span>
                         <span class="sale-price">${product.salePrice.toFixed(2)} ₪</span>
                     </p>`;
-                }
-                const showBadges = (currentCategoryFilter === 'all');
-let badgeHTML = '';
-if (showBadges) {
-    const cats = getProductCategories(product);
-    if (cats.length > 0) {
-        badgeHTML = `<span class="category-badge">${cats[0]}</span>`;
-    }
-}
+                                }
+                                const showBadges = (currentCategoryFilter === 'all');
+                                let badgeHTML = '';
+                                if (showBadges) {
+                                    const cats = getProductCategories(product);
+                                    if (cats.length > 0) {
+                                        badgeHTML = `<span class="category-badge">${cats[0]}</span>`;
+                                    }
+                                }
 
-card.innerHTML = `
+                                card.innerHTML = `
     ${saleBadge}
     <img src="${product.image}" alt="${product.name}">
     <h3>${product.name}</h3>
@@ -2096,122 +2247,122 @@ card.innerHTML = `
     ${priceHTML}
     <button onclick="openProductModal('${product.id}')">הוסף לעגלה</button>
 `;
-                card.querySelector('img').addEventListener('click', () => openProductModal(product.id));
-                card.querySelector('h3').addEventListener('click', () => openProductModal(product.id));
-                productsContainer.appendChild(card);
-            });
-        }
+                                card.querySelector('img').addEventListener('click', () => openProductModal(product.id));
+                                card.querySelector('h3').addEventListener('click', () => openProductModal(product.id));
+                                productsContainer.appendChild(card);
+                            });
+                        }
 
-        searchInput.addEventListener('input', applyFilters);
-        sortSelect.addEventListener('change', applyFilters);
+                        searchInput.addEventListener('input', applyFilters);
+                        sortSelect.addEventListener('change', applyFilters);
 
-        function updateCategoryFilter() {
-            const filterDiv = document.getElementById('category-filter');
-            filterDiv.innerHTML = '<button class="active" data-category="all">הכל</button>';
-            categories.forEach(cat => {
-                const btn = document.createElement('button');
-                btn.textContent = cat;
-                btn.dataset.category = cat;
-                btn.addEventListener('click', () => filterByCategory(cat));
-                filterDiv.appendChild(btn);
-            });
-            filterDiv.querySelector('[data-category="all"]').addEventListener('click', () => filterByCategory('all'));
-        }
+                        function updateCategoryFilter() {
+                            const filterDiv = document.getElementById('category-filter');
+                            filterDiv.innerHTML = '<button class="active" data-category="all">הכל</button>';
+                            categories.forEach(cat => {
+                                const btn = document.createElement('button');
+                                btn.textContent = cat;
+                                btn.dataset.category = cat;
+                                btn.addEventListener('click', () => filterByCategory(cat));
+                                filterDiv.appendChild(btn);
+                            });
+                            filterDiv.querySelector('[data-category="all"]').addEventListener('click', () => filterByCategory('all'));
+                        }
 
-        function filterByCategory(category) {
-            currentCategoryFilter = category;
-            document.querySelectorAll('#category-filter button').forEach(b => {
-                b.classList.toggle('active', b.dataset.category === category);
-            });
-            applyFilters();
-        }
+                        function filterByCategory(category) {
+                            currentCategoryFilter = category;
+                            document.querySelectorAll('#category-filter button').forEach(b => {
+                                b.classList.toggle('active', b.dataset.category === category);
+                            });
+                            applyFilters();
+                        }
 
-        // ===== SHIPPING =====
-        function calculateShipping() {
-            if (!settings || !settings.Shipping) { shippingCost = 0; return; }
-            const shipping = settings.Shipping;
+                        // ===== SHIPPING =====
+                        function calculateShipping() {
+                            if (!settings || !settings.Shipping) { shippingCost = 0; return; }
+                            const shipping = settings.Shipping;
 
-            if (shipping.FreeThreshold > 0 && subtotal >= shipping.FreeThreshold) {
-                shippingCost = 0;
-                shippingInfoElement.innerHTML = '<strong style="color:#28a745;">✓ זכאי למשלוח חינם!</strong>';
-                return;
-            }
+                            if (shipping.FreeThreshold > 0 && subtotal >= shipping.FreeThreshold) {
+                                shippingCost = 0;
+                                shippingInfoElement.innerHTML = '<strong style="color:#28a745;">✓ זכאי למשלוח חינם!</strong>';
+                                return;
+                            }
 
-            const itemsWithCustom = [];
-            const itemsWithout = [];
-            cart.forEach(item => {
-                const p = products.find(x => x.id === item.id);
-                if (p && p.customShipping !== undefined && p.customShipping >= 0) itemsWithCustom.push({ item, p });
-                else itemsWithout.push({ item, p });
-            });
+                            const itemsWithCustom = [];
+                            const itemsWithout = [];
+                            cart.forEach(item => {
+                                const p = products.find(x => x.id === item.id);
+                                if (p && p.customShipping !== undefined && p.customShipping >= 0) itemsWithCustom.push({ item, p });
+                                else itemsWithout.push({ item, p });
+                            });
 
-            const customTotal = itemsWithCustom.reduce((s, { item, p }) => s + p.customShipping * item.quantity, 0);
-            let globalShipping = 0;
-            if (itemsWithout.length > 0) {
-                const subWithout = itemsWithout.reduce((s, { item }) => s + item.price * item.quantity, 0);
-                if (shipping.Method === 'percentage') globalShipping = (subWithout * shipping.Value) / 100;
-                else if (shipping.Method === 'per_item') globalShipping = shipping.Value * itemsWithout.reduce((s, { item }) => s + item.quantity, 0);
-                else globalShipping = shipping.Value;
-            }
+                            const customTotal = itemsWithCustom.reduce((s, { item, p }) => s + p.customShipping * item.quantity, 0);
+                            let globalShipping = 0;
+                            if (itemsWithout.length > 0) {
+                                const subWithout = itemsWithout.reduce((s, { item }) => s + item.price * item.quantity, 0);
+                                if (shipping.Method === 'percentage') globalShipping = (subWithout * shipping.Value) / 100;
+                                else if (shipping.Method === 'per_item') globalShipping = shipping.Value * itemsWithout.reduce((s, { item }) => s + item.quantity, 0);
+                                else globalShipping = shipping.Value;
+                            }
 
-            shippingCost = customTotal + globalShipping;
+                            shippingCost = customTotal + globalShipping;
 
-            if (shipping.FreeThreshold > 0) {
-                const rem = shipping.FreeThreshold - subtotal;
-                shippingInfoElement.innerHTML = rem > 0 ? `הוסף עוד ${rem.toFixed(2)}₪ וקבל משלוח חינם!` : '';
-            } else {
-                shippingInfoElement.innerHTML = '';
-            }
-        }
+                            if (shipping.FreeThreshold > 0) {
+                                const rem = shipping.FreeThreshold - subtotal;
+                                shippingInfoElement.innerHTML = rem > 0 ? `הוסף עוד ${rem.toFixed(2)}₪ וקבל משלוח חינם!` : '';
+                            } else {
+                                shippingInfoElement.innerHTML = '';
+                            }
+                        }
 
-        function applyCouponDiscount() {
-            if (!appliedCoupon) return 0;
-            let discount = 0;
-            if (appliedCoupon.Type === 'free_shipping') { discount = shippingCost; shippingCost = 0; }
-            else if (appliedCoupon.Type === 'fixed_discount') discount = Math.min(appliedCoupon.Value, subtotal);
-            else if (appliedCoupon.Type === 'percentage_discount') discount = (subtotal * appliedCoupon.Value) / 100;
-            return discount;
-        }
+                        function applyCouponDiscount() {
+                            if (!appliedCoupon) return 0;
+                            let discount = 0;
+                            if (appliedCoupon.Type === 'free_shipping') { discount = shippingCost; shippingCost = 0; }
+                            else if (appliedCoupon.Type === 'fixed_discount') discount = Math.min(appliedCoupon.Value, subtotal);
+                            else if (appliedCoupon.Type === 'percentage_discount') discount = (subtotal * appliedCoupon.Value) / 100;
+                            return discount;
+                        }
 
-        function buildShippingBreakdown() {
-    if (!settings || !settings.Shipping || cart.length === 0) return '';
-    const lines = [];
-    cart.forEach(item => {
-        const product = products.find(p => p.id === item.id);
-        if (product && product.customShipping !== undefined && product.customShipping >= 0) {
-            lines.push(`<div style="font-size:0.8em;color:#888;margin-top:3px;">• ${item.name}: ${product.customShipping.toFixed(2)}₪</div>`);
-        } else if (settings.Shipping.Method === 'per_item') {
-            lines.push(`<div style="font-size:0.8em;color:#888;margin-top:3px;">• ${item.name}: ${(settings.Shipping.Value * item.quantity).toFixed(2)}₪</div>`);
-        }
-    });
-    if (lines.length === 0) return '';
-    return '<div style="margin-top:4px;">' + lines.join('') + '</div>';
-}
-        
-        // ===== CART DISPLAY =====
-        function updateCartDisplay() {
-            cartItemsList.innerHTML = '';
-            subtotal = 0;
+                        function buildShippingBreakdown() {
+                            if (!settings || !settings.Shipping || cart.length === 0) return '';
+                            const lines = [];
+                            cart.forEach(item => {
+                                const product = products.find(p => p.id === item.id);
+                                if (product && product.customShipping !== undefined && product.customShipping >= 0) {
+                                    lines.push(`<div style="font-size:0.8em;color:#888;margin-top:3px;">• ${item.name}: ${product.customShipping.toFixed(2)}₪</div>`);
+                                } else if (settings.Shipping.Method === 'per_item') {
+                                    lines.push(`<div style="font-size:0.8em;color:#888;margin-top:3px;">• ${item.name}: ${(settings.Shipping.Value * item.quantity).toFixed(2)}₪</div>`);
+                                }
+                            });
+                            if (lines.length === 0) return '';
+                            return '<div style="margin-top:4px;">' + lines.join('') + '</div>';
+                        }
 
-            if (cart.length === 0) {
-                cartItemsList.innerHTML = `
+                        // ===== CART DISPLAY =====
+                        function updateCartDisplay() {
+                            cartItemsList.innerHTML = '';
+                            subtotal = 0;
+
+                            if (cart.length === 0) {
+                                cartItemsList.innerHTML = `
                     <div class="empty-cart-message">
                         <div style="font-size:3em;margin-bottom:10px;">🛒</div>
                         <p>העגלה ריקה</p>
                     </div>`;
-                shippingInfoElement.innerHTML = '';
-            } else {
-                cart.forEach(item => {
-                    const li = document.createElement('li');
-                    let optTxt = '';
-                    if (item.selectedOptions) {
-                        Object.keys(item.selectedOptions).forEach(k => {
-                            if (item.selectedOptions[k]) optTxt += `${k}: ${item.selectedOptions[k]} `;
-                        });
-                    }
-                    const idx = cart.indexOf(item);
-                    const freebieTag = item.isFreebie ? '<span class="freebie-badge">מתנה</span>' : '';
-                    li.innerHTML = `
+                                shippingInfoElement.innerHTML = '';
+                            } else {
+                                cart.forEach(item => {
+                                    const li = document.createElement('li');
+                                    let optTxt = '';
+                                    if (item.selectedOptions) {
+                                        Object.keys(item.selectedOptions).forEach(k => {
+                                            if (item.selectedOptions[k]) optTxt += `${k}: ${item.selectedOptions[k]} `;
+                                        });
+                                    }
+                                    const idx = cart.indexOf(item);
+                                    const freebieTag = item.isFreebie ? '<span class="freebie-badge">מתנה</span>' : '';
+                                    li.innerHTML = `
                         <div class="cart-item-details">
                             <img src="${item.displayImage || item.image}" alt="${item.name}">
                             <div class="cart-item-info">
@@ -2227,267 +2378,267 @@ card.innerHTML = `
                         </div>
                         <button class="remove-from-cart" data-cart-index="${idx}" title="הסר">🗑</button>
                     `;
-                    cartItemsList.appendChild(li);
-                    subtotal += item.price * item.quantity;
-                });
-            }
+                                    cartItemsList.appendChild(li);
+                                    subtotal += item.price * item.quantity;
+                                });
+                            }
 
-            calculateShipping();
-            const couponDiscount = applyCouponDiscount();
-            updatePointsUsage();
+                            calculateShipping();
+                            const couponDiscount = applyCouponDiscount();
+                            updatePointsUsage();
 
-            total = subtotal + shippingCost - couponDiscount - pointsDiscount;
-            if (total < 0) total = 0;
+                            total = subtotal + shippingCost - couponDiscount - pointsDiscount;
+                            if (total < 0) total = 0;
 
-            // Rebuild totals
-            const totalsSection = document.getElementById('cart-totals-section');
-            let html = `
+                            // Rebuild totals
+                            const totalsSection = document.getElementById('cart-totals-section');
+                            let html = `
                 <div class="total-row"><span>סה"כ מוצרים:</span><span>${subtotal.toFixed(2)} ₪</span></div>
                 <div class="total-row"><span>דמי משלוח:${buildShippingBreakdown()}</span><span>${shippingCost.toFixed(2)} ₪</span></div>`;
-            if (couponDiscount > 0) html += `<div class="total-row" style="color:#28a745;"><span>הנחת קופון:</span><span>-${couponDiscount.toFixed(2)} ₪</span></div>`;
-            if (pointsDiscount > 0) html += `<div class="total-row" style="color:#28a745;"><span>הנחת נקודות:</span><span>-${pointsDiscount.toFixed(2)} ₪</span></div>`;
-            html += `<div class="total-row grand-total"><span>סה"כ לתשלום:</span><span>${total.toFixed(2)} ₪</span></div>`;
-            totalsSection.innerHTML = html;
+                            if (couponDiscount > 0) html += `<div class="total-row" style="color:#28a745;"><span>הנחת קופון:</span><span>-${couponDiscount.toFixed(2)} ₪</span></div>`;
+                            if (pointsDiscount > 0) html += `<div class="total-row" style="color:#28a745;"><span>הנחת נקודות:</span><span>-${pointsDiscount.toFixed(2)} ₪</span></div>`;
+                            html += `<div class="total-row grand-total"><span>סה"כ לתשלום:</span><span>${total.toFixed(2)} ₪</span></div>`;
+                            totalsSection.innerHTML = html;
 
-            updateCartButton();
-            saveCartToStorage();
-            if (cartOpen) renderPayPalButton();
-        }
-
-        function removeFromCart(idx) {
-            cart.splice(idx, 1);
-            updateCartDisplay();
-        }
-
-        function changeQuantity(idx, delta) {
-            if (cart[idx]) {
-                cart[idx].quantity += delta;
-                if (cart[idx].quantity < 1) cart.splice(idx, 1);
-                updateCartDisplay();
-            }
-        }
-
-        cartItemsList.addEventListener('click', e => {
-            const idx = parseInt(e.target.dataset.cartIndex);
-            if (!isNaN(idx)) {
-                if (e.target.classList.contains('increase-quantity')) changeQuantity(idx, 1);
-                else if (e.target.classList.contains('decrease-quantity')) changeQuantity(idx, -1);
-                else if (e.target.classList.contains('remove-from-cart')) removeFromCart(idx);
-            }
-        });
-
-        function addToCart(productId, selectedOptions, displayImage, finalPrice, isFreebie = false) {
-            const product = products.find(p => p.id === productId);
-            const existIdx = cart.findIndex(item => {
-                if (item.id !== product.id || item.isFreebie !== isFreebie) return false;
-                if (!item.selectedOptions && !selectedOptions) return true;
-                if (!item.selectedOptions || !selectedOptions) return false;
-                return JSON.stringify(item.selectedOptions) === JSON.stringify(selectedOptions);
-            });
-            if (existIdx !== -1) {
-                cart[existIdx].quantity++;
-            } else {
-                cart.push({
-                    ...product,
-                    quantity: 1,
-                    price: finalPrice,
-                    originalPrice: isProductOnSale(product) && !isFreebie ? product.price : null,
-                    selectedOptions,
-                    displayImage,
-                    isFreebie
-                });
-            }
-            updateCartDisplay();
-            openCart();
-        }
-
-        // ===== COUPON =====
-        applyCouponBtn.addEventListener('click', async () => {
-            const code = couponInput.value.trim();
-            if (!code) { couponMessage.innerHTML = '<span style="color:red;font-weight:700;">אנא הזן קוד קופון</span>'; return; }
-            if (!settings || !settings.Coupons) { couponMessage.innerHTML = '<span style="color:red;font-weight:700;">קוד לא תקין</span>'; return; }
-
-            const coupon = settings.Coupons.find(c => c.Code === code);
-            if (!coupon) { couponMessage.innerHTML = '<span style="color:red;font-weight:700;">קוד קופון לא קיים</span>'; return; }
-
-            if (coupon.ExpiryDate) {
-                const expiry = new Date(coupon.ExpiryDate);
-                const today = new Date(); today.setHours(0,0,0,0);
-                if (expiry < today) { couponMessage.innerHTML = '<span style="color:red;font-weight:700;">תוקף הקופון עבר</span>'; return; }
-            }
-
-            if (appliedCoupon && appliedCoupon.Type === 'free_product' && appliedCoupon.ProductId) {
-                cart = cart.filter(item => !(item.id === appliedCoupon.ProductId && item.isFreebie));
-            }
-            appliedCoupon = coupon;
-
-            if (coupon.Type === 'free_product' && coupon.ProductId) {
-                const freeProduct = products.find(p => p.id === coupon.ProductId);
-                if (freeProduct && !cart.find(i => i.id === coupon.ProductId && i.isFreebie)) {
-                    const needsInput = freeProduct.customFields && freeProduct.customFields.length > 0 &&
-                        (freeProduct.customFields.some(f => f.required && !(coupon.SelectedOptions && coupon.SelectedOptions[f.name])) ||
-                         freeProduct.customFields.some(f => f.type === 'text'));
-                    if (needsInput) {
-                        couponLockedOptions = coupon.SelectedOptions || {};
-                        isCouponProduct = true;
-                        openProductModal(coupon.ProductId, true);
-                        couponMessage.innerHTML = '<span style="color:#3498db;font-weight:700;">אנא מלא את הפרטים החסרים למוצר המתנה</span>';
-                        return;
-                    }
-                    addToCart(coupon.ProductId, coupon.SelectedOptions || {}, freeProduct.image, 0, true);
-                }
-            }
-
-            updateCartDisplay();
-            couponMessage.innerHTML = '<span class="coupon-applied">✓ קופון הוחל בהצלחה!</span>';
-        });
-
-        // ===== POINTS =====
-        function updatePointsUsage() {
-            const container = document.getElementById('points-usage-container');
-            const slider = document.getElementById('points-slider');
-            if (currentClubMember && currentClubMember.points >= 10) {
-                container.style.display = 'block';
-                const maxPoints = Math.min(currentClubMember.points, Math.floor(subtotal));
-                slider.min = 10;
-                slider.max = maxPoints;
-                if (pointsToUse < 10) { pointsToUse = 0; slider.value = 10; }
-                else slider.value = Math.min(pointsToUse, maxPoints);
-                document.getElementById('cart-available-points').textContent = currentClubMember.points;
-                document.getElementById('cart-points-value').textContent = currentClubMember.points.toFixed(2);
-                updatePointsDisplay();
-            } else {
-                container.style.display = 'none';
-                pointsToUse = 0;
-                pointsDiscount = 0;
-            }
-        }
-
-        function updatePointsDisplay() {
-            document.getElementById('points-to-use').textContent = pointsToUse;
-            document.getElementById('points-discount').textContent = pointsDiscount.toFixed(2);
-        }
-
-        document.getElementById('points-slider').addEventListener('input', e => {
-            const val = parseInt(e.target.value) || 0;
-            if (!currentClubMember || currentClubMember.points < 10) {
-                pointsToUse = 0; pointsDiscount = 0;
-                e.target.value = 10;
-            } else if (val < 10) {
-                pointsToUse = 0; pointsDiscount = 0;
-                e.target.value = 10;
-            } else {
-                pointsToUse = Math.min(val, currentClubMember.points, Math.floor(subtotal));
-                pointsDiscount = pointsToUse;
-            }
-            updatePointsDisplay();
-            updateCartDisplay();
-        });
-
-        // ===== CLUB MEMBER =====
-        async function loadClubMember() {
-            const data = localStorage.getItem('yr_jerseys_club_member');
-            if (data) {
-                try {
-                    const m = JSON.parse(data);
-                    const doc = await db.collection('ClubMembers').doc(m.id).get();
-                    if (doc.exists) {
-                        currentClubMember = { id: doc.id, ...doc.data() };
-                        updateClubButton();
-                        updateClubModal();
-                        return true;
-                    } else {
-                        localStorage.removeItem('yr_jerseys_club_member');
-                    }
-                } catch(e) { localStorage.removeItem('yr_jerseys_club_member'); }
-            }
-            return false;
-        }
-
-        function saveClubMember() {
-            if (currentClubMember) localStorage.setItem('yr_jerseys_club_member', JSON.stringify(currentClubMember));
-            else localStorage.removeItem('yr_jerseys_club_member');
-        }
-
-        function updateClubButton() {
-            const btn = document.getElementById('club-toggle-button');
-            if (currentClubMember) {
-                btn.innerHTML = `<span>👤</span><span class="club-text">${currentClubMember.name.split(' ')[0]}</span>`;
-            } else {
-                btn.innerHTML = `<span>⭐</span><span class="club-text">מועדון VIP</span>`;
-            }
-        }
-
-        function updateClubModal() {
-            const guestView = document.getElementById('club-guest-view');
-            const memberView = document.getElementById('club-member-view');
-            const title = document.getElementById('club-modal-title');
-
-            if (currentClubMember) {
-                guestView.style.display = 'none';
-                memberView.style.display = 'block';
-                title.textContent = `שלום ${currentClubMember.name.split(' ')[0]}!`;
-                document.getElementById('member-points').textContent = currentClubMember.points || 0;
-                document.getElementById('member-points-value').textContent = (currentClubMember.points || 0).toFixed(2);
-                document.getElementById('profile-name').value = currentClubMember.name || '';
-                document.getElementById('profile-email').value = currentClubMember.email || '';
-                document.getElementById('profile-phone').value = currentClubMember.phone || '';
-
-                if (currentClubMember.address) {
-                    const parts = currentClubMember.address.split(',').map(p => p.trim());
-                    if (parts.length >= 3) {
-                        const sh = parts[0].trim();
-                        const hm = sh.match(/\s+(\d+[א-ת]?)$/);
-                        if (hm) {
-                            document.getElementById('profile-address-house').value = hm[1];
-                            document.getElementById('profile-address-street').value = sh.replace(/\s+\d+[א-ת]?$/, '').trim();
-                        } else {
-                            document.getElementById('profile-address-street').value = sh;
-                            document.getElementById('profile-address-house').value = '';
+                            updateCartButton();
+                            saveCartToStorage();
+                            if (cartOpen) renderPayPalButton();
                         }
-                        document.getElementById('profile-address-city').value = parts[1] || '';
-                        const cz = parts[2].trim().split(/\s+/);
-                        const last = cz[cz.length - 1];
-                        if (last && /^\d+$/.test(last)) {
-                            document.getElementById('profile-address-zip').value = last;
-                            document.getElementById('profile-address-country').value = cz.slice(0,-1).join(' ') || 'ישראל';
-                        } else {
-                            document.getElementById('profile-address-zip').value = '';
-                            document.getElementById('profile-address-country').value = parts[2] || 'ישראל';
+
+                        function removeFromCart(idx) {
+                            cart.splice(idx, 1);
+                            updateCartDisplay();
                         }
-                    }
-                }
-                loadMemberOrders();
-            } else {
-                guestView.style.display = 'block';
-                memberView.style.display = 'none';
-                title.textContent = 'מועדון VIP';
-            }
-            updateCheckoutForm();
-            updatePointsUsage();
-        }
 
-        async function loadMemberOrders() {
-            const list = document.getElementById('member-orders-list');
-            if (!currentClubMember) return;
-            try {
-                list.innerHTML = '<p style="text-align:center;color:#999;font-weight:700;">טוען הזמנות...</p>';
-                const snap = await db.collection('yr_orders').where('clubMemberId', '==', currentClubMember.id).get();
-                if (snap.empty) { list.innerHTML = '<p style="text-align:center;color:#999;font-weight:700;">אין הזמנות עדיין</p>'; return; }
+                        function changeQuantity(idx, delta) {
+                            if (cart[idx]) {
+                                cart[idx].quantity += delta;
+                                if (cart[idx].quantity < 1) cart.splice(idx, 1);
+                                updateCartDisplay();
+                            }
+                        }
 
-                const sorted = snap.docs.map(d => ({ id: d.id, ...d.data() }))
-                    .sort((a,b) => {
-                        const da = a.orderDate ? a.orderDate.toDate() : new Date(0);
-                        const db2 = b.orderDate ? b.orderDate.toDate() : new Date(0);
-                        return db2 - da;
-                    });
+                        cartItemsList.addEventListener('click', e => {
+                            const idx = parseInt(e.target.dataset.cartIndex);
+                            if (!isNaN(idx)) {
+                                if (e.target.classList.contains('increase-quantity')) changeQuantity(idx, 1);
+                                else if (e.target.classList.contains('decrease-quantity')) changeQuantity(idx, -1);
+                                else if (e.target.classList.contains('remove-from-cart')) removeFromCart(idx);
+                            }
+                        });
 
-                list.innerHTML = '';
-                sorted.forEach(order => {
-                    const date = order.orderDate ? new Date(order.orderDate.toDate()).toLocaleDateString('he-IL') : 'לא ידוע';
-                    const amount = (order.totalAmount && typeof order.totalAmount === 'number') ? order.totalAmount.toFixed(2) : '0.00';
-                    const items = Array.isArray(order.items) ? order.items.map(i => `${i.quantity}x ${i.productName || i.name}`).join(', ') : '';
-                    list.insertAdjacentHTML('beforeend', `
+                        function addToCart(productId, selectedOptions, displayImage, finalPrice, isFreebie = false) {
+                            const product = products.find(p => p.id === productId);
+                            const existIdx = cart.findIndex(item => {
+                                if (item.id !== product.id || item.isFreebie !== isFreebie) return false;
+                                if (!item.selectedOptions && !selectedOptions) return true;
+                                if (!item.selectedOptions || !selectedOptions) return false;
+                                return JSON.stringify(item.selectedOptions) === JSON.stringify(selectedOptions);
+                            });
+                            if (existIdx !== -1) {
+                                cart[existIdx].quantity++;
+                            } else {
+                                cart.push({
+                                    ...product,
+                                    quantity: 1,
+                                    price: finalPrice,
+                                    originalPrice: isProductOnSale(product) && !isFreebie ? product.price : null,
+                                    selectedOptions,
+                                    displayImage,
+                                    isFreebie
+                                });
+                            }
+                            updateCartDisplay();
+                            openCart();
+                        }
+
+                        // ===== COUPON =====
+                        applyCouponBtn.addEventListener('click', async () => {
+                            const code = couponInput.value.trim();
+                            if (!code) { couponMessage.innerHTML = '<span style="color:red;font-weight:700;">אנא הזן קוד קופון</span>'; return; }
+                            if (!settings || !settings.Coupons) { couponMessage.innerHTML = '<span style="color:red;font-weight:700;">קוד לא תקין</span>'; return; }
+
+                            const coupon = settings.Coupons.find(c => c.Code === code);
+                            if (!coupon) { couponMessage.innerHTML = '<span style="color:red;font-weight:700;">קוד קופון לא קיים</span>'; return; }
+
+                            if (coupon.ExpiryDate) {
+                                const expiry = new Date(coupon.ExpiryDate);
+                                const today = new Date(); today.setHours(0, 0, 0, 0);
+                                if (expiry < today) { couponMessage.innerHTML = '<span style="color:red;font-weight:700;">תוקף הקופון עבר</span>'; return; }
+                            }
+
+                            if (appliedCoupon && appliedCoupon.Type === 'free_product' && appliedCoupon.ProductId) {
+                                cart = cart.filter(item => !(item.id === appliedCoupon.ProductId && item.isFreebie));
+                            }
+                            appliedCoupon = coupon;
+
+                            if (coupon.Type === 'free_product' && coupon.ProductId) {
+                                const freeProduct = products.find(p => p.id === coupon.ProductId);
+                                if (freeProduct && !cart.find(i => i.id === coupon.ProductId && i.isFreebie)) {
+                                    const needsInput = freeProduct.customFields && freeProduct.customFields.length > 0 &&
+                                        (freeProduct.customFields.some(f => f.required && !(coupon.SelectedOptions && coupon.SelectedOptions[f.name])) ||
+                                            freeProduct.customFields.some(f => f.type === 'text'));
+                                    if (needsInput) {
+                                        couponLockedOptions = coupon.SelectedOptions || {};
+                                        isCouponProduct = true;
+                                        openProductModal(coupon.ProductId, true);
+                                        couponMessage.innerHTML = '<span style="color:#3498db;font-weight:700;">אנא מלא את הפרטים החסרים למוצר המתנה</span>';
+                                        return;
+                                    }
+                                    addToCart(coupon.ProductId, coupon.SelectedOptions || {}, freeProduct.image, 0, true);
+                                }
+                            }
+
+                            updateCartDisplay();
+                            couponMessage.innerHTML = '<span class="coupon-applied">✓ קופון הוחל בהצלחה!</span>';
+                        });
+
+                        // ===== POINTS =====
+                        function updatePointsUsage() {
+                            const container = document.getElementById('points-usage-container');
+                            const slider = document.getElementById('points-slider');
+                            if (currentClubMember && currentClubMember.points >= 10) {
+                                container.style.display = 'block';
+                                const maxPoints = Math.min(currentClubMember.points, Math.floor(subtotal));
+                                slider.min = 10;
+                                slider.max = maxPoints;
+                                if (pointsToUse < 10) { pointsToUse = 0; slider.value = 10; }
+                                else slider.value = Math.min(pointsToUse, maxPoints);
+                                document.getElementById('cart-available-points').textContent = currentClubMember.points;
+                                document.getElementById('cart-points-value').textContent = currentClubMember.points.toFixed(2);
+                                updatePointsDisplay();
+                            } else {
+                                container.style.display = 'none';
+                                pointsToUse = 0;
+                                pointsDiscount = 0;
+                            }
+                        }
+
+                        function updatePointsDisplay() {
+                            document.getElementById('points-to-use').textContent = pointsToUse;
+                            document.getElementById('points-discount').textContent = pointsDiscount.toFixed(2);
+                        }
+
+                        document.getElementById('points-slider').addEventListener('input', e => {
+                            const val = parseInt(e.target.value) || 0;
+                            if (!currentClubMember || currentClubMember.points < 10) {
+                                pointsToUse = 0; pointsDiscount = 0;
+                                e.target.value = 10;
+                            } else if (val < 10) {
+                                pointsToUse = 0; pointsDiscount = 0;
+                                e.target.value = 10;
+                            } else {
+                                pointsToUse = Math.min(val, currentClubMember.points, Math.floor(subtotal));
+                                pointsDiscount = pointsToUse;
+                            }
+                            updatePointsDisplay();
+                            updateCartDisplay();
+                        });
+
+                        // ===== CLUB MEMBER =====
+                        async function loadClubMember() {
+                            const data = localStorage.getItem('yr_jerseys_club_member');
+                            if (data) {
+                                try {
+                                    const m = JSON.parse(data);
+                                    const doc = await db.collection('ClubMembers').doc(m.id).get();
+                                    if (doc.exists) {
+                                        currentClubMember = { id: doc.id, ...doc.data() };
+                                        updateClubButton();
+                                        updateClubModal();
+                                        return true;
+                                    } else {
+                                        localStorage.removeItem('yr_jerseys_club_member');
+                                    }
+                                } catch (e) { localStorage.removeItem('yr_jerseys_club_member'); }
+                            }
+                            return false;
+                        }
+
+                        function saveClubMember() {
+                            if (currentClubMember) localStorage.setItem('yr_jerseys_club_member', JSON.stringify(currentClubMember));
+                            else localStorage.removeItem('yr_jerseys_club_member');
+                        }
+
+                        function updateClubButton() {
+                            const btn = document.getElementById('club-toggle-button');
+                            if (currentClubMember) {
+                                btn.innerHTML = `<span>👤</span><span class="club-text">${currentClubMember.name.split(' ')[0]}</span>`;
+                            } else {
+                                btn.innerHTML = `<span>⭐</span><span class="club-text">מועדון VIP</span>`;
+                            }
+                        }
+
+                        function updateClubModal() {
+                            const guestView = document.getElementById('club-guest-view');
+                            const memberView = document.getElementById('club-member-view');
+                            const title = document.getElementById('club-modal-title');
+
+                            if (currentClubMember) {
+                                guestView.style.display = 'none';
+                                memberView.style.display = 'block';
+                                title.textContent = `שלום ${currentClubMember.name.split(' ')[0]}!`;
+                                document.getElementById('member-points').textContent = currentClubMember.points || 0;
+                                document.getElementById('member-points-value').textContent = (currentClubMember.points || 0).toFixed(2);
+                                document.getElementById('profile-name').value = currentClubMember.name || '';
+                                document.getElementById('profile-email').value = currentClubMember.email || '';
+                                document.getElementById('profile-phone').value = currentClubMember.phone || '';
+
+                                if (currentClubMember.address) {
+                                    const parts = currentClubMember.address.split(',').map(p => p.trim());
+                                    if (parts.length >= 3) {
+                                        const sh = parts[0].trim();
+                                        const hm = sh.match(/\s+(\d+[א-ת]?)$/);
+                                        if (hm) {
+                                            document.getElementById('profile-address-house').value = hm[1];
+                                            document.getElementById('profile-address-street').value = sh.replace(/\s+\d+[א-ת]?$/, '').trim();
+                                        } else {
+                                            document.getElementById('profile-address-street').value = sh;
+                                            document.getElementById('profile-address-house').value = '';
+                                        }
+                                        document.getElementById('profile-address-city').value = parts[1] || '';
+                                        const cz = parts[2].trim().split(/\s+/);
+                                        const last = cz[cz.length - 1];
+                                        if (last && /^\d+$/.test(last)) {
+                                            document.getElementById('profile-address-zip').value = last;
+                                            document.getElementById('profile-address-country').value = cz.slice(0, -1).join(' ') || 'ישראל';
+                                        } else {
+                                            document.getElementById('profile-address-zip').value = '';
+                                            document.getElementById('profile-address-country').value = parts[2] || 'ישראל';
+                                        }
+                                    }
+                                }
+                                loadMemberOrders();
+                            } else {
+                                guestView.style.display = 'block';
+                                memberView.style.display = 'none';
+                                title.textContent = 'מועדון VIP';
+                            }
+                            updateCheckoutForm();
+                            updatePointsUsage();
+                        }
+
+                        async function loadMemberOrders() {
+                            const list = document.getElementById('member-orders-list');
+                            if (!currentClubMember) return;
+                            try {
+                                list.innerHTML = '<p style="text-align:center;color:#999;font-weight:700;">טוען הזמנות...</p>';
+                                const snap = await db.collection('yr_orders').where('clubMemberId', '==', currentClubMember.id).get();
+                                if (snap.empty) { list.innerHTML = '<p style="text-align:center;color:#999;font-weight:700;">אין הזמנות עדיין</p>'; return; }
+
+                                const sorted = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+                                    .sort((a, b) => {
+                                        const da = a.orderDate ? a.orderDate.toDate() : new Date(0);
+                                        const db2 = b.orderDate ? b.orderDate.toDate() : new Date(0);
+                                        return db2 - da;
+                                    });
+
+                                list.innerHTML = '';
+                                sorted.forEach(order => {
+                                    const date = order.orderDate ? new Date(order.orderDate.toDate()).toLocaleDateString('he-IL') : 'לא ידוע';
+                                    const amount = (order.totalAmount && typeof order.totalAmount === 'number') ? order.totalAmount.toFixed(2) : '0.00';
+                                    const items = Array.isArray(order.items) ? order.items.map(i => `${i.quantity}x ${i.productName || i.name}`).join(', ') : '';
+                                    list.insertAdjacentHTML('beforeend', `
                         <div class="club-order-item">
                             <div class="club-order-header">
                                 <span class="club-order-date">📅 ${date}</span>
@@ -2497,549 +2648,549 @@ card.innerHTML = `
                             <span class="club-order-status ${order.completed ? 'completed' : 'pending'}">${order.completed ? 'הושלם' : 'בטיפול'}</span>
                         </div>
                     `);
-                });
-            } catch(e) {
-                list.innerHTML = `<p style="text-align:center;color:var(--accent-color);font-weight:700;">שגיאה בטעינת הזמנות</p>`;
-            }
-        }
-
-        function updateCheckoutForm() {
-            const joinSection = document.getElementById('join-club-section');
-            if (currentClubMember) {
-                document.getElementById('name').value = currentClubMember.name || '';
-                document.getElementById('email').value = currentClubMember.email || '';
-                document.getElementById('phone').value = currentClubMember.phone || '';
-                if (currentClubMember.address) {
-                    const parts = currentClubMember.address.split(',').map(p => p.trim());
-                    if (parts.length >= 3) {
-                        const sh = parts[0].trim();
-                        const hm = sh.match(/\s+(\d+[א-ת]?)$/);
-                        if (hm) {
-                            document.getElementById('address-house').value = hm[1];
-                            document.getElementById('address-street').value = sh.replace(/\s+\d+[א-ת]?$/, '').trim();
-                        } else {
-                            document.getElementById('address-street').value = sh;
-                            document.getElementById('address-house').value = '';
+                                });
+                            } catch (e) {
+                                list.innerHTML = `<p style="text-align:center;color:var(--accent-color);font-weight:700;">שגיאה בטעינת הזמנות</p>`;
+                            }
                         }
-                        document.getElementById('address-city').value = parts[1] || '';
-                        const cz = parts[2].trim().split(/\s+/);
-                        const last = cz[cz.length - 1];
-                        if (last && /^\d+$/.test(last)) {
-                            document.getElementById('address-zip').value = last;
-                            document.getElementById('address-country').value = cz.slice(0,-1).join(' ') || 'ישראל';
-                        } else {
-                            document.getElementById('address-zip').value = '';
-                            document.getElementById('address-country').value = parts[2] || 'ישראל';
+
+                        function updateCheckoutForm() {
+                            const joinSection = document.getElementById('join-club-section');
+                            if (currentClubMember) {
+                                document.getElementById('name').value = currentClubMember.name || '';
+                                document.getElementById('email').value = currentClubMember.email || '';
+                                document.getElementById('phone').value = currentClubMember.phone || '';
+                                if (currentClubMember.address) {
+                                    const parts = currentClubMember.address.split(',').map(p => p.trim());
+                                    if (parts.length >= 3) {
+                                        const sh = parts[0].trim();
+                                        const hm = sh.match(/\s+(\d+[א-ת]?)$/);
+                                        if (hm) {
+                                            document.getElementById('address-house').value = hm[1];
+                                            document.getElementById('address-street').value = sh.replace(/\s+\d+[א-ת]?$/, '').trim();
+                                        } else {
+                                            document.getElementById('address-street').value = sh;
+                                            document.getElementById('address-house').value = '';
+                                        }
+                                        document.getElementById('address-city').value = parts[1] || '';
+                                        const cz = parts[2].trim().split(/\s+/);
+                                        const last = cz[cz.length - 1];
+                                        if (last && /^\d+$/.test(last)) {
+                                            document.getElementById('address-zip').value = last;
+                                            document.getElementById('address-country').value = cz.slice(0, -1).join(' ') || 'ישראל';
+                                        } else {
+                                            document.getElementById('address-zip').value = '';
+                                            document.getElementById('address-country').value = parts[2] || 'ישראל';
+                                        }
+                                    }
+                                }
+                                joinSection.style.display = 'none';
+                            } else {
+                                joinSection.style.display = 'block';
+                            }
                         }
-                    }
-                }
-                joinSection.style.display = 'none';
-            } else {
-                joinSection.style.display = 'block';
-            }
-        }
 
-        function showClubMessage(msg, type = 'success') {
-            const el = document.getElementById('club-message');
-            el.className = `club-message ${type}`;
-            el.textContent = msg;
-            el.style.display = 'block';
-            setTimeout(() => el.style.display = 'none', 5000);
-        }
+                        function showClubMessage(msg, type = 'success') {
+                            const el = document.getElementById('club-message');
+                            el.className = `club-message ${type}`;
+                            el.textContent = msg;
+                            el.style.display = 'block';
+                            setTimeout(() => el.style.display = 'none', 5000);
+                        }
 
-        function openClubModal() {
-            if (clubModalOpen) return;
-            clubModalOpen = true;
-            document.getElementById('club-modal').classList.add('active');
-            updateClubModal();
-        }
+                        function openClubModal() {
+                            if (clubModalOpen) return;
+                            clubModalOpen = true;
+                            document.getElementById('club-modal').classList.add('active');
+                            updateClubModal();
+                        }
 
-        function closeClubModal() {
-            if (!clubModalOpen) return;
-            clubModalOpen = false;
-            document.getElementById('club-modal').classList.remove('active');
-            document.getElementById('club-message').style.display = 'none';
-        }
+                        function closeClubModal() {
+                            if (!clubModalOpen) return;
+                            clubModalOpen = false;
+                            document.getElementById('club-modal').classList.remove('active');
+                            document.getElementById('club-message').style.display = 'none';
+                        }
 
-        document.getElementById('club-toggle-button').addEventListener('click', openClubModal);
-        document.querySelector('.close-club-modal').addEventListener('click', closeClubModal);
-        document.getElementById('club-modal').addEventListener('click', e => { if (e.target.id === 'club-modal') closeClubModal(); });
+                        document.getElementById('club-toggle-button').addEventListener('click', openClubModal);
+                        document.querySelector('.close-club-modal').addEventListener('click', closeClubModal);
+                        document.getElementById('club-modal').addEventListener('click', e => { if (e.target.id === 'club-modal') closeClubModal(); });
 
-        // Club Tabs
-        document.querySelectorAll('.club-tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                const targetTab = tab.dataset.tab;
-                const isGuest = document.getElementById('club-guest-view').style.display !== 'none';
-                tab.parentElement.querySelectorAll('.club-tab').forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                const containerId = isGuest ? 'club-guest-view' : 'club-member-view';
-                document.querySelectorAll(`#${containerId} .club-tab-content`).forEach(c => c.classList.remove('active'));
-                document.getElementById(`${targetTab}-tab`).classList.add('active');
-            });
-        });
+                        // Club Tabs
+                        document.querySelectorAll('.club-tab').forEach(tab => {
+                            tab.addEventListener('click', () => {
+                                const targetTab = tab.dataset.tab;
+                                const isGuest = document.getElementById('club-guest-view').style.display !== 'none';
+                                tab.parentElement.querySelectorAll('.club-tab').forEach(t => t.classList.remove('active'));
+                                tab.classList.add('active');
+                                const containerId = isGuest ? 'club-guest-view' : 'club-member-view';
+                                document.querySelectorAll(`#${containerId} .club-tab-content`).forEach(c => c.classList.remove('active'));
+                                document.getElementById(`${targetTab}-tab`).classList.add('active');
+                            });
+                        });
 
-        // Login
-        document.getElementById('club-login-form').addEventListener('submit', async e => {
-            e.preventDefault();
-            const email = document.getElementById('login-email').value.trim();
-            const password = document.getElementById('login-password').value;
-            try {
-                const snap = await db.collection('ClubMembers').where('email','==',email).where('password','==',password).limit(1).get();
-                if (snap.empty) { showClubMessage('אימייל או סיסמה שגויים', 'error'); return; }
-                currentClubMember = { id: snap.docs[0].id, ...snap.docs[0].data() };
-                saveClubMember();
-                updateClubButton();
-                updateClubModal();
-                showClubMessage('התחברת בהצלחה!');
-                document.getElementById('club-login-form').reset();
-            } catch(e) {
-                showClubMessage('שגיאה בהתחברות', 'error');
-            }
-        });
+                        // Login
+                        document.getElementById('club-login-form').addEventListener('submit', async e => {
+                            e.preventDefault();
+                            const email = document.getElementById('login-email').value.trim();
+                            const password = document.getElementById('login-password').value;
+                            try {
+                                const snap = await db.collection('ClubMembers').where('email', '==', email).where('password', '==', password).limit(1).get();
+                                if (snap.empty) { showClubMessage('אימייל או סיסמה שגויים', 'error'); return; }
+                                currentClubMember = { id: snap.docs[0].id, ...snap.docs[0].data() };
+                                saveClubMember();
+                                updateClubButton();
+                                updateClubModal();
+                                showClubMessage('התחברת בהצלחה!');
+                                document.getElementById('club-login-form').reset();
+                            } catch (e) {
+                                showClubMessage('שגיאה בהתחברות', 'error');
+                            }
+                        });
 
-        // Register
-        document.getElementById('club-register-form').addEventListener('submit', async e => {
-            e.preventDefault();
-            const name = document.getElementById('register-name').value.trim();
-            const email = document.getElementById('register-email').value.trim();
-            const phone = document.getElementById('register-phone').value.trim();
-            const password = document.getElementById('register-password').value;
-            const confirm = document.getElementById('register-password-confirm').value;
-            if (password !== confirm) { showClubMessage('הסיסמאות אינן תואמות', 'error'); return; }
-            try {
-                const existing = await db.collection('ClubMembers').where('email','==',email).limit(1).get();
-                if (!existing.empty) { showClubMessage('האימייל כבר רשום', 'error'); return; }
-                const newMember = { name, email, phone, password, points: 0, address: '', joinDate: firebase.firestore.FieldValue.serverTimestamp(), totalSpent: 0, orderCount: 0 };
-                const ref = await db.collection('ClubMembers').add(newMember);
-                currentClubMember = { id: ref.id, ...newMember };
-                saveClubMember();
-                updateClubButton();
-                updateClubModal();
-                showClubMessage('נרשמת בהצלחה למועדון VIP!');
-                document.getElementById('club-register-form').reset();
-            } catch(e) {
-                showClubMessage('שגיאה ברישום', 'error');
-            }
-        });
+                        // Register
+                        document.getElementById('club-register-form').addEventListener('submit', async e => {
+                            e.preventDefault();
+                            const name = document.getElementById('register-name').value.trim();
+                            const email = document.getElementById('register-email').value.trim();
+                            const phone = document.getElementById('register-phone').value.trim();
+                            const password = document.getElementById('register-password').value;
+                            const confirm = document.getElementById('register-password-confirm').value;
+                            if (password !== confirm) { showClubMessage('הסיסמאות אינן תואמות', 'error'); return; }
+                            try {
+                                const existing = await db.collection('ClubMembers').where('email', '==', email).limit(1).get();
+                                if (!existing.empty) { showClubMessage('האימייל כבר רשום', 'error'); return; }
+                                const newMember = { name, email, phone, password, points: 0, address: '', joinDate: firebase.firestore.FieldValue.serverTimestamp(), totalSpent: 0, orderCount: 0 };
+                                const ref = await db.collection('ClubMembers').add(newMember);
+                                currentClubMember = { id: ref.id, ...newMember };
+                                saveClubMember();
+                                updateClubButton();
+                                updateClubModal();
+                                showClubMessage('נרשמת בהצלחה למועדון VIP!');
+                                document.getElementById('club-register-form').reset();
+                            } catch (e) {
+                                showClubMessage('שגיאה ברישום', 'error');
+                            }
+                        });
 
-        // Profile Update
-        document.getElementById('club-profile-form').addEventListener('submit', async e => {
-            e.preventDefault();
-            if (!currentClubMember) return;
-            const name = document.getElementById('profile-name').value.trim();
-            const phone = document.getElementById('profile-phone').value.trim();
-            const street = document.getElementById('profile-address-street').value.trim();
-            const house = document.getElementById('profile-address-house').value.trim();
-            const city = document.getElementById('profile-address-city').value.trim();
-            const zip = document.getElementById('profile-address-zip').value.trim();
-            const country = document.getElementById('profile-address-country').value.trim();
-            let address = '';
-            if (street || house || city) address = `${street} ${house}, ${city}, ${country} ${zip}`.trim();
-            try {
-                await db.collection('ClubMembers').doc(currentClubMember.id).update({ name, phone, address });
-                currentClubMember.name = name;
-                currentClubMember.phone = phone;
-                currentClubMember.address = address;
-                saveClubMember();
-                updateClubButton();
-                showClubMessage('הפרטים עודכנו בהצלחה!');
-            } catch(e) {
-                showClubMessage('שגיאה בעדכון פרטים', 'error');
-            }
-        });
+                        // Profile Update
+                        document.getElementById('club-profile-form').addEventListener('submit', async e => {
+                            e.preventDefault();
+                            if (!currentClubMember) return;
+                            const name = document.getElementById('profile-name').value.trim();
+                            const phone = document.getElementById('profile-phone').value.trim();
+                            const street = document.getElementById('profile-address-street').value.trim();
+                            const house = document.getElementById('profile-address-house').value.trim();
+                            const city = document.getElementById('profile-address-city').value.trim();
+                            const zip = document.getElementById('profile-address-zip').value.trim();
+                            const country = document.getElementById('profile-address-country').value.trim();
+                            let address = '';
+                            if (street || house || city) address = `${street} ${house}, ${city}, ${country} ${zip}`.trim();
+                            try {
+                                await db.collection('ClubMembers').doc(currentClubMember.id).update({ name, phone, address });
+                                currentClubMember.name = name;
+                                currentClubMember.phone = phone;
+                                currentClubMember.address = address;
+                                saveClubMember();
+                                updateClubButton();
+                                showClubMessage('הפרטים עודכנו בהצלחה!');
+                            } catch (e) {
+                                showClubMessage('שגיאה בעדכון פרטים', 'error');
+                            }
+                        });
 
-        // Logout
-        document.getElementById('club-logout-btn').addEventListener('click', () => {
-            currentClubMember = null;
-            pointsToUse = 0;
-            pointsDiscount = 0;
-            const s = document.getElementById('points-slider');
-            if (s) s.value = 10;
-            saveClubMember();
-            updateClubButton();
-            updateClubModal();
-            updateCartDisplay();
-            showClubMessage('התנתקת בהצלחה');
-        });
+                        // Logout
+                        document.getElementById('club-logout-btn').addEventListener('click', () => {
+                            currentClubMember = null;
+                            pointsToUse = 0;
+                            pointsDiscount = 0;
+                            const s = document.getElementById('points-slider');
+                            if (s) s.value = 10;
+                            saveClubMember();
+                            updateClubButton();
+                            updateClubModal();
+                            updateCartDisplay();
+                            showClubMessage('התנתקת בהצלחה');
+                        });
 
-        // Join Club Checkbox
-        document.getElementById('join-club-checkbox').addEventListener('change', e => {
-            const fields = document.getElementById('club-registration-fields');
-            const pw = document.getElementById('club-password');
-            fields.style.display = e.target.checked ? 'block' : 'none';
-            pw.required = e.target.checked;
-        });
+                        // Join Club Checkbox
+                        document.getElementById('join-club-checkbox').addEventListener('change', e => {
+                            const fields = document.getElementById('club-registration-fields');
+                            const pw = document.getElementById('club-password');
+                            fields.style.display = e.target.checked ? 'block' : 'none';
+                            pw.required = e.target.checked;
+                        });
 
-        // ===== PRODUCT MODAL =====
-        function openProductModal(productId, isCouponFreebie = false) {
-            const product = products.find(p => p.id === productId);
-            if (!product) return;
+                        // ===== PRODUCT MODAL =====
+                        function openProductModal(productId, isCouponFreebie = false) {
+                            const product = products.find(p => p.id === productId);
+                            if (!product) return;
 
-            modalProductImage.src = product.image;
-            modalProductTitle.textContent = product.name;
-            modalProductDescription.textContent = product.description || '';
+                            modalProductImage.src = product.image;
+                            modalProductTitle.textContent = product.name;
+                            modalProductDescription.textContent = product.description || '';
 
-            const onSale = isProductOnSale(product);
-            const effectivePrice = getEffectivePrice(product);
-            currentProductPrice = isCouponFreebie ? 0 : effectivePrice;
+                            const onSale = isProductOnSale(product);
+                            const effectivePrice = getEffectivePrice(product);
+                            currentProductPrice = isCouponFreebie ? 0 : effectivePrice;
 
-            if (isCouponFreebie) {
-                modalProductPrice.innerHTML = '<span style="color:#28a745;font-weight:900;">מתנה - 0.00 ₪</span>';
-            } else if (onSale) {
-                modalProductPrice.innerHTML = `
+                            if (isCouponFreebie) {
+                                modalProductPrice.innerHTML = '<span style="color:#28a745;font-weight:900;">מתנה - 0.00 ₪</span>';
+                            } else if (onSale) {
+                                modalProductPrice.innerHTML = `
                     <span class="price on-sale">
                         <span class="original-price">${product.price.toFixed(2)} ₪</span>
                         <span class="sale-price">${product.salePrice.toFixed(2)} ₪</span>
                     </span>`;
-            } else {
-                modalProductPrice.textContent = `${currentProductPrice.toFixed(2)} ₪`;
-            }
+                            } else {
+                                modalProductPrice.textContent = `${currentProductPrice.toFixed(2)} ₪`;
+                            }
 
-            // Size Charts Carousel
-            const existing = document.getElementById('size-charts-carousel-section');
-            if (existing) existing.remove();
+                            // Size Charts Carousel
+                            const existing = document.getElementById('size-charts-carousel-section');
+                            if (existing) existing.remove();
 
-            if (product.sizeCharts && product.sizeCharts.length > 0) {
-                const section = document.createElement('div');
-                section.id = 'size-charts-carousel-section';
-                section.className = 'size-charts-carousel';
+                            if (product.sizeCharts && product.sizeCharts.length > 0) {
+                                const section = document.createElement('div');
+                                section.id = 'size-charts-carousel-section';
+                                section.className = 'size-charts-carousel';
 
-                const titleDiv = document.createElement('div');
-                titleDiv.className = 'size-charts-carousel-title';
-                titleDiv.textContent = 'טבלת מידות';
-                section.appendChild(titleDiv);
+                                const titleDiv = document.createElement('div');
+                                titleDiv.className = 'size-charts-carousel-title';
+                                titleDiv.textContent = 'טבלת מידות';
+                                section.appendChild(titleDiv);
 
-                const trackContainer = document.createElement('div');
-                trackContainer.className = 'carousel-track-container';
-                const track = document.createElement('div');
-                track.className = 'carousel-track';
+                                const trackContainer = document.createElement('div');
+                                trackContainer.className = 'carousel-track-container';
+                                const track = document.createElement('div');
+                                track.className = 'carousel-track';
 
-                product.sizeCharts.forEach((chart, i) => {
-                    const img = document.createElement('img');
-                    img.src = chart;
-                    img.alt = `טבלת מידות ${i+1}`;
-                    img.style.cssText = 'flex-shrink:0;width:100%;max-height:280px;object-fit:contain;background:#f0f0f0;cursor:zoom-in;display:block;';
-                    img.addEventListener('click', () => {
-                        document.getElementById('size-chart-zoom-modal').classList.add('active');
-                        document.getElementById('size-chart-zoom-img').src = chart;
-                    });
-                    track.appendChild(img);
-                });
+                                product.sizeCharts.forEach((chart, i) => {
+                                    const img = document.createElement('img');
+                                    img.src = chart;
+                                    img.alt = `טבלת מידות ${i + 1}`;
+                                    img.style.cssText = 'flex-shrink:0;width:100%;max-height:280px;object-fit:contain;background:#f0f0f0;cursor:zoom-in;display:block;';
+                                    img.addEventListener('click', () => {
+                                        document.getElementById('size-chart-zoom-modal').classList.add('active');
+                                        document.getElementById('size-chart-zoom-img').src = chart;
+                                    });
+                                    track.appendChild(img);
+                                });
 
-                trackContainer.appendChild(track);
-                section.appendChild(trackContainer);
+                                trackContainer.appendChild(track);
+                                section.appendChild(trackContainer);
 
-                if (product.sizeCharts.length > 1) {
-                    let currentSlide = 0;
-                    const total2 = product.sizeCharts.length;
-                    const controls = document.createElement('div');
-                    controls.className = 'carousel-controls';
-                    const prevBtn = document.createElement('button');
-                    prevBtn.className = 'carousel-btn'; prevBtn.textContent = '‹'; prevBtn.type = 'button'; prevBtn.disabled = true;
-                    const counter = document.createElement('span');
-                    counter.className = 'carousel-counter'; counter.textContent = `1 / ${total2}`;
-                    const nextBtn = document.createElement('button');
-                    nextBtn.className = 'carousel-btn'; nextBtn.textContent = '›'; nextBtn.type = 'button';
+                                if (product.sizeCharts.length > 1) {
+                                    let currentSlide = 0;
+                                    const total2 = product.sizeCharts.length;
+                                    const controls = document.createElement('div');
+                                    controls.className = 'carousel-controls';
+                                    const prevBtn = document.createElement('button');
+                                    prevBtn.className = 'carousel-btn'; prevBtn.textContent = '‹'; prevBtn.type = 'button'; prevBtn.disabled = true;
+                                    const counter = document.createElement('span');
+                                    counter.className = 'carousel-counter'; counter.textContent = `1 / ${total2}`;
+                                    const nextBtn = document.createElement('button');
+                                    nextBtn.className = 'carousel-btn'; nextBtn.textContent = '›'; nextBtn.type = 'button';
 
-                    function goTo(i) {
-                        currentSlide = i;
-                        const w = trackContainer.getBoundingClientRect().width;
-                        track.style.transform = `translateX(${currentSlide * w}px)`;
-                        counter.textContent = `${currentSlide+1} / ${total2}`;
-                        prevBtn.disabled = currentSlide === 0;
-                        nextBtn.disabled = currentSlide === total2-1;
-                    }
+                                    function goTo(i) {
+                                        currentSlide = i;
+                                        const w = trackContainer.getBoundingClientRect().width;
+                                        track.style.transform = `translateX(${currentSlide * w}px)`;
+                                        counter.textContent = `${currentSlide + 1} / ${total2}`;
+                                        prevBtn.disabled = currentSlide === 0;
+                                        nextBtn.disabled = currentSlide === total2 - 1;
+                                    }
 
-                    prevBtn.addEventListener('click', () => { if (currentSlide > 0) goTo(currentSlide - 1); });
-                    nextBtn.addEventListener('click', () => { if (currentSlide < total2-1) goTo(currentSlide + 1); });
-                    controls.append(prevBtn, counter, nextBtn);
-                    section.appendChild(controls);
-                }
+                                    prevBtn.addEventListener('click', () => { if (currentSlide > 0) goTo(currentSlide - 1); });
+                                    nextBtn.addEventListener('click', () => { if (currentSlide < total2 - 1) goTo(currentSlide + 1); });
+                                    controls.append(prevBtn, counter, nextBtn);
+                                    section.appendChild(controls);
+                                }
 
-                customOptionsContainer.parentNode.insertBefore(section, modalAddToCartBtn);
-            }
+                                customOptionsContainer.parentNode.insertBefore(section, modalAddToCartBtn);
+                            }
 
-            currentProductOptions = {};
-            customOptionsContainer.innerHTML = '';
+                            currentProductOptions = {};
+                            customOptionsContainer.innerHTML = '';
 
-            if (product.customFields && product.customFields.length > 0) {
-                product.customFields.forEach((field, index) => {
-                    const group = document.createElement('div');
-                    group.className = 'option-group';
-                    const isLocked = isCouponFreebie && couponLockedOptions && couponLockedOptions[field.name];
-                    const label = document.createElement('label');
-                    label.textContent = field.name + (field.required ? ' *' : '') + ':';
-                    if (field.extraPrice && field.extraPrice > 0 && !isCouponFreebie) {
-                        const pt = document.createElement('span');
-                        pt.className = 'option-price-tag';
-                        pt.textContent = ` (+${field.extraPrice.toFixed(2)}₪)`;
-                        label.appendChild(pt);
-                    }
-                    group.appendChild(label);
+                            if (product.customFields && product.customFields.length > 0) {
+                                product.customFields.forEach((field, index) => {
+                                    const group = document.createElement('div');
+                                    group.className = 'option-group';
+                                    const isLocked = isCouponFreebie && couponLockedOptions && couponLockedOptions[field.name];
+                                    const label = document.createElement('label');
+                                    label.textContent = field.name + (field.required ? ' *' : '') + ':';
+                                    if (field.extraPrice && field.extraPrice > 0 && !isCouponFreebie) {
+                                        const pt = document.createElement('span');
+                                        pt.className = 'option-price-tag';
+                                        pt.textContent = ` (+${field.extraPrice.toFixed(2)}₪)`;
+                                        label.appendChild(pt);
+                                    }
+                                    group.appendChild(label);
 
-                    if (field.type === 'select') {
-                        const select = document.createElement('select');
-                        select.id = `custom-field-${index}`;
-                        select.innerHTML = '<option value="" data-extra-price="0">בחר ' + field.name + '</option>';
-                        field.options.forEach(opt => {
-                            const o = document.createElement('option');
-                            o.value = opt.value;
-                            const op = (!isCouponFreebie && opt.extraPrice) ? opt.extraPrice : 0;
-                            o.textContent = opt.value + (op > 0 ? ` (+${op.toFixed(2)}₪)` : '');
-                            o.dataset.image = opt.image || '';
-                            o.dataset.extraPrice = op;
-                            if (isLocked && opt.value === couponLockedOptions[field.name]) o.selected = true;
-                            select.appendChild(o);
-                        });
-                        if (isLocked) {
-                            select.disabled = true;
-                            select.classList.add('locked-option');
-                            currentProductOptions[field.name] = couponLockedOptions[field.name];
-                            const lo = field.options.find(o => o.value === couponLockedOptions[field.name]);
-                            if (lo && lo.image) modalProductImage.src = lo.image;
+                                    if (field.type === 'select') {
+                                        const select = document.createElement('select');
+                                        select.id = `custom-field-${index}`;
+                                        select.innerHTML = '<option value="" data-extra-price="0">בחר ' + field.name + '</option>';
+                                        field.options.forEach(opt => {
+                                            const o = document.createElement('option');
+                                            o.value = opt.value;
+                                            const op = (!isCouponFreebie && opt.extraPrice) ? opt.extraPrice : 0;
+                                            o.textContent = opt.value + (op > 0 ? ` (+${op.toFixed(2)}₪)` : '');
+                                            o.dataset.image = opt.image || '';
+                                            o.dataset.extraPrice = op;
+                                            if (isLocked && opt.value === couponLockedOptions[field.name]) o.selected = true;
+                                            select.appendChild(o);
+                                        });
+                                        if (isLocked) {
+                                            select.disabled = true;
+                                            select.classList.add('locked-option');
+                                            currentProductOptions[field.name] = couponLockedOptions[field.name];
+                                            const lo = field.options.find(o => o.value === couponLockedOptions[field.name]);
+                                            if (lo && lo.image) modalProductImage.src = lo.image;
+                                        }
+                                        select.addEventListener('change', e => {
+                                            currentProductOptions[field.name] = e.target.value;
+                                            const so = field.options.find(o => o.value === e.target.value);
+                                            if (so && so.image) modalProductImage.src = so.image;
+                                            else modalProductImage.src = product.image;
+                                            if (!isCouponFreebie) updateModalPrice();
+                                        });
+                                        group.appendChild(select);
+                                    } else if (field.type === 'text') {
+                                        const input = document.createElement('input');
+                                        input.type = 'text';
+                                        input.id = `custom-field-${index}`;
+                                        input.placeholder = 'הזן ' + field.name;
+                                        input.dataset.fieldExtraPrice = (!isCouponFreebie && field.extraPrice) ? field.extraPrice : 0;
+                                        input.addEventListener('input', e => {
+                                            currentProductOptions[field.name] = e.target.value;
+                                            if (!isCouponFreebie) updateModalPrice();
+                                        });
+                                        group.appendChild(input);
+                                    }
+                                    customOptionsContainer.appendChild(group);
+                                });
+                            }
+
+                            productModal.style.display = 'flex';
+                            currentModalProductId = product.id;
+                            window.history.replaceState(null, '', '#' + encodeURIComponent(product.name));
                         }
-                        select.addEventListener('change', e => {
-                            currentProductOptions[field.name] = e.target.value;
-                            const so = field.options.find(o => o.value === e.target.value);
-                            if (so && so.image) modalProductImage.src = so.image;
-                            else modalProductImage.src = product.image;
-                            if (!isCouponFreebie) updateModalPrice();
-                        });
-                        group.appendChild(select);
-                    } else if (field.type === 'text') {
-                        const input = document.createElement('input');
-                        input.type = 'text';
-                        input.id = `custom-field-${index}`;
-                        input.placeholder = 'הזן ' + field.name;
-                        input.dataset.fieldExtraPrice = (!isCouponFreebie && field.extraPrice) ? field.extraPrice : 0;
-                        input.addEventListener('input', e => {
-                            currentProductOptions[field.name] = e.target.value;
-                            if (!isCouponFreebie) updateModalPrice();
-                        });
-                        group.appendChild(input);
-                    }
-                    customOptionsContainer.appendChild(group);
-                });
-            }
 
-            productModal.style.display = 'flex';
-            currentModalProductId = product.id;
-            window.history.replaceState(null, '', '#' + encodeURIComponent(product.name));
-        }
-
-        function updateModalPrice() {
-            const product = products.find(p => p.id === currentModalProductId);
-            if (!product) return;
-            let total2 = getEffectivePrice(product);
-            if (product.customFields) {
-                product.customFields.forEach((field, i) => {
-                    const el = document.getElementById(`custom-field-${i}`);
-                    if (!el) return;
-                    const fp = parseFloat(field.extraPrice) || 0;
-                    if (field.type === 'select' && el.value) {
-                        total2 += fp;
-                        const op = parseFloat(el.options[el.selectedIndex].dataset.extraPrice) || 0;
-                        total2 += op;
-                    } else if (field.type === 'text' && el.value) {
-                        total2 += fp;
-                    }
-                });
-            }
-            currentProductPrice = total2;
-            const onSale = isProductOnSale(product);
-            if (onSale) {
-                const extra = total2 - getEffectivePrice(product);
-                modalProductPrice.innerHTML = `
+                        function updateModalPrice() {
+                            const product = products.find(p => p.id === currentModalProductId);
+                            if (!product) return;
+                            let total2 = getEffectivePrice(product);
+                            if (product.customFields) {
+                                product.customFields.forEach((field, i) => {
+                                    const el = document.getElementById(`custom-field-${i}`);
+                                    if (!el) return;
+                                    const fp = parseFloat(field.extraPrice) || 0;
+                                    if (field.type === 'select' && el.value) {
+                                        total2 += fp;
+                                        const op = parseFloat(el.options[el.selectedIndex].dataset.extraPrice) || 0;
+                                        total2 += op;
+                                    } else if (field.type === 'text' && el.value) {
+                                        total2 += fp;
+                                    }
+                                });
+                            }
+                            currentProductPrice = total2;
+                            const onSale = isProductOnSale(product);
+                            if (onSale) {
+                                const extra = total2 - getEffectivePrice(product);
+                                modalProductPrice.innerHTML = `
                     <span class="price on-sale">
                         <span class="original-price">${(product.price + extra).toFixed(2)} ₪</span>
                         <span class="sale-price">${total2.toFixed(2)} ₪</span>
                     </span>`;
-            } else {
-                modalProductPrice.textContent = `${total2.toFixed(2)} ₪`;
-            }
-        }
-
-        modalAddToCartBtn.addEventListener('click', () => {
-            const product = products.find(p => p.id === currentModalProductId);
-            if (!product) return;
-            if (product.customFields) {
-                for (const field of product.customFields) {
-                    if (field.required && !currentProductOptions[field.name]) {
-                        alert('אנא מלא את השדה: ' + field.name);
-                        return;
-                    }
-                }
-            }
-            addToCart(currentModalProductId, { ...currentProductOptions }, modalProductImage.src, currentProductPrice, isCouponProduct);
-            if (isCouponProduct) {
-                couponMessage.innerHTML = '<span class="coupon-applied">✓ קופון הוחל בהצלחה!</span>';
-                isCouponProduct = false;
-                couponLockedOptions = null;
-            }
-            closeProductModal();
-        });
-
-        function closeProductModal() {
-            productModal.style.display = 'none';
-            currentProductOptions = {};
-            isCouponProduct = false;
-            couponLockedOptions = null;
-            window.history.replaceState(null, '', window.location.pathname);
-        }
-
-        closeProductModalBtn.addEventListener('click', closeProductModal);
-        productModal.addEventListener('mousedown', e => { if (e.target === productModal) closeProductModal(); });
-        window.addEventListener('keydown', e => {
-            if (productModal.style.display === 'flex' && e.key === 'Escape') closeProductModal();
-            if (document.getElementById('club-modal').classList.contains('active') && e.key === 'Escape') closeClubModal();
-        });
-
-        // Size chart zoom close
-        document.getElementById('close-zoom-btn').addEventListener('click', () => {
-            document.getElementById('size-chart-zoom-modal').classList.remove('active');
-        });
-
-        document.getElementById('size-chart-zoom-modal').addEventListener('click', e => {
-            if (e.target === document.getElementById('size-chart-zoom-modal')) {
-                document.getElementById('size-chart-zoom-modal').classList.remove('active');
-            }
-        });
-
-        // ===== CONTACT =====
-        contactForm.addEventListener('submit', async e => {
-            e.preventDefault();
-            const data = {
-                name: document.getElementById('contact-name').value,
-                phone: document.getElementById('contact-phone').value,
-                email: document.getElementById('contact-email').value,
-                message: document.getElementById('contact-message').value,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                status: 'open',
-                linkedOrderId: null
-            };
-            try {
-                const snap = await db.collection('yr_orders')
-                    .where('customerPhone', '==', data.phone)
-                    .where('customerEmail', '==', data.email).get();
-                if (!snap.empty && snap.docs.length === 1) data.linkedOrderId = snap.docs[0].id;
-                await db.collection('yr_contact_leads').add(data);
-                alert('הפנייה נשלחה בהצלחה! ניצור איתך קשר בהקדם.');
-                contactForm.reset();
-            } catch(e) {
-                alert('אירעה שגיאה. אנא נסה שוב.');
-            }
-        });
-
-        // ===== HELPERS =====
-        function getFullAddress() {
-            const street = document.getElementById('address-street').value.trim();
-            const house = document.getElementById('address-house').value.trim();
-            const city = document.getElementById('address-city').value.trim();
-            const country = document.getElementById('address-country').value.trim();
-            const zip = document.getElementById('address-zip').value.trim();
-            return `${street} ${house}, ${city}, ${country} ${zip}`;
-        }
-
-        // ===== PAYPAL =====
-        function renderPayPalButton() {
-            const container = document.getElementById('paypal-button-container');
-            if (!container) return;
-            container.innerHTML = '';
-            if (cart.length === 0) return;
-
-            paypal.Buttons({
-                style: { color: 'blue', shape: 'pill', label: 'pay', height: 45 },
-                createOrder: (data, actions) => actions.order.create({
-                    purchase_units: [{
-                        amount: { value: total.toFixed(2), currency_code: 'ILS' },
-                        description: 'רכישה ב-YR Jerseys'
-                    }]
-                }),
-                onApprove: (data, actions) => actions.order.capture().then(async details => {
-                    try {
-                        const name = document.getElementById('name').value;
-                        const email = document.getElementById('email').value;
-                        const phone = document.getElementById('phone').value;
-                        const address = getFullAddress();
-
-                        let clubMemberId = currentClubMember ? currentClubMember.id : null;
-                        const joinChecked = document.getElementById('join-club-checkbox').checked;
-
-                        if (!currentClubMember && joinChecked) {
-                            const pw = document.getElementById('club-password').value;
-                            if (pw && pw.length >= 6) {
-                                try {
-                                    const nm = { name, email, phone, password: pw, points: 0, address, joinDate: firebase.firestore.FieldValue.serverTimestamp(), totalSpent: 0, orderCount: 0 };
-                                    const ref = await db.collection('ClubMembers').add(nm);
-                                    clubMemberId = ref.id;
-                                    currentClubMember = { id: ref.id, ...nm };
-                                    saveClubMember();
-                                    updateClubButton();
-                                } catch(e) { console.error('Club member creation error:', e); }
+                            } else {
+                                modalProductPrice.textContent = `${total2.toFixed(2)} ₪`;
                             }
                         }
 
-                        const pointsEarned = Math.floor(total * 0.01);
-
-                        const orderRef = await db.collection('yr_orders').add({
-                            customerName: name,
-                            customerEmail: email,
-                            customerPhone: phone,
-                            customerAddress: address,
-                            items: cart.map(item => ({
-                                productId: item.id,
-                                productName: item.name,
-                                name: item.name,
-                                quantity: item.quantity,
-                                price: item.price,
-                                originalPrice: item.originalPrice || null,
-                                selectedOptions: item.selectedOptions || null,
-                                isFreebie: item.isFreebie || false
-                            })),
-                            subtotal: parseFloat(subtotal.toFixed(2)),
-                            shippingCost: parseFloat(shippingCost.toFixed(2)),
-                            totalAmount: parseFloat(total.toFixed(2)),
-                            appliedCoupon: appliedCoupon ? appliedCoupon.Code : null,
-                            couponDetails: appliedCoupon || null,
-                            clubMemberId: clubMemberId,
-                            pointsUsed: pointsToUse,
-                            pointsEarned: pointsEarned,
-                            orderDate: firebase.firestore.FieldValue.serverTimestamp(),
-                            status: 'completed',
-                            completed: false,
-                            paymentType: 'paypal',
-                            paypalOrderId: details.id
+                        modalAddToCartBtn.addEventListener('click', () => {
+                            const product = products.find(p => p.id === currentModalProductId);
+                            if (!product) return;
+                            if (product.customFields) {
+                                for (const field of product.customFields) {
+                                    if (field.required && !currentProductOptions[field.name]) {
+                                        alert('אנא מלא את השדה: ' + field.name);
+                                        return;
+                                    }
+                                }
+                            }
+                            addToCart(currentModalProductId, { ...currentProductOptions }, modalProductImage.src, currentProductPrice, isCouponProduct);
+                            if (isCouponProduct) {
+                                couponMessage.innerHTML = '<span class="coupon-applied">✓ קופון הוחל בהצלחה!</span>';
+                                isCouponProduct = false;
+                                couponLockedOptions = null;
+                            }
+                            closeProductModal();
                         });
 
-                        if (clubMemberId) {
-                            try {
-                                await db.collection('ClubMembers').doc(clubMemberId).update({
-                                    points: firebase.firestore.FieldValue.increment(pointsEarned - pointsToUse),
-                                    totalSpent: firebase.firestore.FieldValue.increment(total),
-                                    orderCount: firebase.firestore.FieldValue.increment(1)
-                                });
-                                if (currentClubMember) {
-                                    currentClubMember.points = (currentClubMember.points || 0) + pointsEarned - pointsToUse;
-                                    currentClubMember.totalSpent = (currentClubMember.totalSpent || 0) + total;
-                                    currentClubMember.orderCount = (currentClubMember.orderCount || 0) + 1;
-                                    saveClubMember();
-                                }
-                            } catch(e) { console.error('Points update error:', e); }
+                        function closeProductModal() {
+                            productModal.style.display = 'none';
+                            currentProductOptions = {};
+                            isCouponProduct = false;
+                            couponLockedOptions = null;
+                            window.history.replaceState(null, '', window.location.pathname);
                         }
 
-                        const emailSent = await sendReceiptEmail({
-                            orderId: orderRef.id, customerName: name, customerEmail: email,
-                            customerPhone: phone, customerAddress: address, items: cart,
-                            subtotal, shippingCost, totalAmount: total,
-                            appliedCoupon: appliedCoupon ? appliedCoupon.Code : null,
-                            couponDetails: appliedCoupon
+                        closeProductModalBtn.addEventListener('click', closeProductModal);
+                        productModal.addEventListener('mousedown', e => { if (e.target === productModal) closeProductModal(); });
+                        window.addEventListener('keydown', e => {
+                            if (productModal.style.display === 'flex' && e.key === 'Escape') closeProductModal();
+                            if (document.getElementById('club-modal').classList.contains('active') && e.key === 'Escape') closeClubModal();
                         });
-if (emailSent) {
-    alert(`תודה לך, ${name}! התשלום בוצע בהצלחה.\nקבלה נשלחה למייל שלך.\nסך הכל: ${total.toFixed(2)} ₪`);
-} else {
-    const overlay = document.createElement('div');
-    overlay.style.cssText = `position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);z-index:9999;display:flex;align-items:center;justify-content:center;`;
-    overlay.innerHTML = `
+
+                        // Size chart zoom close
+                        document.getElementById('close-zoom-btn').addEventListener('click', () => {
+                            document.getElementById('size-chart-zoom-modal').classList.remove('active');
+                        });
+
+                        document.getElementById('size-chart-zoom-modal').addEventListener('click', e => {
+                            if (e.target === document.getElementById('size-chart-zoom-modal')) {
+                                document.getElementById('size-chart-zoom-modal').classList.remove('active');
+                            }
+                        });
+
+                        // ===== CONTACT =====
+                        contactForm.addEventListener('submit', async e => {
+                            e.preventDefault();
+                            const data = {
+                                name: document.getElementById('contact-name').value,
+                                phone: document.getElementById('contact-phone').value,
+                                email: document.getElementById('contact-email').value,
+                                message: document.getElementById('contact-message').value,
+                                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                status: 'open',
+                                linkedOrderId: null
+                            };
+                            try {
+                                const snap = await db.collection('yr_orders')
+                                    .where('customerPhone', '==', data.phone)
+                                    .where('customerEmail', '==', data.email).get();
+                                if (!snap.empty && snap.docs.length === 1) data.linkedOrderId = snap.docs[0].id;
+                                await db.collection('yr_contact_leads').add(data);
+                                alert('הפנייה נשלחה בהצלחה! ניצור איתך קשר בהקדם.');
+                                contactForm.reset();
+                            } catch (e) {
+                                alert('אירעה שגיאה. אנא נסה שוב.');
+                            }
+                        });
+
+                        // ===== HELPERS =====
+                        function getFullAddress() {
+                            const street = document.getElementById('address-street').value.trim();
+                            const house = document.getElementById('address-house').value.trim();
+                            const city = document.getElementById('address-city').value.trim();
+                            const country = document.getElementById('address-country').value.trim();
+                            const zip = document.getElementById('address-zip').value.trim();
+                            return `${street} ${house}, ${city}, ${country} ${zip}`;
+                        }
+
+                        // ===== PAYPAL =====
+                        function renderPayPalButton() {
+                            const container = document.getElementById('paypal-button-container');
+                            if (!container) return;
+                            container.innerHTML = '';
+                            if (cart.length === 0) return;
+
+                            paypal.Buttons({
+                                style: { color: 'blue', shape: 'pill', label: 'pay', height: 45 },
+                                createOrder: (data, actions) => actions.order.create({
+                                    purchase_units: [{
+                                        amount: { value: total.toFixed(2), currency_code: 'ILS' },
+                                        description: 'רכישה ב-YR Jerseys'
+                                    }]
+                                }),
+                                onApprove: (data, actions) => actions.order.capture().then(async details => {
+                                    try {
+                                        const name = document.getElementById('name').value;
+                                        const email = document.getElementById('email').value;
+                                        const phone = document.getElementById('phone').value;
+                                        const address = getFullAddress();
+
+                                        let clubMemberId = currentClubMember ? currentClubMember.id : null;
+                                        const joinChecked = document.getElementById('join-club-checkbox').checked;
+
+                                        if (!currentClubMember && joinChecked) {
+                                            const pw = document.getElementById('club-password').value;
+                                            if (pw && pw.length >= 6) {
+                                                try {
+                                                    const nm = { name, email, phone, password: pw, points: 0, address, joinDate: firebase.firestore.FieldValue.serverTimestamp(), totalSpent: 0, orderCount: 0 };
+                                                    const ref = await db.collection('ClubMembers').add(nm);
+                                                    clubMemberId = ref.id;
+                                                    currentClubMember = { id: ref.id, ...nm };
+                                                    saveClubMember();
+                                                    updateClubButton();
+                                                } catch (e) { console.error('Club member creation error:', e); }
+                                            }
+                                        }
+
+                                        const pointsEarned = Math.floor(total * 0.01);
+
+                                        const orderRef = await db.collection('yr_orders').add({
+                                            customerName: name,
+                                            customerEmail: email,
+                                            customerPhone: phone,
+                                            customerAddress: address,
+                                            items: cart.map(item => ({
+                                                productId: item.id,
+                                                productName: item.name,
+                                                name: item.name,
+                                                quantity: item.quantity,
+                                                price: item.price,
+                                                originalPrice: item.originalPrice || null,
+                                                selectedOptions: item.selectedOptions || null,
+                                                isFreebie: item.isFreebie || false
+                                            })),
+                                            subtotal: parseFloat(subtotal.toFixed(2)),
+                                            shippingCost: parseFloat(shippingCost.toFixed(2)),
+                                            totalAmount: parseFloat(total.toFixed(2)),
+                                            appliedCoupon: appliedCoupon ? appliedCoupon.Code : null,
+                                            couponDetails: appliedCoupon || null,
+                                            clubMemberId: clubMemberId,
+                                            pointsUsed: pointsToUse,
+                                            pointsEarned: pointsEarned,
+                                            orderDate: firebase.firestore.FieldValue.serverTimestamp(),
+                                            status: 'completed',
+                                            completed: false,
+                                            paymentType: 'paypal',
+                                            paypalOrderId: details.id
+                                        });
+
+                                        if (clubMemberId) {
+                                            try {
+                                                await db.collection('ClubMembers').doc(clubMemberId).update({
+                                                    points: firebase.firestore.FieldValue.increment(pointsEarned - pointsToUse),
+                                                    totalSpent: firebase.firestore.FieldValue.increment(total),
+                                                    orderCount: firebase.firestore.FieldValue.increment(1)
+                                                });
+                                                if (currentClubMember) {
+                                                    currentClubMember.points = (currentClubMember.points || 0) + pointsEarned - pointsToUse;
+                                                    currentClubMember.totalSpent = (currentClubMember.totalSpent || 0) + total;
+                                                    currentClubMember.orderCount = (currentClubMember.orderCount || 0) + 1;
+                                                    saveClubMember();
+                                                }
+                                            } catch (e) { console.error('Points update error:', e); }
+                                        }
+
+                                        const emailSent = await sendReceiptEmail({
+                                            orderId: orderRef.id, customerName: name, customerEmail: email,
+                                            customerPhone: phone, customerAddress: address, items: cart,
+                                            subtotal, shippingCost, totalAmount: total,
+                                            appliedCoupon: appliedCoupon ? appliedCoupon.Code : null,
+                                            couponDetails: appliedCoupon
+                                        });
+                                        if (emailSent) {
+                                            alert(`תודה לך, ${name}! התשלום בוצע בהצלחה.\nקבלה נשלחה למייל שלך.\nסך הכל: ${total.toFixed(2)} ₪`);
+                                        } else {
+                                            const overlay = document.createElement('div');
+                                            overlay.style.cssText = `position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);z-index:9999;display:flex;align-items:center;justify-content:center;`;
+                                            overlay.innerHTML = `
         <div style="background:white;border:4px solid #000;box-shadow:8px 8px 0 #000;padding:40px;max-width:400px;width:90%;text-align:center;direction:rtl;">
             <div style="font-size:2.5em;margin-bottom:15px;">✅</div>
             <h2 style="color:#000;margin-bottom:10px;font-weight:900;text-transform:uppercase;">התשלום בוצע בהצלחה!</h2>
@@ -3052,127 +3203,127 @@ if (emailSent) {
             <div style="font-size:3em;font-weight:900;color:var(--accent-color);" id="countdown-num">3</div>
         </div>
     `;
-    document.body.appendChild(overlay);
-    let count = 3;
-    const countdownEl = overlay.querySelector('#countdown-num');
-    const timer = setInterval(() => {
-        count--;
-        countdownEl.textContent = count;
-        if (count <= 0) {
-            clearInterval(timer);
-            document.body.removeChild(overlay);
-            window.open(`invoice.html#${orderRef.id}`, '_blank');
-        }
-    }, 1000);
-}
+                                            document.body.appendChild(overlay);
+                                            let count = 3;
+                                            const countdownEl = overlay.querySelector('#countdown-num');
+                                            const timer = setInterval(() => {
+                                                count--;
+                                                countdownEl.textContent = count;
+                                                if (count <= 0) {
+                                                    clearInterval(timer);
+                                                    document.body.removeChild(overlay);
+                                                    window.open(`invoice.html#${orderRef.id}`, '_blank');
+                                                }
+                                            }, 1000);
+                                        }
 
-                        cart = [];
-                        appliedCoupon = null;
-                        pointsToUse = 0;
-                        pointsDiscount = 0;
-                        couponInput.value = '';
-                        couponInput.disabled = false;
-                        applyCouponBtn.disabled = false;
-                        couponMessage.innerHTML = '';
-                        localStorage.removeItem('yr_jerseys_cart');
-                        localStorage.removeItem('yr_jerseys_coupon');
-                        const s = document.getElementById('points-slider');
-                        if (s) s.value = s.min || 10;
-                        updateCartDisplay();
-                        updateClubModal();
-                        checkoutForm.reset();
-                        closeCart();
-                    } catch(e) {
-                        console.error('Payment error:', e);
-                        alert('אירעה שגיאה בתהליך התשלום. נסה שוב.');
-                    }
-                }),
-                onCancel: () => alert('התשלום בוטל.'),
-                onError: err => { alert('שגיאה בתשלום: נסה שוב.'); console.error(err); }
-            }).render('#paypal-button-container');
-        }
+                                        cart = [];
+                                        appliedCoupon = null;
+                                        pointsToUse = 0;
+                                        pointsDiscount = 0;
+                                        couponInput.value = '';
+                                        couponInput.disabled = false;
+                                        applyCouponBtn.disabled = false;
+                                        couponMessage.innerHTML = '';
+                                        localStorage.removeItem('yr_jerseys_cart');
+                                        localStorage.removeItem('yr_jerseys_coupon');
+                                        const s = document.getElementById('points-slider');
+                                        if (s) s.value = s.min || 10;
+                                        updateCartDisplay();
+                                        updateClubModal();
+                                        checkoutForm.reset();
+                                        closeCart();
+                                    } catch (e) {
+                                        console.error('Payment error:', e);
+                                        alert('אירעה שגיאה בתהליך התשלום. נסה שוב.');
+                                    }
+                                }),
+                                onCancel: () => alert('התשלום בוטל.'),
+                                onError: err => { alert('שגיאה בתשלום: נסה שוב.'); console.error(err); }
+                            }).render('#paypal-button-container');
+                        }
 
-        // ===== EMAIL =====
-        const EMAILJS_SERVICE_ID = 'service_pypll0n';
-        const EMAILJS_TEMPLATE_ID = 'yrjerseys';
-        const EMAILJS_PUBLIC_KEY = 'f-U3pdugkQiavzAvU';
-        emailjs.init(EMAILJS_PUBLIC_KEY);
+                        // ===== EMAIL =====
+                        const EMAILJS_SERVICE_ID = 'service_pypll0n';
+                        const EMAILJS_TEMPLATE_ID = 'yrjerseys';
+                        const EMAILJS_PUBLIC_KEY = 'f-U3pdugkQiavzAvU';
+                        emailjs.init(EMAILJS_PUBLIC_KEY);
 
-        async function sendReceiptEmail(orderData) {
-            try {
-                const productsListHTML = orderData.items.map(item => {
-                    const name = item.productName || item.name || 'מוצר YR';
-                    const opts = item.selectedOptions ? Object.entries(item.selectedOptions).filter(([,v]) => v).map(([k,v]) => `${k}: ${v}`).join(', ') : '';
-                    const freebieTag = item.isFreebie ? ' <strong style="color:#28a745;">(מתנה)</strong>' : '';
-                    let priceDisplay = `₪${item.price.toFixed(2)}`;
-                    if (item.originalPrice && item.originalPrice > item.price && !item.isFreebie) {
-                        priceDisplay = `<span style="text-decoration:line-through;color:#999;font-size:0.9em;">₪${item.originalPrice.toFixed(2)}</span><br><span style="color:#e74c3c;font-weight:bold;">₪${item.price.toFixed(2)}</span>`;
-                    }
-                    return `<tr>
+                        async function sendReceiptEmail(orderData) {
+                            try {
+                                const productsListHTML = orderData.items.map(item => {
+                                    const name = item.productName || item.name || 'מוצר YR';
+                                    const opts = item.selectedOptions ? Object.entries(item.selectedOptions).filter(([, v]) => v).map(([k, v]) => `${k}: ${v}`).join(', ') : '';
+                                    const freebieTag = item.isFreebie ? ' <strong style="color:#28a745;">(מתנה)</strong>' : '';
+                                    let priceDisplay = `₪${item.price.toFixed(2)}`;
+                                    if (item.originalPrice && item.originalPrice > item.price && !item.isFreebie) {
+                                        priceDisplay = `<span style="text-decoration:line-through;color:#999;font-size:0.9em;">₪${item.originalPrice.toFixed(2)}</span><br><span style="color:#e74c3c;font-weight:bold;">₪${item.price.toFixed(2)}</span>`;
+                                    }
+                                    return `<tr>
                         <td style="padding:10px;border-bottom:1px solid #eee;text-align:right;vertical-align:top;"><div style="font-weight:bold;">${name}${freebieTag}</div>${opts ? `<div style="font-size:12px;color:#666;">(${opts})</div>` : ''}</td>
                         <td style="padding:10px;border-bottom:1px solid #eee;text-align:right;">${item.quantity}</td>
                         <td style="padding:10px;border-bottom:1px solid #eee;text-align:right;">${priceDisplay}</td>
                         <td style="padding:10px;border-bottom:1px solid #eee;text-align:right;">₪${(item.price * item.quantity).toFixed(2)}</td>
                     </tr>`;
-                }).join('');
+                                }).join('');
 
-                let discountAmount = 0;
-                const coupon = orderData.couponDetails;
-                if (orderData.appliedCoupon && coupon) {
-                    if (coupon.Type === 'fixed_discount') discountAmount = coupon.Value;
-                    else if (coupon.Type === 'percentage_discount') discountAmount = (orderData.subtotal * coupon.Value) / 100;
-                }
+                                let discountAmount = 0;
+                                const coupon = orderData.couponDetails;
+                                if (orderData.appliedCoupon && coupon) {
+                                    if (coupon.Type === 'fixed_discount') discountAmount = coupon.Value;
+                                    else if (coupon.Type === 'percentage_discount') discountAmount = (orderData.subtotal * coupon.Value) / 100;
+                                }
 
-                const res = await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-                    to_email: orderData.customerEmail,
-                    to_name: orderData.customerName,
-                    name: orderData.customerName,
-                    email: orderData.customerEmail,
-                    phone: orderData.customerPhone,
-                    address: orderData.customerAddress,
-                    order_id: orderData.orderId,
-                    date: new Date().toLocaleDateString('he-IL', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
-                    products_list: productsListHTML,
-                    subtotal: orderData.subtotal.toFixed(2),
-                    coupon_code: orderData.appliedCoupon || '',
-                    discount_amount: discountAmount.toFixed(2),
-                    shipping_cost: orderData.shippingCost.toFixed(2),
-                    total_amount: orderData.totalAmount.toFixed(2)
-                });
-                return true;
-            } catch(e) {
-                console.error('Email error:', e);
-                return false;
-            }
-        }
+                                const res = await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+                                    to_email: orderData.customerEmail,
+                                    to_name: orderData.customerName,
+                                    name: orderData.customerName,
+                                    email: orderData.customerEmail,
+                                    phone: orderData.customerPhone,
+                                    address: orderData.customerAddress,
+                                    order_id: orderData.orderId,
+                                    date: new Date().toLocaleDateString('he-IL', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+                                    products_list: productsListHTML,
+                                    subtotal: orderData.subtotal.toFixed(2),
+                                    coupon_code: orderData.appliedCoupon || '',
+                                    discount_amount: discountAmount.toFixed(2),
+                                    shipping_cost: orderData.shippingCost.toFixed(2),
+                                    total_amount: orderData.totalAmount.toFixed(2)
+                                });
+                                return true;
+                            } catch (e) {
+                                console.error('Email error:', e);
+                                return false;
+                            }
+                        }
 
-        // ===== DEEP LINK =====
-        function handleDeepLink() {
-            const hash = window.location.hash;
-            if (!hash || !hash.startsWith('#')) return;
-            const name = decodeURIComponent(hash.substring(1)).trim();
-            if (!name) return;
-            const product = products.find(p => p.name.trim().toLowerCase() === name.toLowerCase());
-            if (product) openProductModal(product.id);
-        }
+                        // ===== DEEP LINK =====
+                        function handleDeepLink() {
+                            const hash = window.location.hash;
+                            if (!hash || !hash.startsWith('#')) return;
+                            const name = decodeURIComponent(hash.substring(1)).trim();
+                            if (!name) return;
+                            const product = products.find(p => p.name.trim().toLowerCase() === name.toLowerCase());
+                            if (product) openProductModal(product.id);
+                        }
 
-        // ===== INIT =====
-        document.addEventListener('DOMContentLoaded', async () => {
-            productsContainer.innerHTML = `
+                        // ===== INIT =====
+                        document.addEventListener('DOMContentLoaded', async () => {
+                            productsContainer.innerHTML = `
                 <div style="text-align:center;padding:80px 20px;width:100%;grid-column:1/-1;">
                     <div style="font-size:3em;font-weight:900;margin-bottom:15px;">⏳</div>
                     <p style="font-size:1.1em;font-weight:900;text-transform:uppercase;">טוען מוצרים...</p>
                 </div>`;
 
-            try {
-                await loadSettings();
-                loadCartFromStorage();
-                await Promise.all([loadAnnouncements(), fetchProducts(), loadClubMember()]);
-                updateCartDisplay();
-            } catch(e) {
-                console.error('Init error:', e);
-            }
-        });
+                            try {
+                                await loadSettings();
+                                loadCartFromStorage();
+                                await Promise.all([loadAnnouncements(), fetchProducts(), loadClubMember()]);
+                                updateCartDisplay();
+                            } catch (e) {
+                                console.error('Init error:', e);
+                            }
+                        });
     </script>
 </body>
 </html>
