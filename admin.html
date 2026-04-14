@@ -2410,7 +2410,7 @@ updateData.sizeCharts = [...existingCharts, ...newCharts].slice(0, 10);
         const ordersList = document.getElementById('orders-list');
         ordersList.innerHTML = '<p>טוען הזמנות...</p>';
         try {
-            const ordersSnapshot = await db.collection(׳yr_orders').orderBy('orderDate', 'desc').get();
+            const ordersSnapshot = await db.collection('yr_orders').orderBy('orderDate', 'desc').get();
             let orders = ordersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
             if (searchTerm) {
@@ -2455,14 +2455,14 @@ updateData.sizeCharts = [...existingCharts, ...newCharts].slice(0, 10);
                 });
                 const statusTextarea = orderCard.querySelector('.order-status-text');
                 statusTextarea.addEventListener('blur', async () => {
-                    try { await db.collection(׳yr_orders').doc(order.id).update({ adminStatus: statusTextarea.value }); }
+                    try { await db.collection('yr_orders').doc(order.id).update({ adminStatus: statusTextarea.value }); }
                     catch (error) { console.error('Error updating status:', error); }
                 });
                 const completeBtn = orderCard.querySelector('.complete-order-btn');
                 completeBtn.addEventListener('click', async () => {
                     if (confirm('האם לסמן הזמנה זו כהושלמה?')) {
                         try {
-                            await db.collection(׳yr_orders').doc(order.id).update({ completed: true, completedAt: firebase.firestore.FieldValue.serverTimestamp() });
+                            await db.collection('yr_orders').doc(order.id).update({ completed: true, completedAt: firebase.firestore.FieldValue.serverTimestamp() });
                             fetchOrders(searchTerm);
                         } catch (error) { alert('שגיאה בעדכון ההזמנה'); console.error(error); }
                     }
@@ -2575,7 +2575,7 @@ updateData.sizeCharts = [...existingCharts, ...newCharts].slice(0, 10);
         orderDiv.innerHTML = '';
         if (lead.linkedOrderId) {
             try {
-                const orderDoc = await db.collection(׳yr_orders').doc(lead.linkedOrderId).get();
+                const orderDoc = await db.collection('yr_orders').doc(lead.linkedOrderId).get();
                 if (orderDoc.exists) {
                     const order = orderDoc.data();
                     orderDiv.innerHTML = `
@@ -2646,7 +2646,7 @@ async function processSizeChartFiles(inputId, previewId, statusId) {
         const searchTerm = e.target.value.trim().toLowerCase();
         if (searchTerm.length < 2) { document.getElementById('order-search-results').innerHTML = ''; return; }
         try {
-            const ordersSnapshot = await db.collection(׳yr_orders').get();
+            const ordersSnapshot = await db.collection('yr_orders').get();
             const orders = ordersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(order => {
                 const name = (order.customerName || '').toLowerCase();
                 const email = (order.customerEmail || '').toLowerCase();
@@ -3349,7 +3349,7 @@ async function viewCustomerOrders(customerId, customerEmail) {
     
     try {
         // ⚡ FIX: משיכת כל ההזמנות ללא orderBy (כדי להימנע מ-index)
-        const ordersSnapshot = await db.collection(׳yr_orders')
+        const ordersSnapshot = await db.collection('yr_orders')
             .where('clubMemberId', '==', customerId)
             .get();
         
