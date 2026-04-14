@@ -1870,6 +1870,99 @@ async function displayCategoriesWithProducts() {
     }
 }
 
+        async function loadCategories() {
+        try {
+            const settingsDoc = await db.collection('yr_settings').doc('main').get();
+            if (settingsDoc.exists) {
+                categories = settingsDoc.data().Categories || [];
+            }
+            updateCategoryCheckboxes('product-category-checkboxes', []);
+            await displayCategoriesWithProducts();
+        } catch (error) {
+            console.error('Error loading categories:', error);
+        }
+    }
+
+        function updateCategoryCheckboxes(containerId, selectedCats = []) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        container.innerHTML = '';
+        categories.forEach(cat => {
+            const label = document.createElement('label');
+            const cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.value = cat;
+            cb.checked = selectedCats.includes(cat);
+            label.appendChild(cb);
+            label.appendChild(document.createTextNode(' ' + cat));
+            container.appendChild(label);
+        });
+    }
+
+    function getSelectedCategories(containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return [];
+        return Array.from(container.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
+    }
+
+        async function editCategoryName(oldName) {
+        const newName = prompt('שם חדש לקטגוריה:', oldName);
+        if (!newName || newName.trim() === oldName) return;
+        const trimmed = newName.trim();
+        try {
+            const docRef = db.collection('yr_settings').doc('main');
+            const doc = await docRef.get();
+            const current = doc.data().Categories || [];
+            if (current.includes(trimmed)) { alert('קטגוריה עם שם זה כבר קיימת'); return; }
+            const updated = current.map(c => c === oldName ? trimmed : c);
+            await docRef.update({ Categories: updated });
+
+            // עדכון כל המוצרים שיש להם את הקטגוריה הישנה
+            const productsSnap = await db.collection('yr_jerseys').get();
+            const batch = db.batch();
+            productsSnap.docs.forEach(docSnap => {
+                const data = docSnap.data();
+                const cats = data.categories || (data.category ? [data.category] : []);
+                if (cats.includes(oldName)) {
+                    const newCats = cats.map(c => c === oldName ? trimmed : c);
+                    batch.update(docSnap.ref, { categories: newCats, category: firebase.firestore.FieldValue.delete() });
+                }
+            });
+            await batch.commit();
+            await loadCategories();
+            await loadAllProducts();
+        } catch (err) {
+            console.error(err);
+            alert('שגיאה בעריכת קטגוריה');
+        }
+    }
+
+    async function deleteCategory(categoryName) {
+        if (!confirm(`האם למחוק את הקטגוריה "${categoryName}"?\nהמוצרים לא יימחקו, רק הקטגוריה תוסר מהם.`)) return;
+        try {
+            await db.collection('yr_settings').doc('main').update({
+                Categories: firebase.firestore.FieldValue.arrayRemove(categoryName)
+            });
+            // הסר את הקטגוריה מכל המוצרים
+            const productsSnap = await db.collection('yr_jerseys').get();
+            const batch = db.batch();
+            productsSnap.docs.forEach(docSnap => {
+                const data = docSnap.data();
+                const cats = data.categories || (data.category ? [data.category] : []);
+                if (cats.includes(categoryName)) {
+                    const newCats = cats.filter(c => c !== categoryName);
+                    batch.update(docSnap.ref, { categories: newCats, category: firebase.firestore.FieldValue.delete() });
+                }
+            });
+            await batch.commit();
+            await loadCategories();
+            await loadAllProducts();
+        } catch (err) {
+            console.error(err);
+            alert('שגיאה במחיקת קטגוריה');
+        }
+    }
+
     // הגדרת אירועים (Event Delegation) - רק אם לא הוגדרו כבר
     setupCategoryEventListeners(categoriesGrid);
 
@@ -1951,9 +2044,7 @@ if (addBtn && !addBtn.dataset.listenerAttached) {
     // =========================
     // EVENTS (event delegation)
     // =========================
-
     categoriesGrid.onclick = async (e) => {
-
         const editBtn = e.target.closest('.btn-edit-category');
         if (editBtn) {
             editCategoryName(decodeURIComponent(editBtn.dataset.category));
@@ -1977,14 +2068,9 @@ if (addBtn && !addBtn.dataset.listenerAttached) {
         if (copyBtn) {
             try {
                 await navigator.clipboard.writeText(copyBtn.dataset.productLink);
-
                 const old = copyBtn.innerHTML;
                 copyBtn.innerHTML = '✓';
-
-                setTimeout(() => {
-                    copyBtn.innerHTML = old;
-                }, 1500);
-
+                setTimeout(() => { copyBtn.innerHTML = old; }, 1500);
             } catch (err) {
                 alert('שגיאה בהעתקה');
             }
