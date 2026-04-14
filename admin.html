@@ -12,7 +12,7 @@
             box-sizing: border-box; 
         }
 
-        body {
+        body {כ
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f0f0f0;
             color: #333;
@@ -1671,8 +1671,8 @@ window.addEventListener('DOMContentLoaded', async () => {
         try {
 const docSnap = await db.collection("users").doc(user).get();
             
-            if (docSnap.exists() && docSnap.data().isAdmin) {
-                onSuccessfulLogin();
+if (docSnap.exists && docSnap.data().isAdmin) {
+    onSuccessfulLogin();
             } else {
                 localStorage.removeItem('vip_admin_logged');
                 localStorage.removeItem('vip_admin_user');
@@ -1785,16 +1785,19 @@ logoutButton.addEventListener('click', () => {
     // CATEGORIES
     // ============================================
     async function loadCategories() {
-        try {
-            const settingsDoc = await db.collection('yr_settings').doc('main').get();
-            if (settingsDoc.exists) {
-                const data = settingsDoc.data();
-                categories = data.Categories || [];
-                await displayCategoriesWithProducts();
-                updateCategoryCheckboxes();
-            }
-        } catch (error) { console.error('Error loading categories:', error); }
-    }
+    try {
+        const settingsDoc = await db.collection('yr_settings').doc('main').get();
+        if (settingsDoc.exists) {
+            const data = settingsDoc.data();
+            categories = data.Categories || [];
+            // טעינת מוצרים עדכניים לפני הצגת הקטגוריות
+            const productsSnapshot = await db.collection('yr_jerseys').get();
+            products = productsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            await displayCategoriesWithProducts();
+            updateCategoryCheckboxes();
+        }
+    } catch (error) { console.error('Error loading categories:', error); }
+}
 
     function updateCategoryCheckboxes(containerId = 'product-category-checkboxes', selectedCats = []) {
         const container = document.getElementById(containerId);
