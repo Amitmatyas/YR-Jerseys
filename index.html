@@ -2541,7 +2541,7 @@ function updateBarHeight() {
                             if (data) {
                                 try {
                                     const m = JSON.parse(data);
-                                    const doc = await db.collection('ClubMembers').doc(m.id).get();
+                                    const doc = await db.collection('yr_ClubMembers').doc(m.id).get();
                                     if (doc.exists) {
                                         currentClubMember = { id: doc.id, ...doc.data() };
                                         updateClubButton();
@@ -2735,7 +2735,7 @@ function updateBarHeight() {
                             const email = document.getElementById('login-email').value.trim();
                             const password = document.getElementById('login-password').value;
                             try {
-                                const snap = await db.collection('ClubMembers').where('email', '==', email).where('password', '==', password).limit(1).get();
+                                const snap = await db.collection('yr_ClubMembers').where('email', '==', email).where('password', '==', password).limit(1).get();
                                 if (snap.empty) { showClubMessage('אימייל או סיסמה שגויים', 'error'); return; }
                                 currentClubMember = { id: snap.docs[0].id, ...snap.docs[0].data() };
                                 saveClubMember();
@@ -2758,10 +2758,10 @@ function updateBarHeight() {
                             const confirm = document.getElementById('register-password-confirm').value;
                             if (password !== confirm) { showClubMessage('הסיסמאות אינן תואמות', 'error'); return; }
                             try {
-                                const existing = await db.collection('ClubMembers').where('email', '==', email).limit(1).get();
+                                const existing = await db.collection('yr_ClubMembers').where('email', '==', email).limit(1).get();
                                 if (!existing.empty) { showClubMessage('האימייל כבר רשום', 'error'); return; }
                                 const newMember = { name, email, phone, password, points: 0, address: '', joinDate: firebase.firestore.FieldValue.serverTimestamp(), totalSpent: 0, orderCount: 0 };
-                                const ref = await db.collection('ClubMembers').add(newMember);
+                                const ref = await db.collection('yr_ClubMembers').add(newMember);
                                 currentClubMember = { id: ref.id, ...newMember };
                                 saveClubMember();
                                 updateClubButton();
@@ -2787,7 +2787,7 @@ function updateBarHeight() {
                             let address = '';
                             if (street || house || city) address = `${street} ${house}, ${city}, ${country} ${zip}`.trim();
                             try {
-                                await db.collection('ClubMembers').doc(currentClubMember.id).update({ name, phone, address });
+                                await db.collection('yr_ClubMembers').doc(currentClubMember.id).update({ name, phone, address });
                                 currentClubMember.name = name;
                                 currentClubMember.phone = phone;
                                 currentClubMember.address = address;
@@ -3121,7 +3121,7 @@ function updateBarHeight() {
                                             if (pw && pw.length >= 6) {
                                                 try {
                                                     const nm = { name, email, phone, password: pw, points: 0, address, joinDate: firebase.firestore.FieldValue.serverTimestamp(), totalSpent: 0, orderCount: 0 };
-                                                    const ref = await db.collection('ClubMembers').add(nm);
+                                                    const ref = await db.collection('yr_ClubMembers').add(nm);
                                                     clubMemberId = ref.id;
                                                     currentClubMember = { id: ref.id, ...nm };
                                                     saveClubMember();
@@ -3164,7 +3164,7 @@ function updateBarHeight() {
 
                                         if (clubMemberId) {
                                             try {
-                                                await db.collection('ClubMembers').doc(clubMemberId).update({
+                                                await db.collection('yr_ClubMembers').doc(clubMemberId).update({
                                                     points: firebase.firestore.FieldValue.increment(pointsEarned - pointsToUse),
                                                     totalSpent: firebase.firestore.FieldValue.increment(total),
                                                     orderCount: firebase.firestore.FieldValue.increment(1)
