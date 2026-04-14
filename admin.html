@@ -1693,9 +1693,9 @@ loginButton.addEventListener('click', async () => {
     if (!u || !p) return;
 
     try {
-        const docSnap = await getDoc(doc(db, "users", u));
+        const docSnap = await db.collection("users").doc(u).get();
 
-        if (!docSnap.exists()) {
+        if (!docSnap.exists) {
             throw new Error("user-not-found");
         }
 
