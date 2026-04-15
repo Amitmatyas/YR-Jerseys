@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>עדכון פרטים - YR Jerseys</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&display=swap');
+
+        :root {
+            --primary-color: #1a1a1a;
+            --bg-color: #f4f7f6;
+            --border-color: #e1e1e1;
+            --text-main: #2d3436;
+            --text-muted: #636e72;
+            --success: #27ae60;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Heebo', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            direction: rtl;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo { text-align: center; margin-bottom: 30px; }
+        .logo img { width: 130px; height: auto; }
+
+        h1 { font-weight: 800; font-size: 1.7rem; text-align: center; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: var(--text-muted); margin-bottom: 30px; }
+
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 0.9rem; }
+        .form-group input {
+            width: 100%; padding: 13px; border: 1.5px solid var(--border-color);
+            border-radius: 10px; font-family: inherit; font-size: 1rem; transition: 0.2s;
+        }
+        .form-group input:focus { border-color: var(--primary-color); outline: none; box-shadow: 0 0 0 3px rgba(0,0,0,0.05); }
+
+        .address-section { border-top: 1px solid #eee; margin-top: 25px; padding-top: 20px; }
+        .address-row { display: flex; gap: 12px; }
+
+        .btn-primary {
+            width: 100%; padding: 16px; background: var(--primary-color); color: white;
+            border: none; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 1.1rem; margin-top: 10px;
+        }
+
+        .info-section { margin-top: 40px; border-top: 2px solid #eee; padding-top: 30px; }
+        .stat-card {
+            background: #f8f9fa; padding: 15px; border-radius: 12px;
+            border-right: 5px solid var(--primary-color); margin-bottom: 25px;
+        }
+        .stat-value { font-size: 1.6rem; font-weight: 800; color: var(--primary-color); }
+
+        .order-box {
+            background: white; border: 1px solid #eee; border-radius: 10px;
+            margin-bottom: 12px; overflow: hidden;
+        }
+        .order-summary {
+            padding: 15px; cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .order-summary:hover { background: #fafafa; }
+
+        .order-details {
+            padding: 0 15px; max-height: 0; overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+            background: #fafafa;
+        }
+        .order-box.active .order-details {
+            max-height: 700px; padding: 15px; border-top: 1px solid #eee;
+        }
+
+        .items-list { list-style: none; padding: 0; margin: 0 0 14px 0; }
+        .items-list li {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            padding: 8px 0; border-bottom: 1px solid #eee; font-size: 0.9rem;
+        }
+        .items-list li:last-child { border-bottom: none; }
+        .item-name-col { flex: 1; }
+        .item-name-col .item-opts { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+        .item-price-col { font-weight: 700; white-space: nowrap; margin-right: 10px; }
+
+        .order-totals { border-top: 1px solid #eee; padding-top: 10px; margin-top: 4px; }
+        .totals-row {
+            display: flex; justify-content: space-between;
+            font-size: 0.88rem; padding: 4px 0; color: var(--text-muted);
+        }
+        .totals-row.final {
+            font-size: 1rem; font-weight: 800;
+            color: var(--text-main); border-top: 2px solid #ddd;
+            margin-top: 6px; padding-top: 8px;
+        }
+        .totals-row.coupon { color: #27ae60; }
+
+        .tag { padding: 3px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; }
+        .tag-success { background: #eafff2; color: #27ae60; }
+        .tag-pending { background: #fff5e6; color: #d35400; }
+
+        .invoice-btn {
+            display: inline-block; margin-top: 14px;
+            padding: 9px 18px; background: var(--primary-color); color: white;
+            border-radius: 8px; font-size: 0.85rem; font-weight: 700;
+            text-decoration: none; font-family: inherit; border: none; cursor: pointer;
+        }
+        .invoice-btn:hover { opacity: 0.85; }
+
+        .message { padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center; display: none; font-weight: 600; }
+        .error { background: #ffeaea; color: #c0392b; display: block; }
+        .success { background: #eafff2; color: #27ae60; display: block; }
+
+        @media (max-width: 500px) { .container { padding: 25px; box-shadow: none; } body { background: white; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="logo">
+        <img src="https://i.postimg.cc/YCXfMWLg/Whats-App-Image-2026-04-14-at-19-24-10.png" alt="YR Jerseys">
+    </div>
+
+    <div id="status-msg"></div>
+    <div id="loading-state" style="text-align:center; padding: 20px;">טוען נתונים...</div>
+
+    <div id="main-content" style="display:none;">
+        <h1>שלום, <span id="user-greeting">...</span></h1>
+        <p class="subtitle">עדכון פרטים וצפייה בהזמנות</p>
+
+        <form id="update-form">
+            <div class="form-group">
+                <label>שם מלא *</label>
+                <input type="text" id="field-name" required>
+            </div>
+            <div class="form-group">
+                <label>טלפון *</label>
+                <input type="tel" id="field-phone" required>
+            </div>
+            <div class="form-group">
+                <label>סיסמה חדשה (אופציונלי)</label>
+                <input type="password" id="field-pass" minlength="6">
+            </div>
+
+            <div class="address-section">
+                <div class="address-row">
+                    <div class="form-group" style="flex:3">
+                        <label>רחוב</label>
+                        <input type="text" id="field-street">
+                    </div>
+                    <div class="form-group" style="flex:1">
+                        <label>מס'</label>
+                        <input type="text" id="field-house">
+                    </div>
+                </div>
+                <div class="address-row">
+                    <div class="form-group" style="flex:1">
+                        <label>עיר</label>
+                        <input type="text" id="field-city">
+                    </div>
+                    <div class="form-group" style="flex:1">
+                        <label>מיקוד</label>
+                        <input type="text" id="field-zip">
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn-primary" id="save-btn">עדכן פרטים</button>
+        </form>
+
+        <div class="info-section">
+            <div class="stat-card">
+                <div style="font-size: 0.9rem; color: var(--text-muted);">נקודות YR</div>
+                <div class="stat-value" id="stat-points">0</div>
+            </div>
+
+            <h3 style="margin-bottom:15px">🛍️ הזמנות אחרונות</h3>
+            <div id="orders-container"></div>
+
+            <h3 style="margin-top:25px; margin-bottom:15px">💬 פניות שירות</h3>
+            <div id="leads-container"></div>
+        </div>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyDLHENaXTeorjL87sExB1EJrH7mrEnNYOA",
+        authDomain: "timetable-titus.firebaseapp.com",
+        projectId: "timetable-titus",
+        storageBucket: "timetable-titus.firebasestorage.app",
+        messagingSenderId: "199146911555",
+        appId: "1:199146911555:web:5d9436d716dfc6de7361f6"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    let userData = null;
+
+    function showStatus(text, type) {
+        const box = document.getElementById('status-msg');
+        box.innerHTML = `<div class="message ${type}">${text}</div>`;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function init() {
+        const hash = window.location.hash.substring(1);
+        if (!hash) {
+            document.getElementById('loading-state').innerHTML = '<div class="message error">לקוח לא נבחר</div>';
+            return;
+        }
+
+        const email = decodeURIComponent(hash);
+
+        try {
+            const snap = await db.collection('ClubMembers').where('email', '==', email).limit(1).get();
+            if (snap.empty) {
+                document.getElementById('loading-state').innerHTML = '<div class="message error">לקוח לא נמצא</div>';
+                return;
+            }
+
+            userData = { id: snap.docs[0].id, ...snap.docs[0].data() };
+
+            document.getElementById('user-greeting').textContent = userData.name || '';
+            document.getElementById('field-name').value = userData.name || '';
+            document.getElementById('field-phone').value = userData.phone || '';
+            document.getElementById('stat-points').textContent = userData.points || 0;
+
+            if (userData.address) {
+                const parts = userData.address.split(',').map(p => p.trim());
+                const streetPart = parts[0] || '';
+                const streetMatch = streetPart.match(/(.*?)\s+(\d+[א-ת]?)$/);
+                if (streetMatch) {
+                    document.getElementById('field-street').value = streetMatch[1];
+                    document.getElementById('field-house').value = streetMatch[2];
+                } else {
+                    document.getElementById('field-street').value = streetPart;
+                }
+                document.getElementById('field-city').value = parts[1] || '';
+                if (parts[2]) {
+                    const zipMatch = parts[2].match(/\d+$/);
+                    if (zipMatch) document.getElementById('field-zip').value = zipMatch[0];
+                }
+            }
+
+            document.getElementById('loading-state').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+
+            loadOrders(userData.id);
+            loadLeads(userData.email);
+
+        } catch (e) {
+            showStatus("שגיאה בטעינת נתונים", "error");
+        }
+    }
+
+    function fmt(n) { return '₪' + (parseFloat(n) || 0).toFixed(2); }
+
+    async function loadOrders(memberId) {
+        const container = document.getElementById('orders-container');
+        try {
+            const snap = await db.collection('orders').where('clubMemberId', '==', memberId).get();
+            if (snap.empty) {
+                container.innerHTML = '<p style="color:#999; font-size:0.9rem;">אין הזמנות.</p>';
+                return;
+            }
+
+            const orders = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+                .sort((a, b) => (b.orderDate?.toDate() || 0) - (a.orderDate?.toDate() || 0));
+
+            container.innerHTML = orders.map(order => {
+                const date = order.orderDate
+                    ? order.orderDate.toDate().toLocaleDateString('he-IL')
+                    : '---';
+
+                const itemsHTML = (order.items || []).map(item => {
+                    const price = item.isFreebie ? null : ((item.price || 0) * (item.quantity || 1));
+                    return `
+                        <li>
+                            <div class="item-name-col">
+                                ${item.quantity}x ${item.productName || item.name || ''}
+                            </div>
+                            <div class="item-price-col">
+                                ${item.isFreebie ? '<span style="color:#27ae60;">חינם</span>' : fmt(price)}
+                            </div>
+                        </li>`;
+                }).join('');
+
+                return `
+                    <div class="order-box" onclick="this.classList.toggle('active')">
+                        <div class="order-summary">
+                            <div>
+                                <strong>#${order.id.substring(0, 6).toUpperCase()}</strong>
+                                <div style="font-size:0.8rem; color:#666;">${date}</div>
+                            </div>
+                            <div style="text-align:left">
+                                <div style="font-weight:800">${fmt(order.totalAmount || 0)}</div>
+                                <span class="tag ${order.completed ? 'tag-success' : 'tag-pending'}">
+                                    ${order.completed ? 'הושלם' : 'בטיפול'}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="order-details">
+                            <ul class="items-list">${itemsHTML}</ul>
+                            <a href="invoice.html#${order.id}" target="_blank"
+                               class="invoice-btn" onclick="event.stopPropagation()">📄 צפה בחשבונית</a>
+                        </div>
+                    </div>`;
+            }).join('');
+
+        } catch (e) {
+            container.innerHTML = '<p style="color:red;">שגיאה בטעינת הזמנות</p>';
+            console.error(e);
+        }
+    }
+
+    async function loadLeads(email) {
+        const container = document.getElementById('leads-container');
+        try {
+            const snap = await db.collection('ContactLeads').where('email', '==', email).get();
+            if (snap.empty) {
+                container.innerHTML = '<p style="color:#999; font-size:0.9rem;">אין פניות.</p>';
+                return;
+            }
+
+            const leads = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+                .sort((a, b) => (b.createdAt?.toDate() || 0) - (a.createdAt?.toDate() || 0));
+
+            container.innerHTML = leads.map(lead => `
+                <div style="background:#fff; border:1px solid #eee; padding:12px; border-radius:10px; margin-bottom:10px;">
+                    <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:#666; margin-bottom:5px;">
+                        <span>פנייה מיום ${lead.createdAt ? lead.createdAt.toDate().toLocaleDateString('he-IL') : 'לא ידוע'}</span>
+                        <span style="color:${lead.status === 'closed' ? 'green' : '#e67e22'}">
+                            ${lead.status === 'closed' ? 'סגור' : 'בטיפול'}
+                        </span>
+                    </div>
+                    <div style="font-size:0.95rem;">${lead.message || ''}</div>
+                </div>
+            `).join('');
+        } catch (e) {
+            container.innerHTML = '<p style="color:red;">שגיאה בטעינת פניות</p>';
+            console.error(e);
+        }
+    }
+
+    document.getElementById('update-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('save-btn');
+        btn.disabled = true;
+        btn.textContent = "מעדכן...";
+
+        try {
+            const street = document.getElementById('field-street').value;
+            const house = document.getElementById('field-house').value;
+            const city = document.getElementById('field-city').value;
+            const zip = document.getElementById('field-zip').value;
+            const fullAddress = `${street} ${house}, ${city}, ${zip}`;
+
+            const upData = {
+                name: document.getElementById('field-name').value,
+                phone: document.getElementById('field-phone').value,
+                address: fullAddress
+            };
+
+            const pass = document.getElementById('field-pass').value;
+            if (pass.length >= 6) upData.password = pass;
+
+            await db.collection('ClubMembers').doc(userData.id).update(upData);
+            showStatus("הפרטים עודכנו!", "success");
+        } catch (e) {
+            showStatus("שגיאה בעדכון", "error");
+        } finally {
+            btn.disabled = false;
+            btn.textContent = "עדכן פרטים";
+        }
+    };
+
+    window.onload = init;
+</script>
+
+</body>
+</html>
