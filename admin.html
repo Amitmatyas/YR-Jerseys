@@ -143,46 +143,50 @@
     background: #ffffff; 
     border-bottom: 1px solid #e0e0e0;
 }
-        
-        .sidebar-header img { 
-            width: 120px; 
-            height: auto; 
-            display: block;
-            margin: 0 auto;
-        }
-        
-        .sidebar-header h1 { 
-            color: #fff; 
-            font-size: 1.2em; 
-            margin-top: 15px; 
-            font-weight: 600; 
-        }
 
-        .sidebar-menu { 
-            padding: 20px 0; 
-        }
+        /* ===== SIDEBAR HEADER ===== */
+.sidebar-header img { 
+    width: 120px; 
+    height: auto; 
+    display: block;
+    margin: 0 auto;
+}
 
-        .menu-item {
-            padding: 15px 25px;
-            color: #ecf0f1;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 1.05em;
-            position: relative;
-            border-right: 4px solid transparent;
-        }
-        
-        .menu-item:hover { 
-            background: #34495e; 
-            color: #fff; 
-        }
-        
-        .menu-item.active {
-            background: #1a252f;
-            color: #fff;
-            border-right-color: #dc3545;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
-        }
+.sidebar-header h1 { 
+    color: #000; /* שינוי לשחור */
+    font-size: 1.2em; 
+    margin-top: 15px; 
+    font-weight: 600; 
+}
+
+/* ===== SIDEBAR MENU ===== */
+.sidebar-menu { 
+    padding: 20px 0; 
+}
+
+.menu-item {
+    padding: 15px 25px;
+    color: #333; /* טקסט אפור כהה/שחור לקריאות מקסימלית */
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 1.05em;
+    position: relative;
+    border-right: 4px solid transparent;
+}
+
+/* מצב מעבר עכבר - אפור ניטרלי קליל */
+.menu-item:hover { 
+    background: #e9ecef; 
+    color: #000; 
+}
+
+/* מצב פעיל (נבחר) - אפור ניטרלי מעט כהה יותר */
+.menu-item.active {
+    background: #dee2e6; 
+    color: #000;
+    border-right-color: #dc3545; /* שומר על הקו האדום לסימון הבחירה */
+    font-weight: bold;
+}
 
         /* ===== MAIN CONTENT ===== */
         .main-content {
