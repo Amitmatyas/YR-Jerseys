@@ -62,11 +62,21 @@
         }
 
         .info-section { margin-top: 40px; border-top: 2px solid #eee; padding-top: 30px; }
-        .stat-card {
-            background: #f8f9fa; padding: 15px; border-radius: 12px;
-            border-right: 5px solid var(--primary-color); margin-bottom: 25px;
+
+        .stats-row {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 25px;
         }
+
+        .stat-card {
+            flex: 1;
+            background: #f8f9fa; padding: 15px; border-radius: 12px;
+            border-right: 5px solid var(--primary-color);
+        }
+        .stat-label { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
         .stat-value { font-size: 1.6rem; font-weight: 800; color: var(--primary-color); }
+        .stat-sub { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
 
         .order-box {
             background: white; border: 1px solid #eee; border-radius: 10px;
@@ -94,20 +104,7 @@
         }
         .items-list li:last-child { border-bottom: none; }
         .item-name-col { flex: 1; }
-        .item-name-col .item-opts { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
         .item-price-col { font-weight: 700; white-space: nowrap; margin-right: 10px; }
-
-        .order-totals { border-top: 1px solid #eee; padding-top: 10px; margin-top: 4px; }
-        .totals-row {
-            display: flex; justify-content: space-between;
-            font-size: 0.88rem; padding: 4px 0; color: var(--text-muted);
-        }
-        .totals-row.final {
-            font-size: 1rem; font-weight: 800;
-            color: var(--text-main); border-top: 2px solid #ddd;
-            margin-top: 6px; padding-top: 8px;
-        }
-        .totals-row.coupon { color: #27ae60; }
 
         .tag { padding: 3px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; }
         .tag-success { background: #eafff2; color: #27ae60; }
@@ -125,7 +122,11 @@
         .error { background: #ffeaea; color: #c0392b; display: block; }
         .success { background: #eafff2; color: #27ae60; display: block; }
 
-        @media (max-width: 500px) { .container { padding: 25px; box-shadow: none; } body { background: white; } }
+        @media (max-width: 500px) {
+            .container { padding: 25px; box-shadow: none; }
+            body { background: white; }
+            .stats-row { flex-direction: column; }
+        }
     </style>
 </head>
 <body>
@@ -182,9 +183,21 @@
         </form>
 
         <div class="info-section">
-            <div class="stat-card">
-                <div style="font-size: 0.9rem; color: var(--text-muted);">נקודות YR</div>
-                <div class="stat-value" id="stat-points">0</div>
+            <!-- סטטיסטיקות -->
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-label">נקודות YR</div>
+                    <div class="stat-value" id="stat-points">0</div>
+                    <div class="stat-sub">שווי: <span id="stat-points-value">0.00</span>₪</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">סה"כ הזמנות</div>
+                    <div class="stat-value" id="stat-orders">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">סה"כ הוצאה</div>
+                    <div class="stat-value" id="stat-spent">₪0</div>
+                </div>
             </div>
 
             <h3 style="margin-bottom:15px">🛍️ הזמנות אחרונות</h3>
@@ -229,7 +242,8 @@
         const email = decodeURIComponent(hash);
 
         try {
-            const snap = await db.collection('ClubMembers').where('email', '==', email).limit(1).get();
+            // ✅ תוקן: yr_ClubMembers (כמו ב-index.html)
+            const snap = await db.collection('yr_ClubMembers').where('email', '==', email).limit(1).get();
             if (snap.empty) {
                 document.getElementById('loading-state').innerHTML = '<div class="message error">לקוח לא נמצא</div>';
                 return;
@@ -240,7 +254,12 @@
             document.getElementById('user-greeting').textContent = userData.name || '';
             document.getElementById('field-name').value = userData.name || '';
             document.getElementById('field-phone').value = userData.phone || '';
-            document.getElementById('stat-points').textContent = userData.points || 0;
+
+            const points = userData.points || 0;
+            document.getElementById('stat-points').textContent = points;
+            document.getElementById('stat-points-value').textContent = points.toFixed(2);
+            document.getElementById('stat-orders').textContent = userData.orderCount || 0;
+            document.getElementById('stat-spent').textContent = '₪' + (userData.totalSpent || 0).toFixed(0);
 
             if (userData.address) {
                 const parts = userData.address.split(',').map(p => p.trim());
@@ -254,7 +273,7 @@
                 }
                 document.getElementById('field-city').value = parts[1] || '';
                 if (parts[2]) {
-                    const zipMatch = parts[2].match(/\d+$/);
+                    const zipMatch = parts[2].match(/\d+/);
                     if (zipMatch) document.getElementById('field-zip').value = zipMatch[0];
                 }
             }
@@ -266,6 +285,7 @@
             loadLeads(userData.email);
 
         } catch (e) {
+            console.error(e);
             showStatus("שגיאה בטעינת נתונים", "error");
         }
     }
@@ -275,7 +295,8 @@
     async function loadOrders(memberId) {
         const container = document.getElementById('orders-container');
         try {
-            const snap = await db.collection('orders').where('clubMemberId', '==', memberId).get();
+            // ✅ תוקן: yr_orders (כמו ב-index.html)
+            const snap = await db.collection('yr_orders').where('clubMemberId', '==', memberId).get();
             if (snap.empty) {
                 container.innerHTML = '<p style="color:#999; font-size:0.9rem;">אין הזמנות.</p>';
                 return;
@@ -291,10 +312,14 @@
 
                 const itemsHTML = (order.items || []).map(item => {
                     const price = item.isFreebie ? null : ((item.price || 0) * (item.quantity || 1));
+                    const opts = item.selectedOptions
+                        ? Object.entries(item.selectedOptions).filter(([,v])=>v).map(([k,v])=>`${k}: ${v}`).join(', ')
+                        : '';
                     return `
                         <li>
                             <div class="item-name-col">
-                                ${item.quantity}x ${item.productName || item.name || ''}
+                                <div>${item.quantity}x ${item.productName || item.name || ''}</div>
+                                ${opts ? `<div style="font-size:0.78rem;color:#888;">${opts}</div>` : ''}
                             </div>
                             <div class="item-price-col">
                                 ${item.isFreebie ? '<span style="color:#27ae60;">חינם</span>' : fmt(price)}
@@ -333,7 +358,8 @@
     async function loadLeads(email) {
         const container = document.getElementById('leads-container');
         try {
-            const snap = await db.collection('ContactLeads').where('email', '==', email).get();
+            // ✅ תוקן: yr_contact_leads (כמו ב-index.html)
+            const snap = await db.collection('yr_contact_leads').where('email', '==', email).get();
             if (snap.empty) {
                 container.innerHTML = '<p style="color:#999; font-size:0.9rem;">אין פניות.</p>';
                 return;
@@ -366,25 +392,27 @@
         btn.textContent = "מעדכן...";
 
         try {
-            const street = document.getElementById('field-street').value;
-            const house = document.getElementById('field-house').value;
-            const city = document.getElementById('field-city').value;
-            const zip = document.getElementById('field-zip').value;
-            const fullAddress = `${street} ${house}, ${city}, ${zip}`;
+            const street = document.getElementById('field-street').value.trim();
+            const house = document.getElementById('field-house').value.trim();
+            const city = document.getElementById('field-city').value.trim();
+            const zip = document.getElementById('field-zip').value.trim();
+            const fullAddress = `${street} ${house}, ${city}, ישראל ${zip}`.trim();
 
             const upData = {
-                name: document.getElementById('field-name').value,
-                phone: document.getElementById('field-phone').value,
+                name: document.getElementById('field-name').value.trim(),
+                phone: document.getElementById('field-phone').value.trim(),
                 address: fullAddress
             };
 
             const pass = document.getElementById('field-pass').value;
             if (pass.length >= 6) upData.password = pass;
 
-            await db.collection('ClubMembers').doc(userData.id).update(upData);
-            showStatus("הפרטים עודכנו!", "success");
+            // ✅ תוקן: yr_ClubMembers (כמו ב-index.html)
+            await db.collection('yr_ClubMembers').doc(userData.id).update(upData);
+            showStatus("הפרטים עודכנו בהצלחה! ✓", "success");
         } catch (e) {
-            showStatus("שגיאה בעדכון", "error");
+            console.error(e);
+            showStatus("שגיאה בעדכון הפרטים", "error");
         } finally {
             btn.disabled = false;
             btn.textContent = "עדכן פרטים";
