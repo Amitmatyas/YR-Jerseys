@@ -748,16 +748,13 @@
         }
 
         /* ===== PRODUCTS GRID ===== */
-/* ===== PRODUCTS GRID ===== */
 main#products-container {
-    max-width: 1200px;
+    max-width: 1400px; /* הגדלתי מעט כדי לתת מרחב נשימה */
     margin: 40px auto;
     padding: 20px;
-    display: grid;
-    /* auto-fill מאפשר לשורה להתמלא בכמה כרטיסים שנכנסים */
-    grid-template-columns: repeat(auto-fill, 280px); 
-    /* זה הקסם - ממרכז את כל ה-Grid בתוך ה-Container */
-    justify-content: center; 
+    display: flex;      /* עוברים ל-flex במקום grid למרכוז מקסימלי */
+    flex-wrap: wrap;    /* מאפשר למוצרים לרדת שורה */
+    justify-content: center; /* זה המרכוז האמיתי של כל השורה */
     gap: 40px;
 }
 
@@ -767,31 +764,31 @@ main#products-container {
     box-shadow: var(--hard-shadow);
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: auto;
     transition: all 0.2s ease-in-out;
     position: relative;
-    /* מוודא שהכרטיס לא יתרחב מעבר ל-280px שהגדרנו ב-Grid */
-    width: 100%; 
+    /* במקום רוחב קבוע, אנחנו נותנים לו "בסיס" אבל מאפשרים לו להיות גמיש */
+    flex: 0 1 auto; 
+    min-width: 300px; /* רוחב מינימלי לכרטיס */
 }
 
-        .product-card:hover {
+                .product-card:hover {
             transform: translate(-4px, -4px);
             box-shadow: var(--hard-shadow-hover);
-        }
+      }
 
 .product-card img {
-    width: auto; /* מאפשר לתמונה לשמור על הרוחב המקורי שלה */
-    max-width: 100%; /* מונע מהתמונה לחרוג מהמסך */
+    width: 100%;    /* התמונה תתפרס על כל רוחב הכרטיס */
     height: auto;
     max-height: 400px;
     object-fit: contain;
-    background: transparent; /* מסיר את הרקע האפור */
+    background: transparent;
     border-bottom: var(--border-val);
-    cursor: pointer;
     display: block;
-    margin: 0 auto; /* ממרכז את התמונה בתוך הכרטיס אם היא צרה יותר */
 }
 
+
+        
         .sale-badge {
             position: absolute;
             top: 12px;
