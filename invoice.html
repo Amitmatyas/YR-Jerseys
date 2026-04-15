@@ -173,6 +173,7 @@
         }
 
         .coupon-row { color: #27ae60; }
+        .points-row { color: #3498db; }
 
         .invoice-footer {
             margin-top: 40px;
@@ -296,6 +297,10 @@
                     <span>קופון (<span id="inv-coupon-code"></span>)</span>
                     <span id="inv-coupon-val"></span>
                 </div>
+                <div class="totals-row points-row" id="inv-points-row" style="display:none;">
+                    <span>נקודות מועדון</span>
+                    <span id="inv-points-val"></span>
+                </div>
                 <div class="totals-row total-final">
                     <span>סה"כ לתשלום</span>
                     <span id="inv-total"></span>
@@ -320,7 +325,7 @@
         projectId: "timetable-titus",
         storageBucket: "timetable-titus.firebasestorage.app",
         messagingSenderId: "199146911555",
-        appId: "1:199146911155:web:5d9436d716dfc6de7361f6"
+        appId: "1:199146911555:web:5d9436d716dfc6de7361f6"
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
@@ -339,7 +344,8 @@
         showState('טוען חשבונית...', 'loading');
 
         try {
-            const doc = await db.collection('orders').doc(hash).get();
+            // ✅ תוקן: yr_orders (כמו ב-index.html)
+            const doc = await db.collection('yr_orders').doc(hash).get();
             if (!doc.exists) { showState('הזמנה לא נמצאה', 'error'); return; }
 
             const o = doc.data();
@@ -387,11 +393,20 @@
             document.getElementById('inv-shipping').textContent =
                 shipping === 0 ? 'חינם' : fmt(shipping);
 
+            // קופון
             if (o.appliedCoupon) {
                 document.getElementById('inv-coupon-row').style.display = 'flex';
                 document.getElementById('inv-coupon-code').textContent = o.appliedCoupon;
-                const discount = (o.subtotal || 0) + shipping - (o.totalAmount || 0);
-                document.getElementById('inv-coupon-val').textContent = '−' + fmt(discount);
+                // חישוב הנחת קופון: subtotal + shipping - pointsUsed - total
+                const pointsUsed = o.pointsUsed || 0;
+                const discount = (o.subtotal || 0) + shipping - pointsUsed - (o.totalAmount || 0);
+                document.getElementById('inv-coupon-val').textContent = '−' + fmt(Math.max(0, discount));
+            }
+
+            // נקודות מועדון
+            if (o.pointsUsed && o.pointsUsed > 0) {
+                document.getElementById('inv-points-row').style.display = 'flex';
+                document.getElementById('inv-points-val').textContent = '−' + fmt(o.pointsUsed);
             }
 
             document.getElementById('inv-total').textContent = fmt(o.totalAmount || 0);
