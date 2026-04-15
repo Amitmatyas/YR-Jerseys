@@ -3119,8 +3119,6 @@ window.saveEditCoupon = async function(index) {
     // ============================================
     // SETTINGS - ANNOUNCEMENTS
     // ============================================
-    let announcements = [];
-
 async function loadAnnouncements() {
     try {
         const settingsDoc = await db.collection('yr_settings').doc('main').get();
