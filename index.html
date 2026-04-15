@@ -3079,130 +3079,208 @@ function updateBarHeight() {
                         }
 
                         // ===== PAYPAL =====
-                        function renderPayPalButton() {
-                            const container = document.getElementById('paypal-button-container');
-                            if (!container) return;
-                            container.innerHTML = '';
-                            if (cart.length === 0) return;
+async function renderPayPalButton() {
+    const container = document.getElementById('paypal-button-container');
+    
+    // בדיקה שהקונטיינר קיים ב-DOM
+    if (!container) {
+        console.warn('PayPal container not found');
+        return;
+    }
 
-                            paypal.Buttons({
-                                style: { color: 'blue', shape: 'pill', label: 'pay', height: 45 },
-                                createOrder: (data, actions) => actions.order.create({
-                                    purchase_units: [{
-                                        amount: { value: total.toFixed(2), currency_code: 'ILS' },
-                                        description: 'רכישה ב-YR Jerseys'
-                                    }]
-                                }),
-                                onApprove: (data, actions) => actions.order.capture().then(async details => {
-                                    try {
-                                        const name = document.getElementById('name').value;
-                                        const email = document.getElementById('email').value;
-                                        const phone = document.getElementById('phone').value;
-                                        const address = getFullAddress();
+    // ניקוי הקונטיינר לפני רינדור מחדש
+    container.innerHTML = '';
 
-                                        let clubMemberId = currentClubMember ? currentClubMember.id : null;
-                                        const joinChecked = document.getElementById('join-club-checkbox').checked;
+    // אם העגלה ריקה, אין טעם לרנדר כפתור
+    if (!cart || cart.length === 0) return;
 
-                                        if (!currentClubMember && joinChecked) {
-                                            const pw = document.getElementById('club-password').value;
-                                            if (pw && pw.length >= 6) {
-                                                try {
-                                                    const nm = { name, email, phone, password: pw, points: 0, address, joinDate: firebase.firestore.FieldValue.serverTimestamp(), totalSpent: 0, orderCount: 0 };
-                                                    const ref = await db.collection('yr_ClubMembers').add(nm);
-                                                    clubMemberId = ref.id;
-                                                    currentClubMember = { id: ref.id, ...nm };
-                                                    saveClubMember();
-                                                    updateClubButton();
-                                                } catch (e) { console.error('Club member creation error:', e); }
-                                            }
-                                        }
+    // הגנה מפני רינדור כפול - PayPal זורק שגיאה אם מנסים לרנדר על אותו אלמנט פעמיים
+    if (container.classList.contains('paypal-rendered')) return;
+    container.classList.add('paypal-rendered');
 
-                                        const pointsEarned = Math.floor(total * 0.01);
+    try {
+        await paypal.Buttons({
+            style: { color: 'blue', shape: 'pill', label: 'pay', height: 45 },
+            
+            // יצירת הזמנה
+            createOrder: (data, actions) => {
+                return actions.order.create({
+                    purchase_units: [{
+                        amount: { 
+                            value: total.toFixed(2), 
+                            currency_code: 'ILS' 
+                        },
+                        description: 'רכישה ב-YR Jerseys'
+                    }]
+                });
+            },
 
-                                        const orderRef = await db.collection('yr_orders').add({
-                                            customerName: name,
-                                            customerEmail: email,
-                                            customerPhone: phone,
-                                            customerAddress: address,
-                                            items: cart.map(item => ({
-                                                productId: item.id,
-                                                productName: item.name,
-                                                name: item.name,
-                                                quantity: item.quantity,
-                                                price: item.price,
-                                                originalPrice: item.originalPrice || null,
-                                                selectedOptions: item.selectedOptions || null,
-                                                isFreebie: item.isFreebie || false
-                                            })),
-                                            subtotal: parseFloat(subtotal.toFixed(2)),
-                                            shippingCost: parseFloat(shippingCost.toFixed(2)),
-                                            totalAmount: parseFloat(total.toFixed(2)),
-                                            appliedCoupon: appliedCoupon ? appliedCoupon.Code : null,
-                                            couponDetails: appliedCoupon || null,
-                                            clubMemberId: clubMemberId,
-                                            pointsUsed: pointsToUse,
-                                            pointsEarned: pointsEarned,
-                                            orderDate: firebase.firestore.FieldValue.serverTimestamp(),
-                                            status: 'completed',
-                                            completed: false,
-                                            paymentType: 'paypal',
-                                            paypalOrderId: details.id
-                                        });
+            // אישור תשלום
+            onApprove: async (data, actions) => {
+                const details = await actions.order.capture();
+                
+                try {
+                    // שליפת נתונים מהטופס
+                    const name = document.getElementById('name').value;
+                    const email = document.getElementById('email').value;
+                    const phone = document.getElementById('phone').value;
+                    const address = typeof getFullAddress === 'function' ? getFullAddress() : '';
 
-                                        if (clubMemberId) {
-                                            try {
-                                                await db.collection('yr_ClubMembers').doc(clubMemberId).update({
-                                                    points: firebase.firestore.FieldValue.increment(pointsEarned - pointsToUse),
-                                                    totalSpent: firebase.firestore.FieldValue.increment(total),
-                                                    orderCount: firebase.firestore.FieldValue.increment(1)
-                                                });
-                                                if (currentClubMember) {
-                                                    currentClubMember.points = (currentClubMember.points || 0) + pointsEarned - pointsToUse;
-                                                    currentClubMember.totalSpent = (currentClubMember.totalSpent || 0) + total;
-                                                    currentClubMember.orderCount = (currentClubMember.orderCount || 0) + 1;
-                                                    saveClubMember();
-                                                }
-                                            } catch (e) { console.error('Points update error:', e); }
-                                        }
+                    let clubMemberId = currentClubMember ? currentClubMember.id : null;
+                    const joinCheckbox = document.getElementById('join-club-checkbox');
+                    const joinChecked = joinCheckbox ? joinCheckbox.checked : false;
 
-                                        const emailSent = await sendReceiptEmail({
-                                            orderId: orderRef.id, customerName: name, customerEmail: email,
-                                            customerPhone: phone, customerAddress: address, items: cart,
-                                            subtotal, shippingCost, totalAmount: total,
-                                            appliedCoupon: appliedCoupon ? appliedCoupon.Code : null,
-                                            couponDetails: appliedCoupon
-                                        });
-                                        if (emailSent) {
-                                            alert(`תודה לך, ${name}! התשלום בוצע בהצלחה.\nקבלה נשלחה למייל שלך.\nסך הכל: ${total.toFixed(2)} ₪`);
-                                        } else {
-                                            const overlay = document.createElement('div');
-                                            overlay.style.cssText = `position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);z-index:9999;display:flex;align-items:center;justify-content:center;`;
-                                            overlay.innerHTML = `
-        <div style="background:white;border:4px solid #000;box-shadow:8px 8px 0 #000;padding:40px;max-width:400px;width:90%;text-align:center;direction:rtl;">
-            <div style="font-size:2.5em;margin-bottom:15px;">✅</div>
-            <h2 style="color:#000;margin-bottom:10px;font-weight:900;text-transform:uppercase;">התשלום בוצע בהצלחה!</h2>
-            <p style="color:#555;margin-bottom:8px;">תודה לך, ${name}!</p>
-            <p style="color:#555;margin-bottom:20px;">סך הכל: <strong>${total.toFixed(2)} ₪</strong></p>
-            <div style="background:#fff8e1;border:2px solid #000;padding:15px;margin-bottom:20px;">
-                <p style="color:#d35400;font-weight:900;margin-bottom:5px;text-transform:uppercase;">⚠️ שגיאה בשליחת הקבלה למייל</p>
-                <p style="color:#666;font-size:0.9em;">מעביר אותך לחשבונית בעוד...</p>
+                    // טיפול במועדון לקוחות
+                    if (!currentClubMember && joinChecked) {
+                        const pwEl = document.getElementById('club-password');
+                        const pw = pwEl ? pwEl.value : null;
+                        
+                        if (pw && pw.length >= 6) {
+                            try {
+                                const nm = { 
+                                    name, email, phone, password: pw, 
+                                    points: 0, address, 
+                                    joinDate: firebase.firestore.FieldValue.serverTimestamp(), 
+                                    totalSpent: 0, orderCount: 0 
+                                };
+                                const ref = await db.collection('yr_ClubMembers').add(nm);
+                                clubMemberId = ref.id;
+                                currentClubMember = { id: ref.id, ...nm };
+                                if (typeof saveClubMember === 'function') saveClubMember();
+                                if (typeof updateClubButton === 'function') updateClubButton();
+                            } catch (e) { console.error('Club creation error:', e); }
+                        }
+                    }
+
+                    const pointsEarned = Math.floor(total * 0.01);
+
+                    // שמירת הזמנה ב-Firestore
+                    const orderRef = await db.collection('yr_orders').add({
+                        customerName: name,
+                        customerEmail: email,
+                        customerPhone: phone,
+                        customerAddress: address,
+                        items: cart.map(item => ({
+                            productId: item.id || '',
+                            productName: item.name || '',
+                            name: item.name || '',
+                            quantity: item.quantity || 1,
+                            price: item.price || 0,
+                            originalPrice: item.originalPrice || null,
+                            selectedOptions: item.selectedOptions || null,
+                            isFreebie: item.isFreebie || false
+                        })),
+                        subtotal: parseFloat(subtotal.toFixed(2)),
+                        shippingCost: parseFloat(shippingCost.toFixed(2)),
+                        totalAmount: parseFloat(total.toFixed(2)),
+                        appliedCoupon: appliedCoupon ? appliedCoupon.Code : null,
+                        couponDetails: appliedCoupon || null,
+                        clubMemberId: clubMemberId,
+                        pointsUsed: typeof pointsToUse !== 'undefined' ? pointsToUse : 0,
+                        pointsEarned: pointsEarned,
+                        orderDate: firebase.firestore.FieldValue.serverTimestamp(),
+                        status: 'completed',
+                        completed: false,
+                        paymentType: 'paypal',
+                        paypalOrderId: details.id
+                    });
+
+                    // עדכון נקודות מועדון
+                    if (clubMemberId) {
+                        const pUsed = typeof pointsToUse !== 'undefined' ? pointsToUse : 0;
+                        await db.collection('yr_ClubMembers').doc(clubMemberId).update({
+                            points: firebase.firestore.FieldValue.increment(pointsEarned - pUsed),
+                            totalSpent: firebase.firestore.FieldValue.increment(total),
+                            orderCount: firebase.firestore.FieldValue.increment(1)
+                        });
+                    }
+
+                    // שליחת אישור/קבלה
+                    const emailData = {
+                        orderId: orderRef.id, customerName: name, customerEmail: email,
+                        customerPhone: phone, customerAddress: address, items: cart,
+                        subtotal, shippingCost, totalAmount: total,
+                        appliedCoupon: appliedCoupon ? appliedCoupon.Code : null,
+                        couponDetails: appliedCoupon
+                    };
+
+                    const emailSent = await sendReceiptEmail(emailData);
+
+                    if (emailSent) {
+                        alert(`תודה לך, ${name}! התשלום בוצע בהצלחה.\nקבלה נשלחה למייל.`);
+                        finalizeOrder();
+                    } else {
+                        showSuccessOverlay(name, total, orderRef.id);
+                        finalizeOrder();
+                    }
+
+                } catch (e) {
+                    console.error('Processing error:', e);
+                    alert('התשלום עבר ב-PayPal אך אירעה שגיאה ברישום ההזמנה. נא ליצור קשר עם שירות הלקוחות.');
+                }
+            },
+            
+            onCancel: () => alert('התשלום בוטל.'),
+            onError: (err) => {
+                console.error('PayPal Error:', err);
+                container.classList.remove('paypal-rendered'); // מאפשר ניסיון חוזר
+                alert('שגיאה בחיבור ל-PayPal. נא לנסות שוב.');
+            }
+        }).render('#paypal-button-container');
+    } catch (err) {
+        console.error('Render error:', err);
+        container.classList.remove('paypal-rendered');
+    }
+}
+
+// פונקציית עזר לניקוי העגלה והמצב לאחר הצלחה
+function finalizeOrder() {
+    cart = [];
+    appliedCoupon = null;
+    if (typeof pointsToUse !== 'undefined') pointsToUse = 0;
+    
+    localStorage.removeItem('yr_jerseys_cart');
+    localStorage.removeItem('yr_jerseys_coupon');
+    
+    updateCartDisplay();
+    if (typeof updateClubModal === 'function') updateClubModal();
+    if (typeof closeCart === 'function') closeCart();
+    
+    const form = document.getElementById('checkout-form');
+    if (form) form.reset();
+}
+
+// פונקציה להצגת האוברליי במקרה של תקלה במייל
+function showSuccessOverlay(name, totalAmount, orderId) {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;`;
+    overlay.innerHTML = `
+        <div style="background:white;border:4px solid #000;padding:40px;max-width:400px;width:90%;text-align:center;direction:rtl;font-family:sans-serif;">
+            <div style="font-size:3em;">✅</div>
+            <h2 style="margin:15px 0;">התשלום בוצע בהצלחה!</h2>
+            <p>תודה, ${name}!</p>
+            <p>סכום: <strong>${totalAmount.toFixed(2)} ₪</strong></p>
+            <div style="background:#fff8e1;border:1px solid #ffe082;padding:15px;margin-top:20px;">
+                <p style="color:#d35400;font-weight:bold;margin:0;">⚠️ תקלה קלה בשליחת המייל</p>
+                <p style="font-size:0.9em;">אנחנו מעבירים אותך לצפייה בחשבונית...</p>
+                <div id="countdown-num" style="font-size:2em;font-weight:bold;">3</div>
             </div>
-            <div style="font-size:3em;font-weight:900;color:var(--accent-color);" id="countdown-num">3</div>
         </div>
     `;
-                                            document.body.appendChild(overlay);
-                                            let count = 3;
-                                            const countdownEl = overlay.querySelector('#countdown-num');
-                                            const timer = setInterval(() => {
-                                                count--;
-                                                countdownEl.textContent = count;
-                                                if (count <= 0) {
-                                                    clearInterval(timer);
-                                                    document.body.removeChild(overlay);
-                                                    window.open(`invoice.html#${orderRef.id}`, '_blank');
-                                                }
-                                            }, 1000);
-                                        }
+    document.body.appendChild(overlay);
+    
+    let count = 3;
+    const interval = setInterval(() => {
+        count--;
+        const el = document.getElementById('countdown-num');
+        if (el) el.textContent = count;
+        if (count <= 0) {
+            clearInterval(interval);
+            document.body.removeChild(overlay);
+            window.open(`invoice.html#${orderId}`, '_blank');
+        }
+    }, 1000);
+}
 
                                         cart = [];
                                         appliedCoupon = null;
