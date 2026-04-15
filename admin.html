@@ -1532,14 +1532,14 @@
     const IMGBB_API_KEY = '949918f473144748f8dea05705ac165a';
     const ADMIN_USERNAME = 'Imri';
     const ADMIN_PASSWORD = 'imrispak27';
-
-    let products = [];
-    let categories = [];
-    let settings = null;
-    let currentLeadId = null;
-    let currentProductToEdit = null;
-    let selectedCouponOptions = {};
-
+let products = [];
+let categories = [];
+let settings = null;
+let currentLeadId = null;
+let currentProductToEdit = null;
+let selectedCouponOptions = {};
+const bulkSelectedIds = new Set(); // ← הוסף כאן
+        
     // ===== HELPER: get product categories as array (supports legacy .category string) =====
     function getProductCategories(product) {
         if (Array.isArray(product.categories) && product.categories.length > 0) return product.categories;
@@ -1784,10 +1784,6 @@ logoutButton.addEventListener('click', () => {
 // ============================================
 // CATEGORIES
 // ============================================
-// הוספת הגנה בראש הקובץ (מחוץ לפונקציה)
-if (typeof bulkSelectedIds === 'undefined') {
-    window.bulkSelectedIds = [];
-}
 
 async function displayCategoriesWithProducts() {
     const categoriesGrid = document.getElementById('categories-grid');
@@ -1850,7 +1846,7 @@ async function displayCategoriesWithProducts() {
             const productLink = `${window.location.origin}/#${encodeURIComponent(product.name)}`;
             
             // כאן הייתה השגיאה - הוספנו בדיקה בטוחה
-            const isChecked = (window.bulkSelectedIds && window.bulkSelectedIds.includes(product.id)) ? 'checked' : '';
+            const isChecked = bulkSelectedIds.has(product.id) ? 'checked' : '';
 
             const card = document.createElement('div');
             card.className = 'product-mini-card';
@@ -3694,7 +3690,7 @@ async function viewCustomerLeads(customerId, customerEmail, customerPhone) {
 // ============================================
     // BULK EDIT
     // ============================================
-    let bulkSelectedIds = new Set();
+    const bulkSelectedIds = new Set();
 
     function renderBulkProductGrid(filterText = '') {
         const grid = document.getElementById('bulk-select-grid');
