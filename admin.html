@@ -1540,6 +1540,8 @@ let currentLeadId = null;
 let currentProductToEdit = null;
 let selectedCouponOptions = {};
 const bulkSelectedIds = new Set();
+const categoriesGrid = document.getElementById('categories-grid');
+let announcements = [];
         
     // ===== HELPER: get product categories as array (supports legacy .category string) =====
     function getProductCategories(product) {
