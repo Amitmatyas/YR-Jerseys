@@ -1989,117 +1989,52 @@ async function displayCategoriesWithProducts() {
         }
     }
 
-    // הגדרת אירועים (Event Delegation) - רק אם לא הוגדרו כבר
-    setupCategoryEventListeners(categoriesGrid);
-
-// פונקציית עזר לניהול אירועים כדי למנוע כפילויות
-function setupCategoryEventListeners(categoriesGrid) {
-    // הסרת מאזין קודם אם קיים (אופציונלי, תלוי במבנה הקוד)
-    categoriesGrid.onclick = async (e) => {
-        const target = e.target;
-
-        // עריכת קטגוריה
-        const editBtn = target.closest('.btn-edit-category');
-        if (editBtn) {
-            editCategoryName(decodeURIComponent(editBtn.dataset.category));
-            return;
-        }
-
-        // מחיקת קטגוריה
-        const deleteBtn = target.closest('.btn-delete-category');
-        if (deleteBtn) {
-            deleteCategory(decodeURIComponent(deleteBtn.dataset.category));
-            return;
-        }
-
-        // עריכת מוצר
-        const editProductBtn = target.closest('.btn-edit-product');
-        if (editProductBtn && typeof products !== 'undefined') {
-            const product = products.find(p => p.id === editProductBtn.dataset.productId);
-            if (product && typeof openEditProductModal === 'function') {
-                openEditProductModal(product.id, product);
-            }
-            return;
-        }
-
-// אחרי:
-const copyBtn = target.closest('.btn-copy-link');
-if (copyBtn) {
-    const success = await copyToClipboard(copyBtn.dataset.productLink);
-    if (success) {
-        const oldIcon = copyBtn.innerHTML;
-        copyBtn.innerHTML = '✓';
-        setTimeout(() => copyBtn.innerHTML = oldIcon, 1500);
-    } else {
-        alert('שגיאה בהעתקה');
+// הוספת קטגוריה
+document.getElementById('add-category-btn').addEventListener('click', async () => {
+    const input = document.getElementById('category-name');
+    const value = input.value.trim();
+    if (!value) return alert('אנא הזן שם קטגוריה');
+    try {
+        const docRef = db.collection('yr_settings').doc('main');
+        const doc = await docRef.get();
+        const current = (doc.data() && doc.data().Categories) || [];
+        if (current.includes(value)) return alert('קטגוריה כבר קיימת');
+        await docRef.update({ Categories: firebase.firestore.FieldValue.arrayUnion(value) });
+        input.value = '';
+        await loadCategories();
+    } catch (err) {
+        console.error(err);
+        alert('שגיאה בהוספת קטגוריה');
     }
-}
+});
 
-// לוגיקת הוספת קטגוריה - מומלץ להוציא מחוץ לפונקציית התצוגה ולהריץ פעם אחת ב-Init
-const addBtn = document.getElementById('add-category-btn');
-if (addBtn && !addBtn.dataset.listenerAttached) {
-    addBtn.addEventListener('click', async () => {
-        const input = document.getElementById('category-name');
-        const value = input.value.trim();
+// Event delegation על גריד הקטגוריות
+categoriesGrid.onclick = async (e) => {
+    const editBtn = e.target.closest('.btn-edit-category');
+    if (editBtn) { editCategoryName(decodeURIComponent(editBtn.dataset.category)); return; }
 
-        if (!value) return alert('אנא הזן שם קטגוריה');
+    const deleteBtn = e.target.closest('.btn-delete-category');
+    if (deleteBtn) { deleteCategory(decodeURIComponent(deleteBtn.dataset.category)); return; }
 
-        try {
-            const docRef = db.collection('yr_settings').doc('main');
-            const doc = await docRef.get();
-            const current = (doc.data() && doc.data().Categories) || [];
+    const editProductBtn = e.target.closest('.btn-edit-product');
+    if (editProductBtn) {
+        const product = products.find(p => p.id === editProductBtn.dataset.productId);
+        if (product) openEditProductModal(product.id, product);
+        return;
+    }
 
-            if (current.includes(value)) return alert('קטגוריה כבר קיימת');
-
-            await docRef.update({
-                Categories: firebase.firestore.FieldValue.arrayUnion(value)
-            });
-
-            input.value = '';
-            if (typeof loadCategories === 'function') await loadCategories();
-        } catch (err) {
-            console.error(err);
-            alert('שגיאה בהוספת קטגוריה');
+    const copyBtn = e.target.closest('.btn-copy-link');
+    if (copyBtn) {
+        const success = await copyToClipboard(copyBtn.dataset.productLink);
+        if (success) {
+            const old = copyBtn.innerHTML;
+            copyBtn.innerHTML = '✓';
+            setTimeout(() => { copyBtn.innerHTML = old; }, 1500);
+        } else {
+            alert('שגיאה בהעתקה');
         }
-    });
-    addBtn.dataset.listenerAttached = "true";
-}
-    
-    // =========================
-    // EVENTS (event delegation)
-    // =========================
-    categoriesGrid.onclick = async (e) => {
-        const editBtn = e.target.closest('.btn-edit-category');
-        if (editBtn) {
-            editCategoryName(decodeURIComponent(editBtn.dataset.category));
-            return;
-        }
-
-        const deleteBtn = e.target.closest('.btn-delete-category');
-        if (deleteBtn) {
-            deleteCategory(decodeURIComponent(deleteBtn.dataset.category));
-            return;
-        }
-
-        const editProductBtn = e.target.closest('.btn-edit-product');
-        if (editProductBtn) {
-            const product = products.find(p => p.id === editProductBtn.dataset.productId);
-            if (product) openEditProductModal(product.id, product);
-            return;
-        }
-
-        const copyBtn = e.target.closest('.btn-copy-link');
-        if (copyBtn) {
-            try {
-                await navigator.clipboard.writeText(copyBtn.dataset.productLink);
-                const old = copyBtn.innerHTML;
-                copyBtn.innerHTML = '✓';
-                setTimeout(() => { copyBtn.innerHTML = old; }, 1500);
-            } catch (err) {
-                alert('שגיאה בהעתקה');
-            }
-        }
-    };
+    }
+};
     // ============================================
     // SKELETON LOADERS
     // ============================================
@@ -3397,13 +3332,6 @@ document.querySelectorAll('.btn-copy-reset-link').forEach(btn => {
                     } else {
                         alert('שגיאה בהעתקת הקישור');
                     }
-                     }
-                                      }
-                                                           }
-         }
-         }
-     }
-        
                 });
             });
 
@@ -3414,6 +3342,10 @@ document.querySelectorAll('.btn-copy-reset-link').forEach(btn => {
         }
     }
 
+        document.querySelectorAll('.btn-delete-customer').forEach(btn => {
+    btn.addEventListener('click', () => deleteCustomer(btn.dataset.customerId));
+});
+        
 async function openEditCustomerModal(customerId) {
         try {
             const customerDoc = await db.collection('yr_ClubMembers').doc(customerId).get();
