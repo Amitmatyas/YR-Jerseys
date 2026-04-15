@@ -748,14 +748,16 @@
         }
 
         /* ===== PRODUCTS GRID ===== */
+/* ===== PRODUCTS GRID ===== */
 main#products-container {
     max-width: 1200px;
     margin: 40px auto;
     padding: 20px;
     display: grid;
-    /* שינוי כאן: auto-fill במקום auto-fit ומרכוז */
-    grid-template-columns: repeat(auto-fill, minmax(280px, max-content)); 
-    justify-content: center; /* ממרכז את כל שורת המוצרים */
+    /* auto-fill מאפשר לשורה להתמלא בכמה כרטיסים שנכנסים */
+    grid-template-columns: repeat(auto-fill, 280px); 
+    /* זה הקסם - ממרכז את כל ה-Grid בתוך ה-Container */
+    justify-content: center; 
     gap: 40px;
 }
 
@@ -768,9 +770,8 @@ main#products-container {
     height: 100%;
     transition: all 0.2s ease-in-out;
     position: relative;
-    /* שינוי כאן: גורם לכרטיס להתכווץ לרוחב התוכן */
-    width: fit-content; 
-    margin: 0 auto;
+    /* מוודא שהכרטיס לא יתרחב מעבר ל-280px שהגדרנו ב-Grid */
+    width: 100%; 
 }
 
         .product-card:hover {
