@@ -3384,15 +3384,12 @@ window.addEventListener('click', (event) => {
 document.querySelectorAll('.btn-copy-reset-link').forEach(btn => {
     btn.addEventListener('click', async () => {
         const resetLink = `${window.location.origin}/customer.html#${encodeURIComponent(btn.dataset.customerEmail)}`;
-        
         const success = await copyToClipboard(resetLink);
-        
         if (success) {
             const originalText = btn.innerHTML;
             btn.innerHTML = '✓ הועתק';
             const originalBackground = btn.style.background;
             btn.style.background = '#27ae60';
-            
             setTimeout(() => {
                 btn.innerHTML = originalText;
                 btn.style.background = originalBackground;
@@ -3403,7 +3400,9 @@ document.querySelectorAll('.btn-copy-reset-link').forEach(btn => {
     });
 });
 
-    async function openEditCustomerModal(customerId) {
+}
+
+async function openEditCustomerModal(customerId) {
         try {
             const customerDoc = await db.collection('yr_ClubMembers').doc(customerId).get();
             if (!customerDoc.exists) {
