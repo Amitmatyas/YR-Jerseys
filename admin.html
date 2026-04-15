@@ -3382,25 +3382,30 @@ window.addEventListener('click', (event) => {
             });
 
 document.querySelectorAll('.btn-copy-reset-link').forEach(btn => {
-    btn.addEventListener('click', async () => {
-        const resetLink = `${window.location.origin}/customer.html#${encodeURIComponent(btn.dataset.customerEmail)}`;
-        const success = await copyToClipboard(resetLink);
-        if (success) {
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '✓ הועתק';
-            const originalBackground = btn.style.background;
-            btn.style.background = '#27ae60';
-            setTimeout(() => {
-                btn.innerHTML = originalText;
-                btn.style.background = originalBackground;
-            }, 2000);
-        } else {
-            alert('שגיאה בהעתקת הקישור');
-        }
-    });
-});
+                btn.addEventListener('click', async () => {
+                    const resetLink = `${window.location.origin}/customer.html#${encodeURIComponent(btn.dataset.customerEmail)}`;
+                    const success = await copyToClipboard(resetLink);
+                    if (success) {
+                        const originalText = btn.innerHTML;
+                        btn.innerHTML = '✓ הועתק';
+                        const originalBackground = btn.style.background;
+                        btn.style.background = '#27ae60';
+                        setTimeout(() => {
+                            btn.innerHTML = originalText;
+                            btn.style.background = originalBackground;
+                        }, 2000);
+                    } else {
+                        alert('שגיאה בהעתקת הקישור');
+                    }
+                });
+            });
 
-}
+        } catch (error) {
+            // זה החלק שהיה חסר וגרם ל-SyntaxError
+            console.error("Error fetching customers:", error);
+            document.getElementById('customers-list').innerHTML = '<p>שגיאה בטעינת לקוחות.</p>';
+        }
+    }
 
 async function openEditCustomerModal(customerId) {
         try {
