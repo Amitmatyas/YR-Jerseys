@@ -1079,44 +1079,40 @@
 <div id="login-overlay">
     <div style="display: flex; flex-direction: column; align-items: center;">
         
-<div id="login-overlay">
-    <div style="display: flex; flex-direction: column; align-items: center;">
         <div id="login-form-container">
             <img src="https://i.postimg.cc/YCXfMWLg/Whats-App-Image-2026-04-14-at-19-24-10.png" alt="YR Jerseys" style="width: 200px; height: auto; display: block; margin: 0 auto 20px;">
             <h2>פאנל ניהול YR Jerseys</h2>
             <input type="text" id="username" placeholder="שם משתמש" autofocus>
             <input type="password" id="password" placeholder="סיסמה">
             <button id="login-button">התחבר</button>
-            <p id="login-error-message" style="display: none; color: red; margin-top: 10px;"></p>
+            <p id="login-error-message" style="display: none;"></p>
         </div>
-        <a href="/password" id="admin-management-link" style="margin-top: 15px; color: #666; text-decoration: none;">ניהול משתמשים</a>
+
+        <a href="/password" id="admin-management-link">ניהול משתמשים</a>
     </div>
 </div>
 
-<div class="admin-layout" id="admin-layout">
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <img src="https://i.postimg.cc/YCXfMWLg/Whats-App-Image-2026-04-14-at-19-24-10.png" alt="YR Jerseys">
-            <h1>פאנל ניהול</h1>
-            <p id="welcome-user-text" style="color: #4caf50; margin-top: 10px; font-weight: bold; font-size: 1.1em;"></p>
+    <div class="admin-layout" id="admin-layout">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <img src="https://i.postimg.cc/YCXfMWLg/Whats-App-Image-2026-04-14-at-19-24-10.png" alt="YR Jerseys">
+                <h1>פאנל ניהול</h1>
+            </div>
+<div class="sidebar-menu">
+    <div class="menu-item active" data-section="categories">קטגוריות</div>
+    <div class="menu-item" data-section="products">מוצרים</div>
+    <div class="menu-item" data-section="orders">הזמנות</div>
+    <div class="menu-item" data-section="leads">פניות</div>
+    <div class="menu-item" data-section="customers">מועדון לקוחות</div>
+    <div class="menu-item" data-section="bulk-edit">עריכה מרובה</div>
+    <div class="menu-item" data-section="settings">הגדרות</div>
+    <div class="sidebar-footer" style="padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: auto;">
+    <button id="logout-button" class="btn btn-danger" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <span>התנתקות</span>
+    </button>
+</div>
+</div>
         </div>
-
-        <div class="sidebar-menu">
-            <div class="menu-item active" data-section="categories">קטגוריות</div>
-            <div class="menu-item" data-section="products">מוצרים</div>
-            <div class="menu-item" data-section="orders">הזמנות</div>
-            <div class="menu-item" data-section="leads">פניות</div>
-            <div class="menu-item" data-section="customers">מועדון לקוחות</div>
-            <div class="menu-item" data-section="bulk-edit">עריכה מרובה</div>
-            <div class="menu-item" data-section="settings">הגדרות</div>
-        </div>
-
-        <div class="sidebar-footer" style="padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: auto;">
-            <button id="logout-button" class="btn btn-danger" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; background: #ff4444; color: white; border: none; padding: 10px; cursor: pointer; border-radius: 5px;">
-                <span>התנתקות</span>
-            </button>
-        </div>
-    </div>
 
         <div class="main-content">
             <!-- קטגוריות -->
@@ -1666,30 +1662,10 @@ const loginErrorMessage = document.getElementById('login-error-message');
 // ============================================
 // AFTER LOGIN
 // ============================================
-// 1. נגדיר משתנה לאלמנט הטקסט החדש בראש הקובץ
-const welcomeUserText = document.getElementById('welcome-user-text');
-
 async function onSuccessfulLogin() {
     loginOverlay.style.display = 'none';
     adminLayout.classList.add('active');
     loginErrorMessage.style.display = 'none';
-
-    // שליפת שם המשתמש מה-LocalStorage
-    const userId = localStorage.getItem('vip_admin_user');
-
-    if (userId) {
-        try {
-            // פנייה ל-DB כדי להביא את השדה hebrewName
-            const userDoc = await db.collection("users").doc(userId).get();
-            if (userDoc.exists) {
-                const userData = userDoc.data();
-                const fullName = userData.hebrewName || "מנהל"; // ברירת מחדל אם השדה ריק
-                welcomeUserText.textContent = `ברוך הבא, ${fullName}`;
-            }
-        } catch (err) {
-            console.error("שגיאה בשליפת שם המשתמש:", err);
-        }
-    }
 
     try {
         await initializeSettings();
