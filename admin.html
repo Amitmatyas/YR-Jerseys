@@ -1699,10 +1699,10 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     if (isLogged === 'true' && user) {
         try {
-const docSnap = await db.collection("users").doc(user).get();
+            const docSnap = await db.collection("users").doc(user).get();
             
-if (docSnap.exists && docSnap.data().isAdmin) {
-    onSuccessfulLogin();
+            if (docSnap.exists) { 
+                onSuccessfulLogin();
             } else {
                 localStorage.removeItem('vip_admin_logged');
                 localStorage.removeItem('vip_admin_user');
@@ -1712,7 +1712,7 @@ if (docSnap.exists && docSnap.data().isAdmin) {
         }
     }
 });
-
+        
 // ============================================
 // LOGIN CLICK
 // ============================================
@@ -1723,7 +1723,7 @@ loginButton.addEventListener('click', async () => {
     if (!u || !p) return;
 
     try {
-const docSnap = await db.collection("users").doc(u).get();
+        const docSnap = await db.collection("users").doc(u).get();
         
         if (!docSnap.exists) {
             throw new Error("user-not-found");
@@ -1735,9 +1735,8 @@ const docSnap = await db.collection("users").doc(u).get();
             throw new Error("wrong-password");
         }
 
-        if (!user.isAdmin) {
-            throw new Error("not-admin");
-        }
+        // מחקנו את הבדיקה: if (!user.isAdmin) { ... }
+        // כעת כל משתמש עם סיסמה נכונה יעבור
 
         const rememberMe = confirm("להישאר מחובר?");
         if (rememberMe) {
@@ -1749,12 +1748,11 @@ const docSnap = await db.collection("users").doc(u).get();
 
     } catch (err) {
         console.log("LOGIN ERROR:", err);
-
         let msg = "שגיאה בהתחברות";
 
         if (err.message === "user-not-found") msg = "משתמש לא קיים";
         if (err.message === "wrong-password") msg = "סיסמה שגויה";
-        if (err.message === "not-admin") msg = "אין הרשאת אדמין";
+        // הודעת ה-"אין הרשאת אדמין" כבר לא רלוונטית כאן
 
         loginErrorMessage.textContent = msg;
         loginErrorMessage.style.display = 'block';
