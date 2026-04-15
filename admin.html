@@ -91,23 +91,18 @@
             font-size: 0.95em;
         }
 
-        #admin-management-btn {
-    display: inline-block;
-    margin-top: 20px;
-    padding: 10px 20px;
-    background-color: #2980b9; /* כחול - שונה מהאדום של ההתחברות */
-    color: white;
-    text-decoration: none;
-    border-radius: 6px;
-    font-weight: 500;
-    transition: background 0.3s ease;
-    font-size: 0.9em;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+#admin-management-link {
+    display: block;
+    margin-top: 15px; /* רווח מתחת לקונטיינר הלבן */
+    color: rgba(255, 255, 255, 0.6); /* לבן עם שקיפות כדי שיהיה פחות בולט */
+    text-decoration: none; /* בלי קו מתחת כברירת מחדל */
+    font-size: 0.85em;
+    transition: color 0.3s ease;
 }
 
-#admin-management-btn:hover {
-    background-color: #3498db;
-    color: white;
+#admin-management-link:hover {
+    color: #fff; /* הופך ללבן חזק כשעוברים עליו */
+    text-decoration: underline; /* קו תחתי רק ב-hover כדי להבהיר שזה לחיץ */
 }
 
         /* ===== ADMIN LAYOUT ===== */
@@ -1081,7 +1076,9 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
-    <div id="login-overlay">
+<div id="login-overlay">
+    <div style="display: flex; flex-direction: column; align-items: center;">
+        
         <div id="login-form-container">
             <img src="https://i.postimg.cc/YCXfMWLg/Whats-App-Image-2026-04-14-at-19-24-10.png" alt="YR Jerseys" style="width: 200px; height: auto; display: block; margin: 0 auto 20px;">
             <h2>פאנל ניהול YR Jerseys</h2>
@@ -1090,8 +1087,10 @@
             <button id="login-button">התחבר</button>
             <p id="login-error-message" style="display: none;"></p>
         </div>
-        <a href="/password" id="admin-management-btn">ניהול משתמשים</a>
+
+        <a href="/password" id="admin-management-link">ניהול משתמשים</a>
     </div>
+</div>
 
     <div class="admin-layout" id="admin-layout">
         <div class="sidebar">
