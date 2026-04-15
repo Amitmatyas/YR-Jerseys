@@ -3282,31 +3282,6 @@ function showSuccessOverlay(name, totalAmount, orderId) {
     }, 1000);
 }
 
-                                        cart = [];
-                                        appliedCoupon = null;
-                                        pointsToUse = 0;
-                                        pointsDiscount = 0;
-                                        couponInput.value = '';
-                                        couponInput.disabled = false;
-                                        applyCouponBtn.disabled = false;
-                                        couponMessage.innerHTML = '';
-                                        localStorage.removeItem('yr_jerseys_cart');
-                                        localStorage.removeItem('yr_jerseys_coupon');
-                                        const s = document.getElementById('points-slider');
-                                        if (s) s.value = s.min || 10;
-                                        updateCartDisplay();
-                                        updateClubModal();
-                                        checkoutForm.reset();
-                                        closeCart();
-                                        catch (e) {
-                                        console.error('Payment error:', e);
-                                        alert('אירעה שגיאה בתהליך התשלום. נסה שוב.');
-                                    }
-                                }),
-                                onCancel: () => alert('התשלום בוטל.'),
-                                onError: err => { alert('שגיאה בתשלום: נסה שוב.'); console.error(err); }
-                            }).render('#paypal-button-container');
-                        }
 
                         // ===== EMAIL =====
                         const EMAILJS_SERVICE_ID = 'service_pypll0n';
