@@ -3805,6 +3805,12 @@ async function viewCustomerLeads(customerId, customerEmail, customerPhone) {
         if (el) el.textContent = `${bulkSelectedIds.size} נבחרו`;
     }
 
+        function getSiteBaseUrl() {
+    const url = new URL(window.location.href);
+    const path = url.pathname.replace(/\/[^\/]*$/, '');
+    return url.origin + (path === '/' ? '' : path);
+}
+        
     function updateBulkCategoryCheckboxes() {
         const container = document.getElementById('bulk-categories-checkboxes');
         if (!container) return;
