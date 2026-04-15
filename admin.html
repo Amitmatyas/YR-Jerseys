@@ -1092,12 +1092,11 @@
     </div>
 </div>
 
-    <div class="admin-layout" id="admin-layout">
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <img src="https://i.postimg.cc/YCXfMWLg/Whats-App-Image-2026-04-14-at-19-24-10.png" alt="YR Jerseys">
-                <h1>פאנל ניהול</h1>
-            </div>
+<div class="sidebar-header">
+    <img src="https://i.postimg.cc/YCXfMWLg/Whats-App-Image-2026-04-14-at-19-24-10.png" alt="YR Jerseys">
+    <h1>פאנל ניהול</h1>
+    <p id="welcome-user-text" style="color: white; margin-top: 10px; font-weight: bold;"></p>
+</div>
 <div class="sidebar-menu">
     <div class="menu-item active" data-section="categories">קטגוריות</div>
     <div class="menu-item" data-section="products">מוצרים</div>
@@ -1662,10 +1661,30 @@ const loginErrorMessage = document.getElementById('login-error-message');
 // ============================================
 // AFTER LOGIN
 // ============================================
+// 1. נגדיר משתנה לאלמנט הטקסט החדש בראש הקובץ
+const welcomeUserText = document.getElementById('welcome-user-text');
+
 async function onSuccessfulLogin() {
     loginOverlay.style.display = 'none';
     adminLayout.classList.add('active');
     loginErrorMessage.style.display = 'none';
+
+    // שליפת שם המשתמש מה-LocalStorage
+    const userId = localStorage.getItem('vip_admin_user');
+
+    if (userId) {
+        try {
+            // פנייה ל-DB כדי להביא את השדה hebrewName
+            const userDoc = await db.collection("users").doc(userId).get();
+            if (userDoc.exists) {
+                const userData = userDoc.data();
+                const fullName = userData.hebrewName || "מנהל"; // ברירת מחדל אם השדה ריק
+                welcomeUserText.textContent = `ברוך הבא, ${fullName}`;
+            }
+        } catch (err) {
+            console.error("שגיאה בשליפת שם המשתמש:", err);
+        }
+    }
 
     try {
         await initializeSettings();
