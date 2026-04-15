@@ -748,25 +748,30 @@
         }
 
         /* ===== PRODUCTS GRID ===== */
-        main#products-container {
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 20px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(30%, 1fr));
-            gap: 40px;
-        }
+main#products-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 20px;
+    display: grid;
+    /* שינוי כאן: auto-fill במקום auto-fit ומרכוז */
+    grid-template-columns: repeat(auto-fill, minmax(280px, max-content)); 
+    justify-content: center; /* ממרכז את כל שורת המוצרים */
+    gap: 40px;
+}
 
-        .product-card {
-            background: #fff;
-            border: var(--border-val);
-            box-shadow: var(--hard-shadow);
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            transition: all 0.2s ease-in-out;
-            position: relative;
-        }
+.product-card {
+    background: #fff;
+    border: var(--border-val);
+    box-shadow: var(--hard-shadow);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition: all 0.2s ease-in-out;
+    position: relative;
+    /* שינוי כאן: גורם לכרטיס להתכווץ לרוחב התוכן */
+    width: fit-content; 
+    margin: 0 auto;
+}
 
         .product-card:hover {
             transform: translate(-4px, -4px);
@@ -774,14 +779,16 @@
         }
 
 .product-card img {
-    width: 100%;
+    width: auto; /* מאפשר לתמונה לשמור על הרוחב המקורי שלה */
+    max-width: 100%; /* מונע מהתמונה לחרוג מהמסך */
     height: auto;
     max-height: 400px;
     object-fit: contain;
-    background: #f0f0f0;
+    background: transparent; /* מסיר את הרקע האפור */
     border-bottom: var(--border-val);
     cursor: pointer;
     display: block;
+    margin: 0 auto; /* ממרכז את התמונה בתוך הכרטיס אם היא צרה יותר */
 }
 
         .sale-badge {
