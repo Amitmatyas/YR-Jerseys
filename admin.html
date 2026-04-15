@@ -91,6 +91,25 @@
             font-size: 0.95em;
         }
 
+        #admin-management-btn {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #2980b9; /* כחול - שונה מהאדום של ההתחברות */
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: background 0.3s ease;
+    font-size: 0.9em;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+#admin-management-btn:hover {
+    background-color: #3498db;
+    color: white;
+}
+
         /* ===== ADMIN LAYOUT ===== */
         .admin-layout { 
             display: none;
@@ -1067,6 +1086,7 @@
             <button id="login-button">התחבר</button>
             <p id="login-error-message" style="display: none;"></p>
         </div>
+        <a href="/password" id="admin-management-btn">ניהול משתמשים</a>
     </div>
 
     <div class="admin-layout" id="admin-layout">
