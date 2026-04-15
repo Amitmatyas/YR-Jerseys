@@ -103,23 +103,27 @@
         }
 
         /* ===== SIDEBAR ===== */
-        .sidebar {
-            width: 250px;
-            background: #2c3e50;
-            min-height: 100vh;
-            position: fixed;
-            right: 0;
-            top: 0;
-            z-index: 100;
-            overflow-y: auto;
-        }
+.sidebar {
+    width: 250px;
+    /* שינוי לרקע בהיר כדי שהלוגו השחור יבלוט */
+    background: #f8f9fa; 
+    min-height: 100vh;
+    position: fixed;
+    right: 0;
+    top: 0;
+    z-index: 100;
+    overflow-y: auto;
+    /* הוספת צל עדין במקום צבע כהה כדי להפריד מהתוכן */
+    box-shadow: -2px 0 5px rgba(0,0,0,0.05);
+}
 
-        .sidebar-header {
-            padding: 30px 20px;
-            text-align: center;
-            background: #34495e;
-            border-bottom: 2px solid #1a252f;
-        }
+.sidebar-header {
+    padding: 30px 20px;
+    text-align: center;
+    /* רקע בהיר מעט יותר או זהה לסיידבר */
+    background: #ffffff; 
+    border-bottom: 1px solid #e0e0e0;
+}
         
         .sidebar-header img { 
             width: 120px; 
