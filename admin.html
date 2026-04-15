@@ -1873,7 +1873,7 @@ async function displayCategoriesWithProducts() {
         for (const product of categoryProducts) {
             const onSale = typeof isProductOnSale === 'function' ? isProductOnSale(product) : false;
             const effectivePrice = typeof getEffectivePrice === 'function' ? getEffectivePrice(product) : (product.price || 0);
-            const productLink = `${window.location.origin}/#${encodeURIComponent(product.name)}`;
+            const productLink = `${getSiteBaseUrl()}/#${encodeURIComponent(product.name)}`;
             
             // כאן הייתה השגיאה - הוספנו בדיקה בטוחה
             const isChecked = bulkSelectedIds.has(product.id) ? 'checked' : '';
@@ -2196,7 +2196,7 @@ if (addBtn && !addBtn.dataset.listenerAttached) {
 
             const cats = getProductCategories(product);
             const catBadges = cats.map(c => `<span class="product-category">${c}</span>`).join('');
-            const productLink = `${window.location.origin.replace('/admin.html', '')}/#${encodeURIComponent(product.name)}`;
+            const productLink = `${getSiteBaseUrl()}/#${encodeURIComponent(product.name)}`;
 
             productCard.innerHTML = `
                 ${saleBadge}
