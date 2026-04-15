@@ -2022,19 +2022,17 @@ function setupCategoryEventListeners(categoriesGrid) {
             return;
         }
 
-        // העתקת קישור
-        const copyBtn = target.closest('.btn-copy-link');
-        if (copyBtn) {
-            try {
-                await navigator.clipboard.writeText(copyBtn.dataset.productLink);
-                const oldIcon = copyBtn.innerHTML;
-                copyBtn.innerHTML = '✓';
-                setTimeout(() => copyBtn.innerHTML = oldIcon, 1500);
-            } catch (err) {
-                console.error('Copy failed', err);
-            }
-        }
-    };
+// אחרי:
+const copyBtn = target.closest('.btn-copy-link');
+if (copyBtn) {
+    const success = await copyToClipboard(copyBtn.dataset.productLink);
+    if (success) {
+        const oldIcon = copyBtn.innerHTML;
+        copyBtn.innerHTML = '✓';
+        setTimeout(() => copyBtn.innerHTML = oldIcon, 1500);
+    } else {
+        alert('שגיאה בהעתקה');
+    }
 }
 
 // לוגיקת הוספת קטגוריה - מומלץ להוציא מחוץ לפונקציית התצוגה ולהריץ פעם אחת ב-Init
@@ -2222,16 +2220,18 @@ if (addBtn && !addBtn.dataset.listenerAttached) {
         document.querySelectorAll('.btn-delete-product-main').forEach(btn => {
             btn.addEventListener('click', () => deleteProductDirect(btn.dataset.productId));
         });
-        document.querySelectorAll('.btn-copy-link-main').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const link = btn.dataset.productLink;
-                navigator.clipboard.writeText(link).then(() => {
-                    const orig = btn.innerHTML;
-                    btn.innerHTML = '✓'; btn.style.background = '#27ae60';
-                    setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; }, 2000);
-                }).catch(() => alert('שגיאה בהעתקת הקישור'));
-            });
-        });
+document.querySelectorAll('.btn-copy-link-main').forEach(btn => {
+    btn.addEventListener('click', async () => {
+        const success = await copyToClipboard(btn.dataset.productLink);
+        if (success) {
+            const orig = btn.innerHTML;
+            btn.innerHTML = '✓'; btn.style.background = '#27ae60';
+            setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; }, 2000);
+        } else {
+            alert('שגיאה בהעתקת הקישור');
+        }
+    });
+});
 
         updateCouponProductSelect();
         renderBulkProductGrid();
@@ -3402,49 +3402,6 @@ document.querySelectorAll('.btn-copy-reset-link').forEach(btn => {
         }
     });
 });
-            async function copyToClipboard(text) {
-    // Try the modern Clipboard API first (requires HTTPS)
-    if (navigator.clipboard && window.isSecureContext) {
-        try {
-            await navigator.clipboard.writeText(text);
-            return true;
-        } catch (err) {
-            console.error("Async Clipboard API failed", err);
-        }
-    }
-
-    // Fallback: Create a temporary textarea for document.execCommand('copy')
-    try {
-        const textArea = document.createElement("textarea");
-        textArea.value = text;
-        
-        // Prevent scrolling to bottom and make invisible
-        textArea.style.position = "fixed";
-        textArea.style.left = "-9999px";
-        textArea.style.top = "0";
-        
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        
-        const successful = document.execCommand('copy');
-        document.body.removeChild(textArea);
-        return successful;
-    } catch (err) {
-        console.error("Fallback copy failed", err);
-        return false;
-    }
-}
-
-            document.querySelectorAll('.btn-delete-customer').forEach(btn => {
-                btn.addEventListener('click', () => deleteCustomer(btn.dataset.customerId));
-            });
-
-        } catch (error) {
-            customersList.innerHTML = '<p style="color: red;">שגיאה בטעינת לקוחות.</p>';
-            console.error(error);
-        }
-    }
 
     async function openEditCustomerModal(customerId) {
         try {
@@ -3810,7 +3767,34 @@ async function viewCustomerLeads(customerId, customerEmail, customerPhone) {
     const path = url.pathname.replace(/\/[^\/]*$/, '');
     return url.origin + (path === '/' ? '' : path);
 }
-        
+
+            async function copyToClipboard(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+        try {
+            await navigator.clipboard.writeText(text);
+            return true;
+        } catch (err) {
+            console.error("Async Clipboard API failed", err);
+        }
+    }
+    try {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-9999px";
+        textArea.style.top = "0";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        return successful;
+    } catch (err) {
+        console.error("Fallback copy failed", err);
+        return false;
+    }
+}
+            
     function updateBulkCategoryCheckboxes() {
         const container = document.getElementById('bulk-categories-checkboxes');
         if (!container) return;
