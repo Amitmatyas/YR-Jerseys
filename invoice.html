@@ -62,6 +62,7 @@
         .invoice-meta .invoice-date {
             font-size: 0.9rem;
             color: var(--text-muted);
+            margin-bottom: 4px;
         }
 
         .logo img { width: 120px; height: auto; }
@@ -152,7 +153,7 @@
             justify-content: flex-end;
         }
 
-        .totals-box { min-width: 260px; }
+        .totals-box { min-width: 280px; }
 
         .totals-row {
             display: flex;
@@ -172,8 +173,49 @@
             border-top: 2px solid var(--primary-color);
         }
 
+        .totals-row.points-earned-row {
+            font-size: 0.85rem;
+            color: #2980b9;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed #e0e0e0;
+            border-bottom: none;
+        }
+
         .coupon-row { color: #27ae60; }
         .points-row { color: #3498db; }
+
+        /* Status badge */
+        .status-section {
+            margin-bottom: 28px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+        .status-paid    { background: #d4edda; color: #155724; }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-shipped { background: #cce5ff; color: #004085; }
+        .payment-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #f0f0f0;
+            color: #444;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
 
         .invoice-footer {
             margin-top: 40px;
@@ -218,6 +260,17 @@
         .error   { background: #ffeaea; color: #c0392b; }
         .loading { background: #f0f5ff; color: #2980b9; }
 
+        /* Club member info */
+        .club-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 6px;
+            font-size: 0.85rem;
+            color: #8e44ad;
+            font-weight: 600;
+        }
+
         @media print {
             body { background: white; padding: 0; }
             .container { box-shadow: none; border-radius: 0; padding: 30px; }
@@ -230,6 +283,7 @@
             .info-grid { grid-template-columns: 1fr; gap: 14px; }
             .actions { flex-direction: column; }
             .btn { width: 100%; text-align: center; }
+            .totals-box { min-width: 100%; }
         }
     </style>
 </head>
@@ -250,12 +304,19 @@
             <div class="invoice-meta">
                 <h2>חשבונית</h2>
                 <div class="invoice-num">מספר הזמנה: #<span id="inv-num"></span></div>
-                <div class="invoice-date">תאריך ושעה: <span id="inv-date"></span></div>
+                <div class="invoice-date">תאריך הזמנה: <span id="inv-date"></span></div>
+                <div class="invoice-date" id="inv-paid-date-row" style="display:none;">תאריך תשלום: <span id="inv-paid-date"></span></div>
+                <div id="inv-club-member-row" class="club-row" style="display:none;">
+                    ⭐ חבר מועדון: <span id="inv-club-member"></span>
+                </div>
             </div>
             <div class="logo">
                 <img src="https://i.postimg.cc/YCXfMWLg/Whats-App-Image-2026-04-14-at-19-24-10.png" alt="YR Jerseys">
             </div>
         </div>
+
+        <!-- Status -->
+        <div class="status-section" id="inv-status-section"></div>
 
         <div class="info-grid">
             <div class="info-block">
@@ -276,7 +337,7 @@
                     <tr>
                         <th>מוצר</th>
                         <th style="text-align:center; width:70px;">כמות</th>
-                        <th style="text-align:left; width:100px;">מחיר</th>
+                        <th style="text-align:left; width:110px;">מחיר</th>
                     </tr>
                 </thead>
                 <tbody id="inv-items"></tbody>
@@ -298,19 +359,24 @@
                     <span id="inv-coupon-val"></span>
                 </div>
                 <div class="totals-row points-row" id="inv-points-row" style="display:none;">
-                    <span>נקודות מועדון</span>
+                    <span>נקודות מועדון (<span id="inv-points-used"></span> נק')</span>
                     <span id="inv-points-val"></span>
                 </div>
                 <div class="totals-row total-final">
                     <span>סה"כ לתשלום</span>
                     <span id="inv-total"></span>
                 </div>
+                <div class="totals-row points-earned-row" id="inv-points-earned-row" style="display:none;">
+                    <span>נקודות שנצברו בהזמנה זו ⭐</span>
+                    <span id="inv-points-earned"></span>
+                </div>
             </div>
         </div>
 
         <div class="invoice-footer">
             <strong>YR Jerseys</strong> — תודה על הרכישה!<br>
-            לשאלות ופניות צור קשר איתנו
+            לשאלות ופניות צור קשר איתנו<br>
+            <span id="inv-footer-id" style="font-size:0.78rem; color:#aaa;"></span>
         </div>
 
     </div>
@@ -337,6 +403,44 @@
             `<div class="message ${type}">${msg}</div>`;
     }
 
+    function fmtDate(ts, locale) {
+        if (!ts) return '—';
+        try {
+            return ts.toDate().toLocaleString('he-IL', {
+                year: 'numeric', month: 'long', day: 'numeric',
+                hour: '2-digit', minute: '2-digit'
+            });
+        } catch(e) { return '—'; }
+    }
+
+    function buildStatusSection(o) {
+        const section = document.getElementById('inv-status-section');
+        let html = '';
+
+        // Payment / completion status
+        const s = o.status || '';
+        const completed = o.completed;
+
+        if (completed) {
+            html += '<span class="status-badge status-shipped">📦 נשלח / הושלם</span>';
+        } else if (s === 'paid' || s === 'paid_bit') {
+            html += '<span class="status-badge status-paid">✅ תשלום אושר</span>';
+        } else if (s === 'bit_pending') {
+            html += '<span class="status-badge status-pending">🟡 ממתין לאישור תשלום</span>';
+        } else {
+            html += '<span class="status-badge status-pending">⏳ בטיפול</span>';
+        }
+
+        // Payment method
+        if (o.paymentType === 'bit') {
+            html += '<span class="payment-badge">💳 תשלום בביט</span>';
+        } else if (o.paymentType === 'paypal') {
+            html += '<span class="payment-badge">🅿️ PayPal</span>';
+        }
+
+        section.innerHTML = html;
+    }
+
     async function init() {
         const hash = window.location.hash.substring(1);
         if (!hash) { showState('מזהה הזמנה חסר', 'error'); return; }
@@ -344,33 +448,55 @@
         showState('טוען חשבונית...', 'loading');
 
         try {
-            // ✅ תוקן: yr_orders (כמו ב-index.html)
             const doc = await db.collection('yr_orders').doc(hash).get();
             if (!doc.exists) { showState('הזמנה לא נמצאה', 'error'); return; }
 
             const o = doc.data();
 
+            // Order number & dates
             document.getElementById('inv-num').textContent = hash.substring(0, 8).toUpperCase();
-            const date = o.orderDate ? o.orderDate.toDate().toLocaleString('he-IL', {
-                year: 'numeric', month: 'long', day: 'numeric',
-                hour: '2-digit', minute: '2-digit'
-            }) : '—';
-            document.getElementById('inv-date').textContent = date;
+            document.getElementById('inv-date').textContent = fmtDate(o.orderDate);
 
+            // Paid date
+            if (o.paidAt || o.adminConfirmedAt) {
+                document.getElementById('inv-paid-date-row').style.display = '';
+                document.getElementById('inv-paid-date').textContent = fmtDate(o.paidAt || o.adminConfirmedAt);
+            }
+
+            // Club member
+            if (o.clubMemberName) {
+                document.getElementById('inv-club-member-row').style.display = 'flex';
+                document.getElementById('inv-club-member').textContent = o.clubMemberName;
+            }
+
+            // Footer full ID
+            document.getElementById('inv-footer-id').textContent = 'מזהה הזמנה: ' + hash;
+
+            // Status badges
+            buildStatusSection(o);
+
+            // Customer details
             document.getElementById('inv-name').textContent = o.customerName || '—';
             document.getElementById('inv-contact').innerHTML =
-                `${o.customerPhone || ''}<br>${o.customerEmail || ''}`;
+                [o.customerPhone, o.customerEmail].filter(Boolean).join('<br>');
             document.getElementById('inv-address').textContent = o.customerAddress || '—';
 
+            // Items
             const tbody = document.getElementById('inv-items');
             (o.items || []).forEach(item => {
-                const price = item.isFreebie ? 0 : (item.price || 0);
+                // Support both old and new field names
+                const unitPrice = typeof item.unitPrice === 'number' ? item.unitPrice
+                    : typeof item.price === 'number' ? item.price : 0;
+                const qty = item.quantity || 1;
+                const lineTotal = item.isFreebie ? 0 : (typeof item.totalPrice === 'number' ? item.totalPrice : unitPrice * qty);
+
                 let optionsHTML = '';
                 if (item.selectedOptions) {
-                    optionsHTML = Object.entries(item.selectedOptions)
+                    const opts = Object.entries(item.selectedOptions)
                         .filter(([, v]) => v)
                         .map(([k, v]) => `${k}: ${v}`)
                         .join(' | ');
+                    if (opts) optionsHTML = `<div class="item-options">${opts}</div>`;
                 }
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
@@ -379,38 +505,55 @@
                             ${item.isFreebie ? '<span class="freebie-tag">מתנה</span>' : ''}
                             ${item.productName || item.name || '—'}
                         </div>
-                        ${optionsHTML ? `<div class="item-options">${optionsHTML}</div>` : ''}
+                        ${optionsHTML}
                     </td>
-                    <td style="text-align:center;">${item.quantity || 1}</td>
-                    <td>${item.isFreebie ? '<span style="color:#27ae60;">חינם</span>' : fmt(price * (item.quantity || 1))}</td>
+                    <td style="text-align:center;">${qty}</td>
+                    <td>${item.isFreebie ? '<span style="color:#27ae60;">חינם</span>' : fmt(lineTotal)}</td>
                 `;
                 tbody.appendChild(tr);
             });
 
+            // Subtotal
             document.getElementById('inv-subtotal').textContent = fmt(o.subtotal || 0);
 
+            // Shipping
             const shipping = o.shippingCost || 0;
             document.getElementById('inv-shipping').textContent =
                 shipping === 0 ? 'חינם' : fmt(shipping);
 
-            // קופון
+            // Coupon
             if (o.appliedCoupon) {
                 document.getElementById('inv-coupon-row').style.display = 'flex';
                 document.getElementById('inv-coupon-code').textContent = o.appliedCoupon;
-                // חישוב הנחת קופון: subtotal + shipping - pointsUsed - total
-                const pointsUsed = o.pointsUsed || 0;
-                const discount = (o.subtotal || 0) + shipping - pointsUsed - (o.totalAmount || 0);
-                document.getElementById('inv-coupon-val').textContent = '−' + fmt(Math.max(0, discount));
+
+                let couponDiscount = 0;
+                if (typeof o.couponDiscount === 'number') {
+                    couponDiscount = o.couponDiscount;
+                } else {
+                    // Fallback calculation for old orders without couponDiscount field
+                    const pointsUsed = o.pointsUsed || 0;
+                    couponDiscount = (o.subtotal || 0) + shipping - pointsUsed - (o.totalAmount || 0);
+                }
+                document.getElementById('inv-coupon-val').textContent = '−' + fmt(Math.max(0, couponDiscount));
             }
 
-            // נקודות מועדון
+            // Points used
             if (o.pointsUsed && o.pointsUsed > 0) {
                 document.getElementById('inv-points-row').style.display = 'flex';
-                document.getElementById('inv-points-val').textContent = '−' + fmt(o.pointsUsed);
+                document.getElementById('inv-points-used').textContent = o.pointsUsed;
+                document.getElementById('inv-points-val').textContent = '−' + fmt(o.pointsDiscount || o.pointsUsed);
             }
 
+            // Grand total
             document.getElementById('inv-total').textContent = fmt(o.totalAmount || 0);
 
+            // Points earned
+            if (o.pointsEarned && o.pointsEarned > 0) {
+                document.getElementById('inv-points-earned-row').style.display = 'flex';
+                document.getElementById('inv-points-earned').textContent = '+' + o.pointsEarned + ' נקודות';
+            }
+
+            // Show
             document.getElementById('state-box').innerHTML = '';
             document.getElementById('invoice-content').style.display = 'block';
             document.getElementById('actions-bar').style.display = 'flex';
