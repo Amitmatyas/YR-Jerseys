@@ -1400,7 +1400,7 @@
                     const amount = typeof order.totalAmount === 'number' ? order.totalAmount.toFixed(2) : '0.00';
                     const items = Array.isArray(order.items) ? order.items.map(i => `${i.quantity}x ${i.productName || i.name}`).join(', ') : '';
                     const statusText = order.status === 'paid_bit' ? '✅ שולם בביט' : order.completed ? '✅ הושלם' : '⏳ בטיפול';
-                    list.insertAdjacentHTML('beforeend', `<div class="club-order-item"><div class="club-order-header"><span class="club-order-date">📅 ${date}</span><span class="club-order-total">₪${amount}</span></div><div class="club-order-items">${items}</div><span class="club-order-status ${order.completed ? 'completed' : 'pending'}">${statusText}</span></div>`);
+list.insertAdjacentHTML('beforeend', `<div class="club-order-item"><div class="club-order-header"><span class="club-order-date">📅 ${date}</span><span class="club-order-total">₪${amount}</span></div><div class="club-order-items">${items}</div><div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px"><span class="club-order-status ${order.completed ? 'completed' : 'pending'}">${statusText}</span><a href="invoice.html#${order.id}" target="_blank" style="padding:5px 12px;background:#1a1a1a;color:white;border-radius:7px;font-size:.78em;font-weight:700;text-decoration:none;">📄 חשבונית</a></div></div>`);
                 });
             } catch(e) { list.innerHTML = '<p style="color:var(--accent-color);font-weight:700;">שגיאה</p>'; }
         }
