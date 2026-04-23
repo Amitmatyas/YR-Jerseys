@@ -958,15 +958,16 @@ let currentSubCategoryFilter = null;
         const searchInput = document.getElementById('search-input');
         const sortSelect = document.getElementById('sort-select');
 
-        function applyFilters() {
-            let filtered = [...products];
-            if (currentSubCategoryFilter) filtered = filtered.filter(p => p.subCategory === currentSubCategoryFilter);
-            const q = searchInput.value.toLowerCase();
-            if (q) filtered = filtered.filter(p => p.name.toLowerCase().includes(q));
-            if (sortSelect.value === 'price-asc') filtered.sort((a, b) => getEffectivePrice(a) - getEffectivePrice(b));
-            else if (sortSelect.value === 'price-desc') filtered.sort((a, b) => getEffectivePrice(b) - getEffectivePrice(a));
-            renderFilteredProducts(filtered);
-        }
+function applyFilters() {
+    let filtered = [...products];
+    if (currentCategoryFilter !== 'all') filtered = filtered.filter(p => getProductCategories(p).includes(currentCategoryFilter));
+    if (currentSubCategoryFilter) filtered = filtered.filter(p => p.subCategory === currentSubCategoryFilter);
+    const q = searchInput.value.toLowerCase();
+    if (q) filtered = filtered.filter(p => p.name.toLowerCase().includes(q));
+    if (sortSelect.value === 'price-asc') filtered.sort((a, b) => getEffectivePrice(a) - getEffectivePrice(b));
+    else if (sortSelect.value === 'price-desc') filtered.sort((a, b) => getEffectivePrice(b) - getEffectivePrice(a));
+    renderFilteredProducts(filtered);
+}
 
         function renderFilteredProducts(list) {
             productsContainer.innerHTML = '';
