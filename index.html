@@ -817,6 +817,8 @@
         let announcements = [];
         let currentAnnouncementIndex = 0;
         let currentCategoryFilter = 'all';
+        let subCategories = {};
+let currentSubCategoryFilter = null;
         let couponLockedOptions = null;
         let isCouponProduct = false;
         let cartOpen = false;
@@ -918,7 +920,7 @@
         async function loadSettings() {
             try {
                 const doc = await db.collection('yr_settings').doc('main').get();
-                if (doc.exists) { settings = doc.data(); categories = settings.Categories || []; updateCategoryFilter(); }
+                if (doc.exists) { settings = doc.data(); categories = settings.Categories || []; subCategories = settings.SubCategories || {}; updateCategoryFilter(); }
                 else settings = { Shipping: { Method: 'fixed', Value: 30, FreeThreshold: 0 }, Coupons: [], Categories: [] };
             } catch(e) { settings = { Shipping: { Method: 'fixed', Value: 30, FreeThreshold: 0 }, Coupons: [], Categories: [] }; }
         }
@@ -958,7 +960,7 @@
 
         function applyFilters() {
             let filtered = [...products];
-            if (currentCategoryFilter !== 'all') filtered = filtered.filter(p => getProductCategories(p).includes(currentCategoryFilter));
+            if (currentSubCategoryFilter) filtered = filtered.filter(p => p.subCategory === currentSubCategoryFilter);
             const q = searchInput.value.toLowerCase();
             if (q) filtered = filtered.filter(p => p.name.toLowerCase().includes(q));
             if (sortSelect.value === 'price-asc') filtered.sort((a, b) => getEffectivePrice(a) - getEffectivePrice(b));
@@ -991,23 +993,74 @@
         searchInput.addEventListener('input', applyFilters);
         sortSelect.addEventListener('change', applyFilters);
 
-        function updateCategoryFilter() {
-            const filterDiv = document.getElementById('category-filter');
-            filterDiv.innerHTML = '<button class="active" data-category="all">הכל</button>';
-            categories.forEach(cat => {
-                const btn = document.createElement('button');
-                btn.textContent = cat; btn.dataset.category = cat;
-                btn.addEventListener('click', () => filterByCategory(cat));
-                filterDiv.appendChild(btn);
-            });
-            filterDiv.querySelector('[data-category="all"]').addEventListener('click', () => filterByCategory('all'));
-        }
+function updateCategoryFilter() {
+    const filterDiv = document.getElementById('category-filter');
+    filterDiv.innerHTML = '';
 
-        function filterByCategory(category) {
-            currentCategoryFilter = category;
-            document.querySelectorAll('#category-filter button').forEach(b => b.classList.toggle('active', b.dataset.category === category));
+    if (currentCategoryFilter === 'all') {
+        const allBtn = document.createElement('button');
+        allBtn.textContent = 'הכל';
+        allBtn.className = 'active';
+        allBtn.addEventListener('click', () => filterByCategory('all'));
+        filterDiv.appendChild(allBtn);
+
+        categories.forEach(cat => {
+            const btn = document.createElement('button');
+            btn.textContent = cat;
+            btn.addEventListener('click', () => enterCategory(cat));
+            filterDiv.appendChild(btn);
+        });
+
+    } else {
+        const backBtn = document.createElement('button');
+        backBtn.textContent = '← חזרה לכל הקטגוריות';
+        backBtn.style.cssText = 'flex-basis:100%;background:#000;color:#fff;border-color:#000;';
+        backBtn.addEventListener('click', () => filterByCategory('all'));
+        filterDiv.appendChild(backBtn);
+
+        const title = document.createElement('div');
+        title.style.cssText = 'flex-basis:100%;text-align:center;font-weight:900;font-size:1em;padding:4px 0 4px;text-transform:uppercase;letter-spacing:1px;';
+        title.textContent = currentCategoryFilter;
+        filterDiv.appendChild(title);
+
+        const allInCat = document.createElement('button');
+        allInCat.textContent = 'הכל';
+        allInCat.className = currentSubCategoryFilter === null ? 'active' : '';
+        allInCat.addEventListener('click', () => {
+            currentSubCategoryFilter = null;
+            updateCategoryFilter();
             applyFilters();
-        }
+        });
+        filterDiv.appendChild(allInCat);
+
+        const subs = subCategories[currentCategoryFilter] || [];
+        subs.forEach(sub => {
+            const btn = document.createElement('button');
+            btn.textContent = '📂 ' + sub;
+            btn.className = currentSubCategoryFilter === sub ? 'active' : '';
+            btn.addEventListener('click', () => {
+                currentSubCategoryFilter = sub;
+                updateCategoryFilter();
+                applyFilters();
+            });
+            filterDiv.appendChild(btn);
+        });
+    }
+}
+
+function enterCategory(cat) {
+    currentCategoryFilter = cat;
+    currentSubCategoryFilter = null;
+    updateCategoryFilter();
+    applyFilters();
+}
+
+function filterByCategory(category) {
+    currentCategoryFilter = category;
+    currentSubCategoryFilter = null;
+    updateCategoryFilter();
+    applyFilters();
+}
 
         // ===== SHIPPING =====
         function calculateShipping() {
