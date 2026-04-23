@@ -1037,7 +1037,7 @@ function updateCategoryFilter() {
         const subs = subCategories[currentCategoryFilter] || [];
         subs.forEach(sub => {
             const btn = document.createElement('button');
-            btn.textContent = '📂 ' + sub;
+            btn.textContent = sub;
             btn.className = currentSubCategoryFilter === sub ? 'active' : '';
             btn.addEventListener('click', () => {
                 currentSubCategoryFilter = sub;
