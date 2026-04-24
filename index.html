@@ -1296,11 +1296,11 @@ function filterByCategory(category) {
 
             try {
                 // Update order status to paid
-                await db.collection('yr_orders').doc(pendingOrderId).update({
-                    status: 'paid_bit',
-                    paidAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    paymentConfirmedByUser: true
-                });
+await db.collection('yr_orders').doc(pendingOrderId).update({
+    status: 'bit_pending',
+    paymentConfirmedByUser: true,
+    userConfirmedAt: firebase.firestore.FieldValue.serverTimestamp()
+});
 
                 // Handle club member
                 let clubMemberId = currentClubMember ? currentClubMember.id : null;
