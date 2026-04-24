@@ -1432,10 +1432,37 @@ await db.collection('yr_orders').doc(pendingOrderId).update({
                 title.textContent = `שלום ${currentClubMember.name.split(' ')[0]}!`;
                 document.getElementById('member-points').textContent = currentClubMember.points || 0;
                 document.getElementById('member-points-value').textContent = (currentClubMember.points || 0).toFixed(2);
-                document.getElementById('profile-name').value = currentClubMember.name || '';
-                document.getElementById('profile-email').value = currentClubMember.email || '';
-                document.getElementById('profile-phone').value = currentClubMember.phone || '';
-                loadMemberOrders();
+document.getElementById('profile-name').value = currentClubMember.name || '';
+document.getElementById('profile-email').value = currentClubMember.email || '';
+document.getElementById('profile-phone').value = currentClubMember.phone || '';
+
+// מילוי כתובת בפרופיל המועדון
+if (currentClubMember.address) {
+    const parts = currentClubMember.address.split(',').map(p => p.trim());
+    if (parts.length >= 2) {
+        const streetPart = parts[0];
+        const houseMatch = streetPart.match(/\s+(\d+[א-ת]?)$/);
+        if (houseMatch) {
+            document.getElementById('profile-address-street').value = streetPart.replace(/\s+\d+[א-ת]?$/, '').trim();
+            document.getElementById('profile-address-house').value = houseMatch[1];
+        } else {
+            document.getElementById('profile-address-street').value = streetPart;
+        }
+        document.getElementById('profile-address-city').value = parts[1] || '';
+        if (parts[2]) {
+            const czParts = parts[2].trim().split(/\s+/);
+            const last = czParts[czParts.length - 1];
+            if (/^\d+$/.test(last)) {
+                document.getElementById('profile-address-zip').value = last;
+                document.getElementById('profile-address-country').value = czParts.slice(0, -1).join(' ') || 'ישראל';
+            } else {
+                document.getElementById('profile-address-country').value = parts[2] || 'ישראל';
+            }
+        }
+    }
+}
+
+loadMemberOrders();
             } else { guestView.style.display = 'block'; memberView.style.display = 'none'; title.textContent = 'מועדון VIP'; }
             updateCheckoutForm(); updatePointsUsage();
         }
