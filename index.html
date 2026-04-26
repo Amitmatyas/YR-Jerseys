@@ -1204,13 +1204,14 @@ function updateCartDisplay() {
         }
 
         // ===== COUPON =====
-        applyCouponBtn.addEventListener('click', async () => {
+applyCouponBtn.addEventListener('click', async () => {
             const code = couponInput.value.trim();
             if (!code) { couponMessage.innerHTML = '<span style="color:red;font-weight:700;">הזן קוד קופון</span>'; return; }
             if (!settings || !settings.Coupons) { couponMessage.innerHTML = '<span style="color:red;font-weight:700;">קוד לא תקין</span>'; return; }
             const coupon = settings.Coupons.find(c => c.Code === code);
             if (!coupon) { couponMessage.innerHTML = '<span style="color:red;font-weight:700;">קוד קופון לא קיים</span>'; return; }
             if (coupon.ExpiryDate) { const expiry = new Date(coupon.ExpiryDate); const today = new Date(); today.setHours(0,0,0,0); if (expiry < today) { couponMessage.innerHTML = '<span style="color:red;font-weight:700;">תוקף הקופון עבר</span>'; return; } }
+            if (coupon.MembersOnly && !currentClubMember) { couponMessage.innerHTML = '<span style="color:red;font-weight:700;">קופון זה מיועד לחברי מועדון בלבד ⭐</span>'; return; }
             if (appliedCoupon && appliedCoupon.Type === 'free_product' && appliedCoupon.ProductId) cart = cart.filter(item => !(item.id === appliedCoupon.ProductId && item.isFreebie));
             appliedCoupon = coupon;
             if (coupon.Type === 'free_product' && coupon.ProductId) {
