@@ -1126,7 +1126,11 @@ function updateCartDisplay() {
         subtotal = 0;
         dealGiftQueue = [];
         checkDeals();
-
+        validateCoupon();
+        validateDealsInCart();
+        dealGiftQueue = [];
+        checkDeals();
+    
         if (cart.length === 0) {
                 cartItemsList.innerHTML = `<div class="empty-cart-message"><div style="font-size:3em;margin-bottom:10px;">🛒</div><p>העגלה ריקה</p></div>`;
                 shippingInfoElement.innerHTML = '';
@@ -1773,6 +1777,30 @@ function updateCheckoutForm() {
         document.getElementById('close-zoom-btn').addEventListener('click', () => document.getElementById('size-chart-zoom-modal').classList.remove('active'));
         document.getElementById('size-chart-zoom-modal').addEventListener('click', e => { if (e.target === document.getElementById('size-chart-zoom-modal')) document.getElementById('size-chart-zoom-modal').classList.remove('active'); });
 
+        // ===== CART VALIDATION =====
+function validateCoupon(){
+  if(!appliedCoupon)return;
+  if(!settings||!settings.Coupons){appliedCoupon=null;localStorage.removeItem('yr_jerseys_coupon');couponMessage.innerHTML='';couponInput.value='';return;}
+  const found=settings.Coupons.find(c=>c.Code===appliedCoupon.Code);
+  if(!found){appliedCoupon=null;localStorage.removeItem('yr_jerseys_coupon');couponMessage.innerHTML='<span style="color:red;font-weight:700;">הקופון כבר לא קיים</span>';couponInput.value='';return;}
+  if(found.ExpiryDate){const exp=new Date(found.ExpiryDate);const today=new Date();today.setHours(0,0,0,0);if(exp<today){appliedCoupon=null;localStorage.removeItem('yr_jerseys_coupon');couponMessage.innerHTML='<span style="color:red;font-weight:700;">תוקף הקופון עבר</span>';couponInput.value='';return;}}
+  if(found.MembersOnly&&!currentClubMember){appliedCoupon=null;localStorage.removeItem('yr_jerseys_coupon');couponMessage.innerHTML='<span style="color:red;font-weight:700;">קופון זה לחברי מועדון בלבד</span>';couponInput.value='';return;}
+  appliedCoupon=found;
+}
+
+function validateDealsInCart(){
+  if(!cart.some(i=>i.isDealFreebie))return;
+  const now=new Date();
+  cart=cart.filter(i=>{
+    if(!i.isDealFreebie)return true;
+    const deal=(activeDeals||[]).find(d=>d.name===i.dealName);
+    if(!deal||!deal.active)return false;
+    if(deal.expiry&&new Date(deal.expiry)<now)return false;
+    if(deal.membersOnly&&!currentClubMember)return false;
+    return true;
+  });
+}
+        
         // ===== DEALS =====
 let activeDeals=[];
 let pendingGiftDeal=null;
@@ -1897,12 +1925,11 @@ document.getElementById('deal-gift-modal').addEventListener('click',e=>{
         }
 
         // ===== INIT =====
-        document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', async () => {
             productsContainer.innerHTML = `<div style="text-align:center;padding:80px 20px;width:100%;"><div style="font-size:3em;font-weight:900;margin-bottom:15px;">⏳</div><p style="font-size:1.1em;font-weight:900;text-transform:uppercase;">טוען מוצרים...</p></div>`;
             try {
                 await loadSettings();
                 loadCartFromStorage();
-                // Check for pending Bit order
                 const pendingId = localStorage.getItem('yr_pending_order_id');
                 if (pendingId) {
                     pendingOrderId = pendingId;
@@ -1911,6 +1938,8 @@ document.getElementById('deal-gift-modal').addEventListener('click',e=>{
                     openCart();
                 }
                 await Promise.all([loadAnnouncements(), fetchProducts(), loadClubMember()]);
+                validateCoupon();
+                validateDealsInCart();
                 updateCartDisplay();
             } catch(e) { console.error('Init error:', e); }
         });
