@@ -385,8 +385,9 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f0f0;color:#333;direction:r
           <div class="form-group"><label>סוג הטבה</label><select id="coup-type"><option value="free_product">מוצר חינם</option><option value="fixed_discount">הנחה בשקלים</option><option value="percentage_discount">הנחה באחוזים</option><option value="free_shipping">משלוח חינם</option></select></div>
           <div class="form-group" id="coup-val-group"><label>ערך</label><input type="number" id="coup-val" step="0.01" min="0"></div>
           <div class="form-group" id="coup-prod-group" style="display:none"><label>בחר מוצר</label><select id="coup-prod"></select><div id="coup-prod-opts" style="display:none;margin-top:8px;padding:11px;background:#f8f9fa;border-radius:7px;border:1px solid #e0e0e0"></div></div>
-          <div class="form-group"><label>תאריך תפוגה</label><input type="date" id="coup-expiry"></div>
-          <button class="btn btn-success" id="add-coupon-btn">+ הוסף קופון</button>
+<div class="form-group"><label>תאריך תפוגה</label><input type="date" id="coup-expiry"></div>
+<div class="form-group"><label><input type="checkbox" id="coup-members-only"> לחברי מועדון בלבד 🔒</label></div>
+<button class="btn btn-success" id="add-coupon-btn">+ הוסף קופון</button>
           <div id="coupons-list" style="margin-top:13px"></div>
         </div>
         <div class="settings-box"><h3>הודעות (עד 5)</h3>
@@ -696,7 +697,7 @@ window.toggleCouponEdit=idx=>{const p=$(`coup-edit-${idx}`);p.style.display=p.st
 window.onCouponTypeChange=idx=>{const t=$(`ce-type-${idx}`).value;$(`ce-val-group-${idx}`).style.display=(t==='free_product'||t==='free_shipping')?'none':'block';$(`ce-prod-group-${idx}`).style.display=t==='free_product'?'block':'none';};
 window.saveCouponEdit=async idx=>{const code=$(`ce-code-${idx}`).value.trim(),type=$(`ce-type-${idx}`).value,val=parseFloat($(`ce-val-${idx}`).value)||0,prodId=$(`ce-prod-${idx}`)?.value,expiry=$(`ce-exp-${idx}`).value;if(!code){alert('הזן קוד');return;}try{const ref=db.collection('yr_settings').doc('main'),d=await ref.get();const coupons=d.data().Coupons||[];coupons[idx]={Code:code,Type:type,Value:(type==='free_shipping'||type==='free_product')?0:val,ProductId:type==='free_product'?prodId:null,SelectedOptions:coupons[idx].SelectedOptions||null,ExpiryDate:expiry||null};await ref.update({Coupons:coupons});alert('עודכן!');await loadCoupons();}catch(e){console.error(e);alert('שגיאה');}};
 window.deleteCoupon=async idx=>{if(!confirm('למחוק קופון?'))return;try{const ref=db.collection('yr_settings').doc('main'),d=await ref.get();const c=d.data().Coupons||[];c.splice(idx,1);await ref.update({Coupons:c});alert('נמחק!');await loadCoupons();}catch(e){alert('שגיאה');}};
-$('add-coupon-btn').addEventListener('click',async()=>{const code=$('coup-code').value.trim(),type=$('coup-type').value,val=parseFloat($('coup-val').value)||0,prodId=$('coup-prod').value,expiry=$('coup-expiry').value;if(!code){alert('הזן קוד קופון');return;}if(type==='free_product'&&!prodId){alert('בחר מוצר');return;}const coup={Code:code,Type:type,Value:type==='free_shipping'?0:val,ProductId:type==='free_product'?prodId:null,SelectedOptions:type==='free_product'&&Object.keys(selectedCouponOptions).length?selectedCouponOptions:null,ExpiryDate:expiry||null};try{const ref=db.collection('yr_settings').doc('main'),d=await ref.get();const c=d.exists?(d.data().Coupons||[]):[];c.push(coup);await ref.update({Coupons:c});alert('נוסף!');$('coup-code').value='';$('coup-val').value='';$('coup-expiry').value='';$('coup-prod').value='';$('coup-prod-opts').style.display='none';selectedCouponOptions={};await loadCoupons();}catch(e){alert('שגיאה');}});
+$('add-coupon-btn').addEventListener('click',async()=>{const code=$('coup-code').value.trim(),type=$('coup-type').value,val=parseFloat($('coup-val').value)||0,prodId=$('coup-prod').value,expiry=$('coup-expiry').value;if(!code){alert('הזן קוד קופון');return;}if(type==='free_product'&&!prodId){alert('בחר מוצר');return;}const coup={Code:code,Type:type,Value:type==='free_shipping'?0:val,ProductId:type==='free_product'?prodId:null,SelectedOptions:type==='free_product'&&Object.keys(selectedCouponOptions).length?selectedCouponOptions:null,ExpiryDate:expiry||null,MembersOnly:$('coup-members-only').checked||false};try{const ref=db.collection('yr_settings').doc('main'),d=await ref.get();const c=d.exists?(d.data().Coupons||[]):[];c.push(coup);await ref.update({Coupons:c});alert('נוסף!');$('coup-code').value='';$('coup-val').value='';$('coup-expiry').value='';$('coup-prod').value='';$('coup-prod-opts').style.display='none';selectedCouponOptions={};await loadCoupons();}catch(e){alert('שגיאה');}});
 
 // SETTINGS - ANNOUNCEMENTS
 async function loadAnnouncements(){try{const d=await db.collection('yr_settings').doc('main').get();if(!d.exists)return;announcements=d.data().Announcements||[];const list=$('ann-list');list.innerHTML='';if(!announcements.length){list.innerHTML='<p style="color:#888">אין הודעות.</p>';return;}announcements.forEach((ann,idx)=>{const item=document.createElement('div');item.className='list-item';item.style.flexDirection='column';item.style.alignItems='stretch';item.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><span>${ann}</span><div class="list-item-actions"><button class="btn btn-dark" onclick="editAnn(${idx})">✏️</button><button class="btn btn-danger" onclick="deleteAnn(${idx})">🗑</button></div></div><div id="ann-edit-${idx}" style="display:none;margin-top:8px"><input type="text" id="ann-input-${idx}" value="${ann.replace(/"/g,'&quot;')}" style="width:100%;padding:8px;border:2px solid #e0e0e0;border-radius:6px;margin-bottom:6px"><div style="display:flex;gap:6px"><button class="btn btn-success" onclick="saveAnn(${idx})">שמור</button><button class="btn btn-secondary" onclick="editAnn(${idx})">ביטול</button></div></div>`;list.appendChild(item);});}catch(e){console.error(e);}}
@@ -769,13 +770,86 @@ async function loadDeals(){
           <span style="font-size:.82em;color:#666">מתנה: ${getDesc}</span>
         </div>
         <div class="list-item-actions">
+          <button class="btn btn-dark" onclick="toggleDealEdit(${idx})">✏️ ערוך</button>
           <button class="btn btn-danger" onclick="deleteDeal(${idx})">🗑 מחק</button>
         </div>
+      </div>
+      <div id="deal-edit-${idx}" style="display:none;margin-top:12px;background:#f8f9fa;border-radius:8px;padding:14px">
+        <div class="form-group"><label>שם המבצע</label><input type="text" id="de-name-${idx}" value="${deal.name}"></div>
+        <div style="display:flex;gap:10px">
+          <div class="form-group" style="flex:1"><label>קנה (X)</label><input type="number" id="de-buy-${idx}" min="1" value="${deal.buyQty}"></div>
+          <div class="form-group" style="flex:1"><label>קבל (Y)</label><input type="number" id="de-get-${idx}" min="1" value="${deal.getQty}"></div>
+        </div>
+        <div class="form-group"><label>מוצרים לרכישה</label>
+          <div style="display:flex;gap:10px;margin-bottom:6px;flex-wrap:wrap">
+            <label><input type="radio" name="de-buy-mode-${idx}" value="all" ${deal.buySelection.mode==='all'?'checked':''}> כל המוצרים</label>
+            <label><input type="radio" name="de-buy-mode-${idx}" value="category" ${deal.buySelection.mode==='category'?'checked':''}> לפי קטגוריה</label>
+            <label><input type="radio" name="de-buy-mode-${idx}" value="specific" ${deal.buySelection.mode==='specific'?'checked':''}> ספציפיים</label>
+          </div>
+          <div id="de-buy-cat-${idx}" style="display:${deal.buySelection.mode==='category'?'flex':'none'}" class="cat-checks">${categories.map(c=>`<label><input type="checkbox" value="${c}" ${deal.buySelection.ids.includes(c)?'checked':''}> ${c}</label>`).join('')}</div>
+          <div id="de-buy-prod-${idx}" style="display:${deal.buySelection.mode==='specific'?'block':'none'};max-height:150px;overflow-y:auto;border:2px solid #eee;border-radius:7px;padding:8px;background:#fff">${products.map(p=>`<label style="display:flex;align-items:center;gap:7px;padding:4px 0;border-bottom:1px solid #f5f5f5;font-size:.88em;cursor:pointer"><input type="checkbox" value="${p.id}" ${deal.buySelection.ids.includes(p.id)?'checked':''}><img src="${p.image}" style="width:28px;height:28px;object-fit:cover;border-radius:3px;border:1px solid #ddd">${p.name}</label>`).join('')}</div>
+        </div>
+        <div class="form-group"><label>מוצרים במתנה</label>
+          <div style="display:flex;gap:10px;margin-bottom:6px;flex-wrap:wrap">
+            <label><input type="radio" name="de-get-mode-${idx}" value="all" ${deal.getSelection.mode==='all'?'checked':''}> כל המוצרים</label>
+            <label><input type="radio" name="de-get-mode-${idx}" value="category" ${deal.getSelection.mode==='category'?'checked':''}> לפי קטגוריה</label>
+            <label><input type="radio" name="de-get-mode-${idx}" value="specific" ${deal.getSelection.mode==='specific'?'checked':''}> ספציפיים</label>
+          </div>
+          <div id="de-get-cat-${idx}" style="display:${deal.getSelection.mode==='category'?'flex':'none'}" class="cat-checks">${categories.map(c=>`<label><input type="checkbox" value="${c}" ${deal.getSelection.ids.includes(c)?'checked':''}> ${c}</label>`).join('')}</div>
+          <div id="de-get-prod-${idx}" style="display:${deal.getSelection.mode==='specific'?'block':'none'};max-height:150px;overflow-y:auto;border:2px solid #eee;border-radius:7px;padding:8px;background:#fff">${products.map(p=>`<label style="display:flex;align-items:center;gap:7px;padding:4px 0;border-bottom:1px solid #f5f5f5;font-size:.88em;cursor:pointer"><input type="checkbox" value="${p.id}" ${deal.getSelection.ids.includes(p.id)?'checked':''}><img src="${p.image}" style="width:28px;height:28px;object-fit:cover;border-radius:3px;border:1px solid #ddd">${p.name}</label>`).join('')}</div>
+        </div>
+        <div class="form-group"><label><input type="checkbox" id="de-mo-${idx}" ${deal.membersOnly?'checked':''}> לחברי מועדון בלבד 🔒</label></div>
+        <div class="form-group"><label>תאריך תפוגה</label><input type="date" id="de-exp-${idx}" value="${deal.expiry||''}"></div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn btn-success" onclick="saveDealEdit(${idx})" style="flex:1">💾 שמור</button>
+          <button class="btn btn-secondary" onclick="toggleDealEdit(${idx})" style="flex:1">ביטול</button>
+        </div>
       </div>`;
+      item.querySelectorAll(`input[name="de-buy-mode-${idx}"]`).forEach(r=>r.addEventListener('change',e=>{
+        $(`de-buy-cat-${idx}`).style.display=e.target.value==='category'?'flex':'none';
+        $(`de-buy-prod-${idx}`).style.display=e.target.value==='specific'?'block':'none';
+      }));
+      item.querySelectorAll(`input[name="de-get-mode-${idx}"]`).forEach(r=>r.addEventListener('change',e=>{
+        $(`de-get-cat-${idx}`).style.display=e.target.value==='category'?'flex':'none';
+        $(`de-get-prod-${idx}`).style.display=e.target.value==='specific'?'block':'none';
+      }));
       list.appendChild(item);
     });
   }catch(e){console.error(e);}
 }
+
+window.toggleDealEdit=function(idx){
+  const p=$(`deal-edit-${idx}`);
+  p.style.display=p.style.display==='block'?'none':'block';
+};
+
+window.saveDealEdit=async function(idx){
+  const name=$(`de-name-${idx}`).value.trim();
+  const buyQty=parseInt($(`de-buy-${idx}`).value)||2;
+  const getQty=parseInt($(`de-get-${idx}`).value)||1;
+  const membersOnly=$(`de-mo-${idx}`).checked;
+  const expiry=$(`de-exp-${idx}`).value||null;
+  if(!name)return alert('הזן שם');
+  const buyMode=document.querySelector(`input[name="de-buy-mode-${idx}"]:checked`).value;
+  const getMode=document.querySelector(`input[name="de-get-mode-${idx}"]:checked`).value;
+  const getBuyIds=()=>{
+    if(buyMode==='all')return[];
+    if(buyMode==='category')return Array.from($(`de-buy-cat-${idx}`).querySelectorAll('input:checked')).map(cb=>cb.value);
+    return Array.from($(`de-buy-prod-${idx}`).querySelectorAll('input:checked')).map(cb=>cb.value);
+  };
+  const getGetIds=()=>{
+    if(getMode==='all')return[];
+    if(getMode==='category')return Array.from($(`de-get-cat-${idx}`).querySelectorAll('input:checked')).map(cb=>cb.value);
+    return Array.from($(`de-get-prod-${idx}`).querySelectorAll('input:checked')).map(cb=>cb.value);
+  };
+  try{
+    const ref=db.collection('yr_settings').doc('main');
+    const d=await ref.get();const deals=d.data().Deals||[];
+    deals[idx]={...deals[idx],name,buyQty,getQty,membersOnly,expiry,buySelection:{mode:buyMode,ids:getBuyIds()},getSelection:{mode:getMode,ids:getGetIds()}};
+    await ref.update({Deals:deals});
+    alert('עודכן!');await loadDeals();
+  }catch(e){alert('שגיאה');console.error(e);}
+};
 
 window.deleteDeal=async function(idx){
   if(!confirm('למחוק מבצע זה?'))return;
