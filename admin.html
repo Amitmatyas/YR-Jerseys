@@ -394,6 +394,37 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f0f0;color:#333;direction:r
           <button class="btn btn-success" id="add-ann-btn">+ הוסף</button>
           <div id="ann-list" style="margin-top:13px"></div>
         </div>
+        <div class="settings-box"><h3>🎁 קנה X קבל Y</h3>
+  <div class="form-group"><label>שם המבצע</label><input type="text" id="deal-name" placeholder="לדוגמה: קנה 2 קבל 1"></div>
+  <div style="display:flex;gap:10px">
+    <div class="form-group" style="flex:1"><label>כמות לרכישה (X)</label><input type="number" id="deal-buy" min="1" value="2"></div>
+    <div class="form-group" style="flex:1"><label>כמות במתנה (Y)</label><input type="number" id="deal-get" min="1" value="1"></div>
+  </div>
+  <div class="form-group">
+    <label>מוצרים שצריך לקנות</label>
+    <div style="display:flex;gap:12px;margin-bottom:8px;flex-wrap:wrap">
+      <label><input type="radio" name="deal-buy-mode" value="all" checked> כל המוצרים</label>
+      <label><input type="radio" name="deal-buy-mode" value="category"> לפי קטגוריה</label>
+      <label><input type="radio" name="deal-buy-mode" value="specific"> מוצרים ספציפיים</label>
+    </div>
+    <div id="deal-buy-cat-picker" style="display:none" class="cat-checks"></div>
+    <div id="deal-buy-prod-picker" style="display:none;max-height:180px;overflow-y:auto;border:2px solid #eee;border-radius:7px;padding:8px;background:#fafafa"></div>
+  </div>
+  <div class="form-group">
+    <label>מוצרים שניתן לקבל במתנה</label>
+    <div style="display:flex;gap:12px;margin-bottom:8px;flex-wrap:wrap">
+      <label><input type="radio" name="deal-get-mode" value="all" checked> כל המוצרים</label>
+      <label><input type="radio" name="deal-get-mode" value="category"> לפי קטגוריה</label>
+      <label><input type="radio" name="deal-get-mode" value="specific"> מוצרים ספציפיים</label>
+    </div>
+    <div id="deal-get-cat-picker" style="display:none" class="cat-checks"></div>
+    <div id="deal-get-prod-picker" style="display:none;max-height:180px;overflow-y:auto;border:2px solid #eee;border-radius:7px;padding:8px;background:#fafafa"></div>
+  </div>
+  <div class="form-group"><label><input type="checkbox" id="deal-members-only"> לחברי מועדון בלבד 🔒</label></div>
+  <div class="form-group"><label>תאריך תפוגה (אופציונלי)</label><input type="date" id="deal-expiry"></div>
+  <button class="btn btn-success" id="add-deal-btn">+ הוסף מבצע</button>
+  <div id="deals-list" style="margin-top:14px"></div>
+</div>
         <div class="settings-box"><h3>הגדרות משלוח</h3>
           <div class="form-group"><label>שיטת חישוב</label><select id="ship-method"><option value="fixed">מחיר קבוע (₪)</option><option value="per_item">לכל מוצר (₪)</option><option value="percentage">אחוז מסך הכל (%)</option></select></div>
           <div class="form-group"><label>ערך</label><input type="number" id="ship-val" step="0.01" min="0"></div>
@@ -505,14 +536,14 @@ function addCFUI(fd=null,container){const fc=document.createElement('div');fc.cl
 function extractCFs(container){const out=[];container.querySelectorAll('.cf-container').forEach(fc=>{const name=fc.querySelector('.cf-name').value.trim(),type=fc.querySelector('.cf-type').value,required=fc.querySelector('.cf-required').checked,extraPrice=parseFloat(fc.querySelector('.cf-extra').value)||0;if(!name)return;const f={name,type,required,extraPrice};if(type==='select'){f.options=[];fc.querySelectorAll('.opt-item').forEach(oi=>{const v=oi.querySelector('.opt-val').value.trim();if(v)f.options.push({value:v,extraPrice:parseFloat(oi.querySelector('.opt-price').value)||0,image:oi.querySelector('.opt-img-url').value||null});});}out.push(f);});return out;}
 
 // LOGIN
-async function doLogin(username, displayName){$('login-overlay').style.display='none';$('admin-layout').classList.add('active');$('sw-name').textContent=`היי ${displayName||username}`;$('sw-sub').textContent='ברוך הבא לפאנל הניהול של YR JERSEYS';$('login-error').style.display='none';try{await initSettings();await Promise.all([loadAllProducts(),loadCategories()]);await Promise.all([fetchOrders(),fetchLeads(),fetchCustomers(),loadShipping(),loadCoupons(),loadAnnouncements()]);setupUpload('pimg-file','pimg-preview','pimg-status','pimg-url','pimg-zone');}catch(e){console.error(e);alert('שגיאה: '+e.message);}}
+async function doLogin(username, displayName){$('login-overlay').style.display='none';$('admin-layout').classList.add('active');$('sw-name').textContent=`היי ${displayName||username}`;$('sw-sub').textContent='ברוך הבא לפאנל הניהול של YR JERSEYS';$('login-error').style.display='none';try{await initSettings();await Promise.all([loadAllProducts(),loadCategories()]);await Promise.all([fetchOrders(),fetchLeads(),fetchCustomers(),loadShipping(),loadCoupons(),loadAnnouncements()]);setupUpload('pimg-file','pimg-preview','pimg-status','pimg-url','pimg-zone');await loadDeals();}catch(e){console.error(e);alert('שגיאה: '+e.message);}}
 window.addEventListener('DOMContentLoaded',async()=>{const logged=localStorage.getItem('vip_admin_logged'),user=localStorage.getItem('vip_admin_user');if(logged==='true'&&user){try{const d=await db.collection('users').doc(user).get();if(d.exists)doLogin(user,d.data().hebrewName);else{localStorage.removeItem('vip_admin_logged');localStorage.removeItem('vip_admin_user');}}catch(e){console.error(e);}}});
 $('login-button').addEventListener('click',async()=>{const u=$('login-username').value.trim(),p=$('login-password').value;if(!u||!p)return;try{const d=await db.collection('users').doc(u).get();if(!d.exists)throw new Error('user-not-found');if(d.data().password!==p)throw new Error('wrong-password');if(confirm('להישאר מחובר?')){localStorage.setItem('vip_admin_logged','true');localStorage.setItem('vip_admin_user',u);}doLogin(u,d.data().hebrewName);}catch(e){const msg=e.message==='user-not-found'?'משתמש לא קיים':e.message==='wrong-password'?'סיסמה שגויה':'שגיאה בהתחברות';$('login-error').textContent=msg;$('login-error').style.display='block';}});
 ['login-username','login-password'].forEach(id=>$(id).addEventListener('keypress',e=>{if(e.key==='Enter')$('login-button').click();}));
 $('logout-button').addEventListener('click',()=>{if(confirm('להתנתק?')){localStorage.removeItem('vip_admin_logged');localStorage.removeItem('vip_admin_user');location.reload();}});
 
 // NAVIGATION
-document.querySelectorAll('.menu-item').forEach(item=>{item.addEventListener('click',()=>{document.querySelectorAll('.menu-item').forEach(m=>m.classList.remove('active'));document.querySelectorAll('.content-section').forEach(s=>s.classList.remove('active'));item.classList.add('active');$(`${item.dataset.section}-section`).classList.add('active');if(item.dataset.section==='bulk-edit'){updateBulkCatChecks();renderBulkGrid($('bulk-search').value);}});});
+document.querySelectorAll('.menu-item').forEach(item=>{item.addEventListener('click',()=>{document.querySelectorAll('.menu-item').forEach(m=>m.classList.remove('active'));document.querySelectorAll('.content-section').forEach(s=>s.classList.remove('active'));item.classList.add('active');$(`${item.dataset.section}-section`).classList.add('active');if(item.dataset.section==='bulk-edit'){updateBulkCatChecks();renderBulkGrid($('bulk-search').value);}if(item.dataset.section==='settings'){renderDealPicker('buy');renderDealPicker('get');loadDeals();}});});
 
 async function initSettings(){try{const d=await db.collection('yr_settings').doc('main').get();if(!d.exists)await db.collection('yr_settings').doc('main').set({Shipping:{Method:'fixed',Value:30,FreeThreshold:0},Coupons:[],Categories:[],SubCategories:{},Announcements:[]});}catch(e){console.error(e);}}
 
@@ -676,7 +707,110 @@ $('add-ann-btn').addEventListener('click',async()=>{const t=$('ann-text').value.
 
 // SETTINGS - SHIPPING
 async function loadShipping(){try{const d=await db.collection('yr_settings').doc('main').get();if(d.exists&&d.data().Shipping){const s=d.data().Shipping;$('ship-method').value=s.Method||'fixed';$('ship-val').value=s.Value||0;$('ship-free').value=s.FreeThreshold||'';}}catch(e){console.error(e);}}
-$('save-ship-btn').addEventListener('click',async()=>{try{await db.collection('yr_settings').doc('main').update({Shipping:{Method:$('ship-method').value,Value:parseFloat($('ship-val').value)||0,FreeThreshold:parseFloat($('ship-free').value)||0}});alert('הגדרות המשלוח נשמרו!');}catch(e){alert('שגיאה');}});
+// ===== DEALS ADMIN =====
+function renderDealPicker(type){
+  const mode=document.querySelector(`input[name="deal-${type}-mode"]:checked`).value;
+  const catPicker=$(`deal-${type}-cat-picker`);
+  const prodPicker=$(`deal-${type}-prod-picker`);
+  if(mode==='all'){catPicker.style.display='none';prodPicker.style.display='none';return;}
+  if(mode==='category'){
+    catPicker.style.display='flex';prodPicker.style.display='none';
+    catPicker.innerHTML='';
+    categories.forEach(cat=>{
+      const lbl=document.createElement('label');const cb=document.createElement('input');
+      cb.type='checkbox';cb.value=cat;
+      lbl.appendChild(cb);lbl.appendChild(document.createTextNode(' '+cat));
+      catPicker.appendChild(lbl);
+    });
+  } else {
+    catPicker.style.display='none';prodPicker.style.display='block';
+    prodPicker.innerHTML='';
+    products.forEach(p=>{
+      const lbl=document.createElement('label');
+      lbl.style.cssText='display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #f0f0f0;cursor:pointer;font-size:.9em';
+      const cb=document.createElement('input');cb.type='checkbox';cb.value=p.id;
+      const img=document.createElement('img');img.src=p.image;img.style.cssText='width:34px;height:34px;object-fit:cover;border-radius:4px;border:1px solid #ddd;flex-shrink:0';
+      lbl.appendChild(cb);lbl.appendChild(img);lbl.appendChild(document.createTextNode(p.name));
+      prodPicker.appendChild(lbl);
+    });
+  }
+}
+
+document.querySelectorAll('input[name="deal-buy-mode"]').forEach(r=>r.addEventListener('change',()=>renderDealPicker('buy')));
+document.querySelectorAll('input[name="deal-get-mode"]').forEach(r=>r.addEventListener('change',()=>renderDealPicker('get')));
+
+function getDealSelection(type){
+  const mode=document.querySelector(`input[name="deal-${type}-mode"]:checked`).value;
+  if(mode==='all')return{mode:'all',ids:[]};
+  if(mode==='category'){
+    const ids=Array.from($(`deal-${type}-cat-picker`).querySelectorAll('input:checked')).map(cb=>cb.value);
+    return{mode:'category',ids};
+  }
+  const ids=Array.from($(`deal-${type}-prod-picker`).querySelectorAll('input:checked')).map(cb=>cb.value);
+  return{mode:'specific',ids};
+}
+
+async function loadDeals(){
+  try{
+    const d=await db.collection('yr_settings').doc('main').get();
+    const deals=(d.data()&&d.data().Deals)||[];
+    const list=$('deals-list');list.innerHTML='';
+    if(!deals.length){list.innerHTML='<p style="color:#888">אין מבצעים פעילים.</p>';return;}
+    deals.forEach((deal,idx)=>{
+      const mo=deal.membersOnly?' | 🔒 מועדון בלבד':'';
+      const exp=deal.expiry?` | עד: ${deal.expiry}`:'';
+      const buyDesc=deal.buySelection.mode==='all'?'כל המוצרים':deal.buySelection.mode==='category'?`קטגוריות: ${deal.buySelection.ids.join(', ')}`:`${deal.buySelection.ids.length} מוצרים`;
+      const getDesc=deal.getSelection.mode==='all'?'כל המוצרים':deal.getSelection.mode==='category'?`קטגוריות: ${deal.getSelection.ids.join(', ')}`:`${deal.getSelection.ids.length} מוצרים`;
+      const item=document.createElement('div');item.className='list-item';item.style.cssText='flex-direction:column;align-items:stretch;';
+      item.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+        <div>
+          <strong>${deal.name}</strong> — קנה ${deal.buyQty} קבל ${deal.getQty}${mo}${exp}<br>
+          <span style="font-size:.82em;color:#666">לרכישה: ${buyDesc}</span><br>
+          <span style="font-size:.82em;color:#666">מתנה: ${getDesc}</span>
+        </div>
+        <div class="list-item-actions">
+          <button class="btn btn-danger" onclick="deleteDeal(${idx})">🗑 מחק</button>
+        </div>
+      </div>`;
+      list.appendChild(item);
+    });
+  }catch(e){console.error(e);}
+}
+
+window.deleteDeal=async function(idx){
+  if(!confirm('למחוק מבצע זה?'))return;
+  const ref=db.collection('yr_settings').doc('main');
+  const d=await ref.get();const deals=d.data().Deals||[];
+  deals.splice(idx,1);
+  await ref.update({Deals:deals});
+  alert('נמחק!');await loadDeals();
+};
+
+$('add-deal-btn').addEventListener('click',async()=>{
+  const name=$('deal-name').value.trim();
+  const buyQty=parseInt($('deal-buy').value)||2;
+  const getQty=parseInt($('deal-get').value)||1;
+  const membersOnly=$('deal-members-only').checked;
+  const expiry=$('deal-expiry').value||null;
+  if(!name)return alert('הזן שם למבצע');
+  const buySelection=getDealSelection('buy');
+  const getSelection=getDealSelection('get');
+  const deal={name,buyQty,getQty,buySelection,getSelection,membersOnly,expiry,active:true};
+  try{
+    const ref=db.collection('yr_settings').doc('main');
+    const d=await ref.get();
+    const deals=(d.data()&&d.data().Deals)||[];
+    deals.push(deal);
+    await ref.update({Deals:deals});
+    alert('מבצע נוסף!');
+    $('deal-name').value='';$('deal-expiry').value='';$('deal-members-only').checked=false;
+    document.querySelector('input[name="deal-buy-mode"][value="all"]').checked=true;
+    document.querySelector('input[name="deal-get-mode"][value="all"]').checked=true;
+    renderDealPicker('buy');renderDealPicker('get');
+    await loadDeals();
+  }catch(e){alert('שגיאה');console.error(e);}
+});
+  $('save-ship-btn').addEventListener('click',async()=>{try{await db.collection('yr_settings').doc('main').update({Shipping:{Method:$('ship-method').value,Value:parseFloat($('ship-val').value)||0,FreeThreshold:parseFloat($('ship-free').value)||0}});alert('הגדרות המשלוח נשמרו!');}catch(e){alert('שגיאה');}});
 </script>
 </body>
 </html>
