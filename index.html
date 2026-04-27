@@ -913,6 +913,8 @@ let currentSubCategoryFilter = null;
         }
 
         // ===== ANNOUNCEMENTS =====
+let announcementsInterval = null;
+
 async function loadAnnouncements() {
     try {
         const doc = await db.collection('yr_settings').doc('main').get();
@@ -921,19 +923,30 @@ async function loadAnnouncements() {
             const data = doc.data();
             announcements = data.Announcements || [];
             if (data.Shipping && data.Shipping.FreeThreshold > 0) announcements.push(`משלוח חינם על קניות מעל ${data.Shipping.FreeThreshold}₪!`);
-            if (currentClubMember && data.MemberAnnouncements && data.MemberAnnouncements.length) {
-                data.MemberAnnouncements.forEach(m => announcements.push('⭐ ' + m));
-            }
-            if (announcements.length > 0 && bar) {
-                bar.textContent = announcements[0];
-                currentAnnouncementIndex = 1;
-                setInterval(() => {
-                    bar.textContent = announcements[currentAnnouncementIndex % announcements.length];
-                    currentAnnouncementIndex++;
-                }, 5000);
-            }
+            startAnnouncementsBar();
         }
     } catch(e) { console.error('Announcements:', e); }
+}
+
+function addMemberAnnouncements(memberAnnouncements) {
+    if (!memberAnnouncements || !memberAnnouncements.length) return;
+    memberAnnouncements.forEach(m => {
+        if (!announcements.includes('⭐ ' + m)) announcements.push('⭐ ' + m);
+    });
+    startAnnouncementsBar();
+}
+
+function startAnnouncementsBar() {
+    const bar = document.getElementById('announcement-bar');
+    if (!bar || !announcements.length) return;
+    if (announcementsInterval) { clearInterval(announcementsInterval); announcementsInterval = null; }
+    currentAnnouncementIndex = 0;
+    bar.textContent = announcements[0];
+    currentAnnouncementIndex = 1;
+    announcementsInterval = setInterval(() => {
+        bar.textContent = announcements[currentAnnouncementIndex % announcements.length];
+        currentAnnouncementIndex++;
+    }, 5000);
 }
 
         // ===== SETTINGS =====
@@ -941,8 +954,8 @@ async function loadSettings() {
     try {
         const doc = await db.collection('yr_settings').doc('main').get();
         if (doc.exists) { settings = doc.data(); categories = settings.Categories || []; subCategories = settings.SubCategories || {}; activeDeals = settings.Deals || []; updateCategoryFilter(); }
-        else { settings = { Shipping: { Method: 'fixed', Value: 30, FreeThreshold: 0 }, Coupons: [], Categories: [] }; activeDeals = []; }
-    } catch(e) { settings = { Shipping: { Method: 'fixed', Value: 30, FreeThreshold: 0 }, Coupons: [], Categories: [] }; activeDeals = []; }
+        else { settings = { Shipping: { Method: 'fixed', Value: 30, FreeThreshold: 0 }, Coupons: [], Categories: [], MemberAnnouncements: [] }; activeDeals = []; }
+    } catch(e) { settings = { Shipping: { Method: 'fixed', Value: 30, FreeThreshold: 0 }, Coupons: [], Categories: [], MemberAnnouncements: [] }; activeDeals = []; }
 }
 
         // ===== PRODUCTS =====
@@ -1588,7 +1601,7 @@ function updateCheckoutForm() {
 currentClubMember = { id: snap.docs[0].id, ...snap.docs[0].data() };
                 saveClubMember(); updateClubButton(); updateClubModal(); showClubMessage('התחברת בהצלחה!');
                 document.getElementById('club-login-form').reset();
-                loadAnnouncements();
+                if (settings && settings.MemberAnnouncements) addMemberAnnouncements(settings.MemberAnnouncements);
             } catch(e) { showClubMessage('שגיאה בהתחברות','error'); }
         });
 
@@ -1934,7 +1947,7 @@ document.getElementById('deal-gift-modal').addEventListener('click',e=>{
         // ===== INIT =====
 document.addEventListener('DOMContentLoaded', async () => {
             productsContainer.innerHTML = `<div style="text-align:center;padding:80px 20px;width:100%;"><div style="font-size:3em;font-weight:900;margin-bottom:15px;">⏳</div><p style="font-size:1.1em;font-weight:900;text-transform:uppercase;">טוען מוצרים...</p></div>`;
-            try {
+try {
                 await loadSettings();
                 loadCartFromStorage();
                 const pendingId = localStorage.getItem('yr_pending_order_id');
@@ -1945,6 +1958,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     openCart();
                 }
                 await Promise.all([loadAnnouncements(), fetchProducts(), loadClubMember()]);
+                if (currentClubMember && settings && settings.MemberAnnouncements) {
+                    addMemberAnnouncements(settings.MemberAnnouncements);
+                }
                 validateCoupon();
                 validateDealsInCart();
                 updateCartDisplay();
