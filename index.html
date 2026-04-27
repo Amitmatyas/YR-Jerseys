@@ -913,25 +913,28 @@ let currentSubCategoryFilter = null;
         }
 
         // ===== ANNOUNCEMENTS =====
-        async function loadAnnouncements() {
-            try {
-                const doc = await db.collection('yr_settings').doc('main').get();
-                const bar = document.getElementById('announcement-bar');
-                if (doc.exists) {
-                    const data = doc.data();
-                    announcements = data.Announcements || [];
-                    if (data.Shipping && data.Shipping.FreeThreshold > 0) announcements.push(`משלוח חינם על קניות מעל ${data.Shipping.FreeThreshold}₪!`);
-                    if (announcements.length > 0 && bar) {
-                        bar.textContent = announcements[0];
-                        currentAnnouncementIndex = 1;
-                        setInterval(() => {
-                            bar.textContent = announcements[currentAnnouncementIndex % announcements.length];
-                            currentAnnouncementIndex++;
-                        }, 5000);
-                    }
-                }
-            } catch(e) { console.error('Announcements:', e); }
+async function loadAnnouncements() {
+    try {
+        const doc = await db.collection('yr_settings').doc('main').get();
+        const bar = document.getElementById('announcement-bar');
+        if (doc.exists) {
+            const data = doc.data();
+            announcements = data.Announcements || [];
+            if (data.Shipping && data.Shipping.FreeThreshold > 0) announcements.push(`משלוח חינם על קניות מעל ${data.Shipping.FreeThreshold}₪!`);
+            if (currentClubMember && data.MemberAnnouncements && data.MemberAnnouncements.length) {
+                data.MemberAnnouncements.forEach(m => announcements.push('⭐ ' + m));
+            }
+            if (announcements.length > 0 && bar) {
+                bar.textContent = announcements[0];
+                currentAnnouncementIndex = 1;
+                setInterval(() => {
+                    bar.textContent = announcements[currentAnnouncementIndex % announcements.length];
+                    currentAnnouncementIndex++;
+                }, 5000);
+            }
         }
+    } catch(e) { console.error('Announcements:', e); }
+}
 
         // ===== SETTINGS =====
 async function loadSettings() {
@@ -1288,9 +1291,11 @@ applyCouponBtn.addEventListener('click', async () => {
             try {
                 const pointsEarned = Math.floor(total * 0.01);
                 const orderData = buildOrderData(name, email, phone, address, pointsEarned, 'bit_pending');
-                const orderRef = await db.collection('yr_orders').add(orderData);
-                pendingOrderId = orderRef.id;
-                localStorage.setItem('yr_pending_order_id', pendingOrderId);
+const shortId = Math.floor(10000 + Math.random() * 90000).toString();
+const orderData2 = { ...orderData, orderId: shortId };
+await db.collection('yr_orders').doc(shortId).set(orderData2);
+pendingOrderId = shortId;
+localStorage.setItem('yr_pending_order_id', pendingOrderId);
 
                 // Show confirm button
                 document.getElementById('confirm-payment-btn').style.display = 'block';
@@ -1580,9 +1585,10 @@ function updateCheckoutForm() {
             try {
                 const snap = await db.collection('yr_ClubMembers').where('email','==',email).where('password','==',password).limit(1).get();
                 if (snap.empty) { showClubMessage('אימייל או סיסמה שגויים','error'); return; }
-                currentClubMember = { id: snap.docs[0].id, ...snap.docs[0].data() };
+currentClubMember = { id: snap.docs[0].id, ...snap.docs[0].data() };
                 saveClubMember(); updateClubButton(); updateClubModal(); showClubMessage('התחברת בהצלחה!');
                 document.getElementById('club-login-form').reset();
+                loadAnnouncements();
             } catch(e) { showClubMessage('שגיאה בהתחברות','error'); }
         });
 
