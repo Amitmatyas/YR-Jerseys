@@ -498,7 +498,6 @@
     background: transparent;
 }
 
-/* הכרטיס המרחף */
 .news-floating-card {
     position: relative;
     width: 92%;
@@ -510,6 +509,7 @@
     background: #000;
     box-shadow: 0 15px 35px rgba(0,0,0,0.4);
     border: 1px solid rgba(255,255,255,0.1);
+    direction: ltr;
 }
 
 .news-track {
@@ -2092,8 +2092,8 @@ function updateSlideView() {
     if (!track) return;
 
     // translateX לפי index — חלק ומדויק
-track.style.transform = `translateX(${newsCurrentIndex * -100}%)`;
-
+track.style.transform = "translateX(" + (newsCurrentIndex * -100) + "%)";
+    
     // עדכון dots
     document.querySelectorAll('.news-dot').forEach((dot, i) => {
         dot.style.background = i === newsCurrentIndex ? '#fff' : 'rgba(255,255,255,0.3)';
