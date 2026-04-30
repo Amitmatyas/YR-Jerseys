@@ -2004,36 +2004,36 @@ document.getElementById('deal-gift-modal').addEventListener('click',e=>{
             } catch(e) { console.error(e); alert('שגיאה בשמירת ההזמנה'); }
         }
 
-// ===== NEWS =====
-        let newsCurrentIndex = 0;
-        let newsItems = [];
+// 1. הגדרת המשתנים (חייבים להיות גלובליים)
+let newsCurrentIndex = 0;
+let newsItems = [];
 
-        async function loadNews() {
-            try {
-                const snap = await db.collection('yr_news').where('active', '==', true).get();
-                if (snap.empty) return;
-                newsItems = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                if (!newsItems.length) return;
+// 2. פונקציית הטעינה
+async function loadNews() {
+    try {
+        const snap = await db.collection('yr_news').where('active', '==', true).get();
+        if (snap.empty) return;
+        newsItems = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        if (!newsItems.length) return;
 
-                const section = document.getElementById('news-section');
-                section.style.display = 'block';
-                newsCurrentIndex = 0;
-                renderNewsSlide(0);
-            } catch(e) { console.error('News:', e); }
-        }
+        const section = document.getElementById('news-section');
+        section.style.display = 'block';
+        newsCurrentIndex = 0;
+        renderNewsSlide(0);
+    } catch(e) { console.error('News Error:', e); }
+}
 
+// 3. פונקציית הרינדור (העיצוב המרחף שסיכמנו)
 function renderNewsSlide(index) {
     const section = document.getElementById('news-section');
+    if (!section || !newsItems[index]) return;
+
     const item = newsItems[index];
     const total = newsItems.length;
 
-    let mediaHTML = '';
-    if (item.mediaType === 'video') {
-        mediaHTML = `<video id="news-video" src="${item.mediaUrl}" autoplay muted playsinline 
-                    class="news-media-element" onended="newsAutoNext()"></video>`;
-    } else {
-        mediaHTML = `<img src="${item.mediaUrl}" alt="${item.title}" class="news-media-element">`;
-    }
+    let mediaHTML = item.mediaType === 'video' 
+        ? `<video id="news-video" src="${item.mediaUrl}" autoplay muted playsinline preload="auto" class="news-media-element" onended="newsAutoNext()"></video>`
+        : `<img src="${item.mediaUrl}" alt="${item.title}" class="news-media-element">`;
 
     const arrowsHTML = total > 1 ? `
         <button onclick="newsGo(-1)" style="position:absolute;top:50%;right:20px;transform:translateY(-50%);background:rgba(0,0,0,0.6);color:#fff;border:2px solid #fff;width:40px;height:40px;font-size:1.4em;font-weight:900;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center;">‹</button>
@@ -2045,44 +2045,40 @@ function renderNewsSlide(index) {
     section.innerHTML = `
         <div class="news-floating-card">
             ${mediaHTML}
-            
-            <!-- Shadow Overlay -->
             <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 50%);z-index:1;pointer-events:none;"></div>
-            
             ${arrowsHTML}
-
-            <!-- Content -->
             <div style="position:absolute;bottom:0;right:0;left:0;z-index:5;padding:25px;display:flex;justify-content:space-between;align-items:flex-end;gap:15px;">
-                
-                <span style="font-weight:900;font-size:clamp(1.1em,3vw,1.7em);color:#fff;text-transform:uppercase;line-height:1.2;text-shadow:2px 2px 8px rgba(0,0,0,0.8);flex:1;">
-                    ${item.title}
-                </span>
-
-                <!-- הכפתור המקורי: מרובע עם צל שחור עבה -->
+                <span style="font-weight:900;font-size:clamp(1.1em,3vw,1.7em);color:#fff;text-transform:uppercase;line-height:1.2;text-shadow:2px 2px 8px rgba(0,0,0,0.8);flex:1;">${item.title}</span>
                 ${item.linkedProductName ? `
                 <button onclick="openProductByName('${encodeURIComponent(item.linkedProductName)}')" 
-                    style="background:#ff3e3e; color:#fff; border:4px solid #000; padding:12px 20px; font-weight:900; font-size:0.9em; text-transform:uppercase; cursor:pointer; white-space:nowrap; flex-shrink:0; box-shadow:5px 5px 0 #000; transition:all .1s;"
-                    onmousedown="this.style.transform='translate(2px, 2px)'; this.style.boxShadow='2px 2px 0 #000';" 
-                    onmouseup="this.style.transform='translate(0, 0)'; this.style.boxShadow='5px 5px 0 #000';"
-                    onmouseenter="this.style.background='#000'" 
-                    onmouseleave="this.style.background='#ff3e3e'">
+                    style="background:#ff3e3e; color:#fff; border:4px solid #000; padding:12px 20px; font-weight:900; font-size:0.9em; text-transform:uppercase; cursor:pointer; white-space:nowrap; flex-shrink:0; box-shadow:5px 5px 0 #000;">
                     עבור לחולצה ›
                 </button>` : ''}
             </div>
-
-            <!-- Index Tag -->
-            ${total > 1 ? `<div style="position:absolute;top:15px;left:15px;background:rgba(0,0,0,0.7);color:#fff;padding:5px 12px;font-size:.8em;font-weight:700;z-index:10;border:2px solid #fff;">${index+1} / ${total}</div>` : ''}
         </div>`;
+
+    // וידוא שהוידאו מנגן
+    if (item.mediaType === 'video') {
+        const v = document.getElementById('news-video');
+        if (v) v.play().catch(() => {});
+    }
 }
 
-        function newsGoTo(index) {
-            newsCurrentIndex = index;
-            renderNewsSlide(index);
-        }
+// 4. הפונקציות שהיו חסרות לך (חייבות להיות כאן!)
+function newsGo(dir) {
+    if (!newsItems.length) return;
+    newsCurrentIndex = (newsCurrentIndex + dir + newsItems.length) % newsItems.length;
+    renderNewsSlide(newsCurrentIndex);
+}
 
-        function newsAutoNext() {
-            if (newsItems.length > 1) newsGo(1);
-        }
+function newsGoTo(index) {
+    newsCurrentIndex = index;
+    renderNewsSlide(index);
+}
+
+function newsAutoNext() {
+    newsGo(1);
+}
 
         function openProductByName(encodedName) {
             const name = decodeURIComponent(encodedName);
