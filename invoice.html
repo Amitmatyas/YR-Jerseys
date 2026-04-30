@@ -431,12 +431,13 @@
             html += '<span class="status-badge status-pending">⏳ בטיפול</span>';
         }
 
-        // Payment method
-        if (o.paymentType === 'bit') {
-            html += '<span class="payment-badge">💳 תשלום בביט</span>';
-        } else if (o.paymentType === 'paypal') {
-            html += '<span class="payment-badge">🅿️ PayPal</span>';
-        }
+if (o.paymentMethodLabel) {
+    html += `<span class="payment-badge">💳 ${o.paymentMethodLabel}</span>`;
+} else if (o.paymentType === 'bit') {
+    html += '<span class="payment-badge">💳 תשלום בביט</span>';
+} else if (o.paymentType === 'paypal') {
+    html += '<span class="payment-badge">🅿️ PayPal</span>';
+}
 
         section.innerHTML = html;
     }
