@@ -2053,6 +2053,14 @@ function addDealFreebie(product,deal,qty){
   }
 }
 
+        function closeGiftModal() {
+  document.getElementById('deal-gift-modal').style.display = 'none';
+  pendingGiftDeal = null;
+  selectedGiftProductId = null;
+  document.getElementById('deal-gift-products').innerHTML = '';
+  document.getElementById('deal-gift-confirm').style.display = 'none';
+}
+        
 function openGiftModal(deal,qty,giftProducts){
   pendingGiftDeal={deal,qty};
   selectedGiftProductId=null;
