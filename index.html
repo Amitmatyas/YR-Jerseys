@@ -597,11 +597,7 @@
     </div>
 
 <!-- NEWS SECTION -->
-    <div id="news-section" style="display:none; max-width:1400px; margin:24px auto 0; padding:0 16px;">
-        <div style="overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:10px;">
-            <div id="news-track" style="display:flex; gap:18px; width:max-content;"></div>
-        </div>
-    </div>
+    <div id="news-section" style="display:none; width:100%; margin:0;"></div>
 
     <!-- Filters -->
     <div id="filters">
@@ -1976,38 +1972,72 @@ document.getElementById('deal-gift-modal').addEventListener('click',e=>{
             } catch(e) { console.error(e); alert('שגיאה בשמירת ההזמנה'); }
         }
 
-        // ===== NEWS =====
+// ===== NEWS =====
+        let newsCurrentIndex = 0;
+        let newsItems = [];
+
         async function loadNews() {
             try {
                 const snap = await db.collection('yr_news').where('active', '==', true).get();
                 if (snap.empty) return;
-                const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                newsItems = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                if (!newsItems.length) return;
+
                 const section = document.getElementById('news-section');
-                const track = document.getElementById('news-track');
-                track.innerHTML = '';
-                items.forEach(item => {
-                    const card = document.createElement('div');
-                    card.style.cssText = 'background:#fff;border:4px solid #000;box-shadow:6px 6px 0 #000;width:280px;flex-shrink:0;display:flex;flex-direction:column;cursor:pointer;transition:all .2s;';
-                    card.onmouseenter = () => { card.style.transform = 'translate(-3px,-3px)'; card.style.boxShadow = '9px 9px 0 #000'; };
-                    card.onmouseleave = () => { card.style.transform = ''; card.style.boxShadow = '6px 6px 0 #000'; };
-                    let mediaHTML = '';
-                    if (item.mediaType === 'video') {
-                        mediaHTML = `<video src="${item.mediaUrl}" autoplay muted loop playsinline style="width:100%;height:175px;object-fit:cover;border-bottom:4px solid #000;display:block;"></video>`;
-                    } else {
-                        mediaHTML = `<img src="${item.mediaUrl}" alt="${item.title}" style="width:100%;height:175px;object-fit:cover;border-bottom:4px solid #000;display:block;">`;
-                    }
-                    card.innerHTML = `${mediaHTML}
-                    <div style="padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:8px;">
-                        <span style="font-weight:900;font-size:.95em;text-transform:uppercase;line-height:1.2;flex:1;">${item.title}</span>
-                        ${item.linkedProductName ? `<button onclick="event.stopPropagation();openProductByName('${encodeURIComponent(item.linkedProductName)}')" style="background:#000;color:#fff;border:none;padding:7px 12px;font-weight:900;font-size:.78em;text-transform:uppercase;cursor:pointer;white-space:nowrap;flex-shrink:0;touch-action:manipulation;">עבור לחולצה</button>` : ''}
-                    </div>`;
-                    if (item.linkedProductName) {
-                        card.addEventListener('click', () => openProductByName(encodeURIComponent(item.linkedProductName)));
-                    }
-                    track.appendChild(card);
-                });
                 section.style.display = 'block';
+                newsCurrentIndex = 0;
+                renderNewsSlide(0);
             } catch(e) { console.error('News:', e); }
+        }
+
+        function renderNewsSlide(index) {
+            const section = document.getElementById('news-section');
+            const item = newsItems[index];
+            const total = newsItems.length;
+
+            let mediaHTML = '';
+            if (item.mediaType === 'video') {
+                mediaHTML = `<video id="news-video" src="${item.mediaUrl}" autoplay muted playsinline
+                    style="width:100%;height:100%;object-fit:cover;display:block;position:absolute;top:0;left:0;"
+                    onended="newsAutoNext()"></video>`;
+            } else {
+                mediaHTML = `<img src="${item.mediaUrl}" alt="${item.title}"
+                    style="width:100%;height:100%;object-fit:cover;display:block;position:absolute;top:0;left:0;">`;
+            }
+
+            const arrowsHTML = total > 1 ? `
+                <button onclick="newsGo(-1)" style="position:absolute;top:50%;right:16px;transform:translateY(-50%);background:rgba(0,0,0,0.6);color:#fff;border:3px solid #fff;width:44px;height:44px;font-size:1.4em;font-weight:900;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center;touch-action:manipulation;">‹</button>
+                <button onclick="newsGo(1)" style="position:absolute;top:50%;left:16px;transform:translateY(-50%);background:rgba(0,0,0,0.6);color:#fff;border:3px solid #fff;width:44px;height:44px;font-size:1.4em;font-weight:900;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center;touch-action:manipulation;">›</button>
+                <div style="position:absolute;bottom:64px;left:50%;transform:translateX(-50%);display:flex;gap:7px;z-index:10;">
+                    ${newsItems.map((_,i) => `<div style="width:9px;height:9px;border-radius:50%;background:${i===index?'#fff':'rgba(255,255,255,0.4)'};border:2px solid #fff;cursor:pointer;transition:background .2s;" onclick="newsGoTo(${i})"></div>`).join('')}
+                </div>` : '';
+
+            section.innerHTML = `
+                <div style="position:relative;width:100%;height:100vh;overflow:hidden;background:#000;">
+                    ${mediaHTML}
+                    <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.72) 0%,rgba(0,0,0,0.1) 50%,transparent 100%);z-index:1;pointer-events:none;"></div>
+                    ${arrowsHTML}
+                    <div style="position:absolute;bottom:0;right:0;left:0;z-index:5;padding:24px 24px 28px;display:flex;justify-content:space-between;align-items:flex-end;gap:12px;">
+                        <span style="font-weight:900;font-size:clamp(1.1em,3vw,1.7em);color:#fff;text-transform:uppercase;line-height:1.2;text-shadow:2px 2px 8px rgba(0,0,0,0.7);flex:1;">${item.title}</span>
+                        ${item.linkedProductName ? `<button onclick="openProductByName('${encodeURIComponent(item.linkedProductName)}')" style="background:#ff3e3e;color:#fff;border:4px solid #000;padding:11px 18px;font-weight:900;font-size:.9em;text-transform:uppercase;cursor:pointer;white-space:nowrap;flex-shrink:0;box-shadow:4px 4px 0 #000;touch-action:manipulation;transition:all .2s;" onmouseenter="this.style.background='#000'" onmouseleave="this.style.background='#ff3e3e'">עבור לחולצה ›</button>` : ''}
+                    </div>
+                    ${total > 1 ? `<div style="position:absolute;top:16px;left:16px;background:rgba(0,0,0,0.55);color:#fff;padding:5px 12px;font-size:.82em;font-weight:700;z-index:10;border:2px solid rgba(255,255,255,0.3);">${index+1} / ${total}</div>` : ''}
+                </div>`;
+        }
+
+        function newsGo(dir) {
+            const total = newsItems.length;
+            newsCurrentIndex = (newsCurrentIndex + dir + total) % total;
+            renderNewsSlide(newsCurrentIndex);
+        }
+
+        function newsGoTo(index) {
+            newsCurrentIndex = index;
+            renderNewsSlide(index);
+        }
+
+        function newsAutoNext() {
+            if (newsItems.length > 1) newsGo(1);
         }
 
         function openProductByName(encodedName) {
