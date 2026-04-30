@@ -492,32 +492,35 @@
             #cart-toggle-button .cart-text { display: none; }
         }
 
-        /* Container for the news section to ensure aspect ratio */
-.news-container-outer {
+/* הקונטיינר החיצוני שנותן מרווח מהצדדים */
+#news-section {
+    padding: 20px 0; /* רווח קטן למעלה ולמטה */
+    background: transparent;
+}
+
+/* הכרטיס המרחף עצמו */
+.news-floating-card {
     position: relative;
-    width: 100%;
-    /* This makes it fill the width but maintain a slim height */
-    aspect-ratio: 21 / 9; /* Choose a slim aspect ratio, like 21:9 for a cinematic feel, or 2:1 */
+    width: 92%; /* לא נוגע בקצוות המסך */
+    max-width: 1000px; /* מגביל את הרוחב כדי שלא יהיה ענק במסכים גדולים */
+    margin: 0 auto; /* מרכוז */
+    aspect-ratio: 16 / 9;
+    border-radius: 24px; /* פינות מעוגלות כמו בתמונה */
     overflow: hidden;
     background: #000;
     
-    /* THE KEY SEPARATION ELEMENTS: */
-    /* Adds a solid white border just at the bottom to define the edge */
-    border-bottom: 5px solid #ffffff; 
+    /* הצל המרחף */
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
     
-    /* Adds a shadow below the border that casts onto the product area */
-    box-shadow: 0 12px 25px rgba(0,0,0,0.5); 
+    /* מסגרת עדינה כדי שייראה יוקרתי */
+    border: 1px solid rgba(255,255,255,0.1);
 }
 
-/* Ensure the video or image fills this new slim container */
 .news-media-element {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Cropping happens automatically here, centering the video */
+    object-fit: cover;
     display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
 }
         
     </style>
@@ -2019,49 +2022,58 @@ document.getElementById('deal-gift-modal').addEventListener('click',e=>{
             } catch(e) { console.error('News:', e); }
         }
 
-        function renderNewsSlide(index) {
+function renderNewsSlide(index) {
     const section = document.getElementById('news-section');
     const item = newsItems[index];
     const total = newsItems.length;
 
-    // mediaHTML will now use the common CSS classes defined above
     let mediaHTML = '';
     if (item.mediaType === 'video') {
         mediaHTML = `<video id="news-video" src="${item.mediaUrl}" autoplay muted playsinline 
-                    class="news-media-element"
-                    onended="newsAutoNext()"></video>`;
+                    class="news-media-element" onended="newsAutoNext()"></video>`;
     } else {
-        mediaHTML = `<img src="${item.mediaUrl}" alt="${item.title}" 
-                    class="news-media-element">`;
+        mediaHTML = `<img src="${item.mediaUrl}" alt="${item.title}" class="news-media-element">`;
     }
 
-    // Controls remain mostly the same, adjusted for slightly smaller area
     const arrowsHTML = total > 1 ? `
-        <button onclick="newsGo(-1)" style="position:absolute;top:50%;right:16px;transform:translateY(-50%);background:rgba(0,0,0,0.6);color:#fff;border:3px solid #fff;width:36px;height:36px;font-size:1.2em;font-weight:900;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center;touch-action:manipulation;border-radius:4px;">‹</button>
-        <button onclick="newsGo(1)" style="position:absolute;top:50%;left:16px;transform:translateY(-50%);background:rgba(0,0,0,0.6);color:#fff;border:3px solid #fff;width:36px;height:36px;font-size:1.2em;font-weight:900;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center;touch-action:manipulation;border-radius:4px;">›</button>
-        <div style="position:absolute;bottom:48px;left:50%;transform:translateX(-50%);display:flex;gap:7px;z-index:10;">
-            ${newsItems.map((_,i) => `<div style="width:8px;height:8px;border-radius:50%;background:${i===index?'#fff':'rgba(255,255,255,0.4)'};border:2px solid #fff;cursor:pointer;transition:background .2s;" onclick="newsGoTo(${i})"></div>`).join('')}
+        <button onclick="newsGo(-1)" style="position:absolute;top:50%;right:20px;transform:translateY(-50%);background:rgba(0,0,0,0.6);color:#fff;border:2px solid #fff;width:40px;height:40px;font-size:1.4em;font-weight:900;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center;">‹</button>
+        <button onclick="newsGo(1)" style="position:absolute;top:50%;left:20px;transform:translateY(-50%);background:rgba(0,0,0,0.6);color:#fff;border:2px solid #fff;width:40px;height:40px;font-size:1.4em;font-weight:900;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center;">›</button>
+        <div style="position:absolute;bottom:15px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:10;">
+            ${newsItems.map((_,i) => `<div style="width:7px;height:7px;border-radius:50%;background:${i===index?'#fff':'rgba(255,255,255,0.3)'};border:1px solid #fff;cursor:pointer;" onclick="newsGoTo(${i})"></div>`).join('')}
         </div>` : '';
 
-    // Main section HTML assembly, using the outer container class for aspect ratio and shadow
     section.innerHTML = `
-        <div class="news-container-outer">
+        <div class="news-floating-card">
             ${mediaHTML}
-            <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.1) 40%,transparent 100%);z-index:1;pointer-events:none;"></div>
+            
+            <!-- Shadow Overlay -->
+            <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 50%);z-index:1;pointer-events:none;"></div>
+            
             ${arrowsHTML}
-            <div style="position:absolute;bottom:0;right:0;left:0;z-index:5;padding:16px 20px 20px;display:flex;justify-content:space-between;align-items:flex-end;gap:12px;">
-                <span style="font-weight:900;font-size:clamp(1em,2.5vw,1.4em);color:#fff;text-transform:uppercase;line-height:1.2;text-shadow:2px 2px 8px rgba(0,0,0,0.7);flex:1;">${item.title}</span>
-                ${item.linkedProductName ? `<button onclick="openProductByName('${encodeURIComponent(item.linkedProductName)}')" style="background:#ff3e3e;color:#fff;border:3px solid #000;padding:8px 14px;font-weight:900;font-size:.8em;text-transform:uppercase;cursor:pointer;white-space:nowrap;flex-shrink:0;box-shadow:3px 3px 0 #000;touch-action:manipulation;transition:all .2s;" onmouseenter="this.style.background='#000'" onmouseleave="this.style.background='#ff3e3e'">עבור לחולצה ›</button>` : ''}
+
+            <!-- Content -->
+            <div style="position:absolute;bottom:0;right:0;left:0;z-index:5;padding:25px;display:flex;justify-content:space-between;align-items:flex-end;gap:15px;">
+                
+                <span style="font-weight:900;font-size:clamp(1.1em,3vw,1.7em);color:#fff;text-transform:uppercase;line-height:1.2;text-shadow:2px 2px 8px rgba(0,0,0,0.8);flex:1;">
+                    ${item.title}
+                </span>
+
+                <!-- הכפתור המקורי: מרובע עם צל שחור עבה -->
+                ${item.linkedProductName ? `
+                <button onclick="openProductByName('${encodeURIComponent(item.linkedProductName)}')" 
+                    style="background:#ff3e3e; color:#fff; border:4px solid #000; padding:12px 20px; font-weight:900; font-size:0.9em; text-transform:uppercase; cursor:pointer; white-space:nowrap; flex-shrink:0; box-shadow:5px 5px 0 #000; transition:all .1s;"
+                    onmousedown="this.style.transform='translate(2px, 2px)'; this.style.boxShadow='2px 2px 0 #000';" 
+                    onmouseup="this.style.transform='translate(0, 0)'; this.style.boxShadow='5px 5px 0 #000';"
+                    onmouseenter="this.style.background='#000'" 
+                    onmouseleave="this.style.background='#ff3e3e'">
+                    עבור לחולצה ›
+                </button>` : ''}
             </div>
-            ${total > 1 ? `<div style="position:absolute;top:12px;left:12px;background:rgba(0,0,0,0.55);color:#fff;padding:4px 10px;font-size:.75em;font-weight:700;z-index:10;border:2px solid rgba(255,255,255,0.3);border-radius:2px;">${index+1} / ${total}</div>` : ''}
+
+            <!-- Index Tag -->
+            ${total > 1 ? `<div style="position:absolute;top:15px;left:15px;background:rgba(0,0,0,0.7);color:#fff;padding:5px 12px;font-size:.8em;font-weight:700;z-index:10;border:2px solid #fff;">${index+1} / ${total}</div>` : ''}
         </div>`;
 }
-
-        function newsGo(dir) {
-            const total = newsItems.length;
-            newsCurrentIndex = (newsCurrentIndex + dir + total) % total;
-            renderNewsSlide(newsCurrentIndex);
-        }
 
         function newsGoTo(index) {
             newsCurrentIndex = index;
