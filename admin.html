@@ -202,6 +202,8 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f0f0;color:#333;direction:r
 </style>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script>emailjs.init('YOUR_PUBLIC_KEY');</script>
 </head>
 <body>
 
@@ -235,6 +237,7 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f0f0;color:#333;direction:r
       <div class="menu-item" data-section="leads">💬 פניות</div>
       <div class="menu-item" data-section="customers">⭐ מועדון לקוחות</div>
       <div class="menu-item" data-section="bulk-edit">✏️ עריכה מרובה</div>
+      <div class="menu-item" data-section="news">📰 חדשות</div>
       <div class="menu-item" data-section="settings">⚙️ הגדרות</div>
     </div>
     <div class="sidebar-footer">
@@ -374,6 +377,28 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f0f0;color:#333;direction:r
         <p id="bulk-progress-text" style="font-size:.86em;color:#666;text-align:center;margin-bottom:8px"></p>
         <button class="btn btn-dark" id="bulk-apply-btn" style="width:100%;padding:13px;font-size:.97em">✅ החל שינויים על המוצרים הנבחרים</button>
       </div>
+    </div>
+
+<!-- NEWS -->
+    <div class="content-section" id="news-section-admin">
+      <div class="content-header"><h2>ניהול חדשות</h2></div>
+      <div class="settings-box" style="margin-bottom:20px;">
+        <h3>הוסף פריט חדשות</h3>
+        <div class="form-group"><label>כותרת *</label><input type="text" id="news-title" placeholder="כותרת הפריט"></div>
+        <div class="form-group"><label>סוג מדיה</label>
+          <select id="news-media-type" onchange="document.getElementById('news-media-hint').textContent=this.value==='video'?'קישור ישיר לוידאו (mp4)':'קישור לתמונה'">
+            <option value="image">תמונה</option>
+            <option value="video">סרטון (mp4)</option>
+          </select>
+          <small id="news-media-hint" style="color:#888;margin-top:3px;display:block;">קישור לתמונה</small>
+        </div>
+        <div class="form-group"><label>URL מדיה *</label><input type="text" id="news-media-url" placeholder="https://..."></div>
+        <div class="form-group"><label>שם מוצר לקישור (אופציונלי)</label>
+          <select id="news-product-link"><option value="">ללא קישור</option></select>
+        </div>
+        <button class="btn btn-success" id="add-news-btn">+ הוסף לחדשות</button>
+      </div>
+      <div id="news-list-admin"></div>
     </div>
 
     <!-- SETTINGS -->
@@ -542,14 +567,14 @@ function addCFUI(fd=null,container){const fc=document.createElement('div');fc.cl
 function extractCFs(container){const out=[];container.querySelectorAll('.cf-container').forEach(fc=>{const name=fc.querySelector('.cf-name').value.trim(),type=fc.querySelector('.cf-type').value,required=fc.querySelector('.cf-required').checked,extraPrice=parseFloat(fc.querySelector('.cf-extra').value)||0;if(!name)return;const f={name,type,required,extraPrice};if(type==='select'){f.options=[];fc.querySelectorAll('.opt-item').forEach(oi=>{const v=oi.querySelector('.opt-val').value.trim();if(v)f.options.push({value:v,extraPrice:parseFloat(oi.querySelector('.opt-price').value)||0,image:oi.querySelector('.opt-img-url').value||null});});}out.push(f);});return out;}
 
 // LOGIN
-async function doLogin(username, displayName){$('login-overlay').style.display='none';$('admin-layout').classList.add('active');$('sw-name').textContent=`היי ${displayName||username}`;$('sw-sub').textContent='ברוך הבא לפאנל הניהול של YR JERSEYS';$('login-error').style.display='none';try{await initSettings();await Promise.all([loadAllProducts(),loadCategories()]);await Promise.all([fetchOrders(),fetchLeads(),fetchCustomers(),loadShipping(),loadCoupons(),loadAnnouncements(),loadMemberAnnouncements()]);setupUpload('pimg-file','pimg-preview','pimg-status','pimg-url','pimg-zone');await loadDeals();}catch(e){console.error(e);alert('שגיאה: '+e.message);}}
+async function doLogin(username, displayName){$('login-overlay').style.display='none';$('admin-layout').classList.add('active');$('sw-name').textContent=`היי ${displayName||username}`;$('sw-sub').textContent='ברוך הבא לפאנל הניהול של YR JERSEYS';$('login-error').style.display='none';try{await initSettings();await Promise.all([loadAllProducts(),loadCategories()]);await Promise.all([fetchOrders(),fetchLeads(),fetchCustomers(),loadShipping(),loadCoupons(),loadAnnouncements(),loadMemberAnnouncements()]);setupUpload('pimg-file','pimg-preview','pimg-status','pimg-url','pimg-zone');await loadDeals();updateNewsProductSelect();}catch(e){console.error(e);alert('שגיאה: '+e.message);}}
 window.addEventListener('DOMContentLoaded',async()=>{const logged=localStorage.getItem('vip_admin_logged'),user=localStorage.getItem('vip_admin_user');if(logged==='true'&&user){try{const d=await db.collection('users').doc(user).get();if(d.exists)doLogin(user,d.data().hebrewName);else{localStorage.removeItem('vip_admin_logged');localStorage.removeItem('vip_admin_user');}}catch(e){console.error(e);}}});
 $('login-button').addEventListener('click',async()=>{const u=$('login-username').value.trim(),p=$('login-password').value;if(!u||!p)return;try{const d=await db.collection('users').doc(u).get();if(!d.exists)throw new Error('user-not-found');if(d.data().password!==p)throw new Error('wrong-password');if(confirm('להישאר מחובר?')){localStorage.setItem('vip_admin_logged','true');localStorage.setItem('vip_admin_user',u);}doLogin(u,d.data().hebrewName);}catch(e){const msg=e.message==='user-not-found'?'משתמש לא קיים':e.message==='wrong-password'?'סיסמה שגויה':'שגיאה בהתחברות';$('login-error').textContent=msg;$('login-error').style.display='block';}});
 ['login-username','login-password'].forEach(id=>$(id).addEventListener('keypress',e=>{if(e.key==='Enter')$('login-button').click();}));
 $('logout-button').addEventListener('click',()=>{if(confirm('להתנתק?')){localStorage.removeItem('vip_admin_logged');localStorage.removeItem('vip_admin_user');location.reload();}});
 
 // NAVIGATION
-document.querySelectorAll('.menu-item').forEach(item=>{item.addEventListener('click',()=>{document.querySelectorAll('.menu-item').forEach(m=>m.classList.remove('active'));document.querySelectorAll('.content-section').forEach(s=>s.classList.remove('active'));item.classList.add('active');$(`${item.dataset.section}-section`).classList.add('active');if(item.dataset.section==='bulk-edit'){updateBulkCatChecks();renderBulkGrid($('bulk-search').value);}if(item.dataset.section==='settings'){renderDealPicker('buy');renderDealPicker('get');loadDeals();}});});
+document.querySelectorAll('.menu-item').forEach(item=>{item.addEventListener('click',()=>{document.querySelectorAll('.menu-item').forEach(m=>m.classList.remove('active'));document.querySelectorAll('.content-section').forEach(s=>s.classList.remove('active'));item.classList.add('active');const secId=item.dataset.section==='news'?'news-section-admin':`${item.dataset.section}-section`;$(secId).classList.add('active');if(item.dataset.section==='bulk-edit'){updateBulkCatChecks();renderBulkGrid($('bulk-search').value);}if(item.dataset.section==='settings'){renderDealPicker('buy');renderDealPicker('get');loadDeals();}if(item.dataset.section==='news'){updateNewsProductSelect();loadNewsAdmin();}});});
 
 async function initSettings(){try{const d=await db.collection('yr_settings').doc('main').get();if(!d.exists)await db.collection('yr_settings').doc('main').set({Shipping:{Method:'fixed',Value:30,FreeThreshold:0},Coupons:[],Categories:[],SubCategories:{},Announcements:[]});}catch(e){console.error(e);}}
 
@@ -644,9 +669,33 @@ $('search-order-btn').addEventListener('click',()=>fetchOrders($('order-search')
 $('clear-order-btn').addEventListener('click',()=>{$('order-search').value='';fetchOrders();});
 $('order-search').addEventListener('keypress',e=>{if(e.key==='Enter')fetchOrders($('order-search').value.trim().toLowerCase());});
 $('order-filter').addEventListener('change',()=>fetchOrders($('order-search').value.trim().toLowerCase()));
-async function fetchOrders(search=''){const list=$('orders-list');list.innerHTML='<p>טוען הזמנות...</p>';try{const snap=await db.collection('yr_orders').orderBy('orderDate','desc').get();let orders=snap.docs.map(d=>({id:d.id,...d.data()}));const filt=$('order-filter').value;if(search){orders=orders.filter(o=>['customerName','customerEmail','customerPhone','customerAddress'].some(k=>(o[k]||'').toLowerCase().includes(search)));}else{if(filt==='awaiting')orders=orders.filter(o=>o.status==='bit_pending');else if(filt==='paid')orders=orders.filter(o=>o.status==='paid');else if(filt==='completed')orders=orders.filter(o=>o.completed);else if(filt==='active')orders=orders.filter(o=>!o.completed);}if(!orders.length){list.innerHTML='<p style="color:#888">אין הזמנות להצגה.</p>';return;}list.innerHTML='';orders.forEach(order=>{const card=document.createElement('div');card.className='order-card';const total=typeof order.totalAmount==='number'?order.totalAmount.toFixed(2):'0.00';const isPending=order.status==='bit_pending';card.innerHTML=`<div class="order-card-top"><div class="order-info"><strong style="font-size:1.01em">הזמנה #${order.id.substring(0,9)}...</strong><p style="margin:5px 0">${sBadge(order)}</p><p><strong>לקוח:</strong> ${order.customerName||'-'}</p><p><strong>טלפון:</strong> ${order.customerPhone||'-'}</p><p><strong>סה"כ:</strong> <strong style="color:#dc3545">${total} ₪</strong></p><p style="color:#888;font-size:.83em">📅 ${fmtDate(order.orderDate)}</p></div><div class="order-btns" onclick="event.stopPropagation()">${isPending?`<button class="btn btn-success btn-confirm-pay" data-id="${order.id}">✅ אשר תשלום</button>`:`<button class="btn btn-outline-green btn-mark-paid" data-id="${order.id}">✅ שולם</button>`}<button class="btn btn-info btn-mark-sent" data-id="${order.id}">📦 נשלח</button><button class="btn btn-dark btn-view-order" data-id="${order.id}">🔍 פרטים</button><button class="btn btn-secondary btn-inv" data-id="${order.id}">🔗 חשבונית</button></div></div><div class="order-notes" onclick="event.stopPropagation()"><textarea class="notes-ta" data-id="${order.id}" placeholder="הערות פנימיות...">${order.adminStatus||''}</textarea><button class="btn btn-dark btn-save-notes" data-id="${order.id}" style="margin-top:6px;width:100%;padding:7px;font-size:.82em">💾 שמור הערות</button></div>`;list.appendChild(card);});list.querySelectorAll('.btn-confirm-pay').forEach(btn=>btn.addEventListener('click',async()=>{if(!confirm('אתה מאשר שהתשלום בביט התקבל?'))return;try{await db.collection('yr_orders').doc(btn.dataset.id).update({status:'paid',adminConfirmedAt:firebase.firestore.FieldValue.serverTimestamp()});fetchOrders(search);}catch(e){alert('שגיאה');}}));list.querySelectorAll('.btn-mark-paid').forEach(btn=>btn.addEventListener('click',async()=>{if(!confirm('סמן כשולם?'))return;try{await db.collection('yr_orders').doc(btn.dataset.id).update({status:'paid',paidAt:firebase.firestore.FieldValue.serverTimestamp()});fetchOrders(search);}catch(e){alert('שגיאה');}}));list.querySelectorAll('.btn-mark-sent').forEach(btn=>btn.addEventListener('click',async()=>{if(!confirm('סמן כנשלח / הושלם?'))return;try{await db.collection('yr_orders').doc(btn.dataset.id).update({completed:true,completedAt:firebase.firestore.FieldValue.serverTimestamp()});fetchOrders(search);}catch(e){alert('שגיאה');}}));list.querySelectorAll('.btn-view-order').forEach(btn=>btn.addEventListener('click',()=>{const o=orders.find(x=>x.id===btn.dataset.id);if(o)showOrderModal(o);}));list.querySelectorAll('.btn-inv').forEach(btn=>btn.addEventListener('click',async()=>{const url=`${window.location.origin}/invoice.html#${btn.dataset.id}`;const ok=await clip(url);if(ok){const o=btn.innerHTML;btn.innerHTML='✓';setTimeout(()=>{btn.innerHTML=o;},2000);}}));list.querySelectorAll('.btn-save-notes').forEach(btn=>btn.addEventListener('click',async()=>{const ta=btn.closest('.order-notes').querySelector('.notes-ta');try{await db.collection('yr_orders').doc(btn.dataset.id).update({adminStatus:ta.value});const orig=btn.textContent;btn.textContent='✓ נשמר!';btn.style.background='#27ae60';setTimeout(()=>{btn.textContent=orig;btn.style.background='';},1500);}catch(e){alert('שגיאה בשמירה');console.error(e);}}));}catch(e){list.innerHTML='<p style="color:#dc3545">שגיאה בטעינת הזמנות.</p>';console.error(e);}}
 
-function showOrderModal(order){currentOrderId=order.id;const isPending=order.status==='bit_pending';$('order-modal-title').textContent=`הזמנה #${order.id}`;$('order-modal-status-bar').innerHTML=`${sBadge(order)}<span style="color:#888;font-size:.86em">📅 ${fmtDate(order.orderDate)}</span>`;$('order-detail-grid').innerHTML=`<div class="detail-box"><h4>פרטי לקוח</h4><p><strong>שם:</strong> ${order.customerName||'-'}</p><p><strong>אימייל:</strong> ${order.customerEmail||'-'}</p><p><strong>טלפון:</strong> ${order.customerPhone||'-'}</p>${order.clubMemberName?`<p><strong>⭐ מועדון:</strong> ${order.clubMemberName}</p>`:''}</div><div class="detail-box"><h4>כתובת משלוח</h4><p>${order.customerAddress||'לא הוזנה'}</p>${order.shippingMethod?`<p style="margin-top:7px"><strong>משלוח:</strong> ${order.shippingMethod}</p>`:''}<p><strong>אמצעי תשלום:</strong> ${order.paymentType==='bit'?'💳 ביט':'PayPal'}</p></div>`;
+  // Payment method modal
+let pendingPaymentOrderId=null;
+function openPaymentMethodModal(orderId,cb){
+  pendingPaymentOrderId=orderId;
+  let modal=$('payment-method-modal');
+  if(!modal){
+    modal=document.createElement('div');modal.id='payment-method-modal';modal.className='modal active';
+    modal.innerHTML=`<div class="modal-box" style="max-width:400px"><button class="modal-close" onclick="document.getElementById('payment-method-modal').classList.remove('active')">&times;</button><h3>בחר אמצעי תשלום</h3><div style="display:flex;flex-direction:column;gap:10px;margin-top:16px"><button class="btn btn-dark pmb" data-method="bit">💳 ביט</button><button class="btn btn-dark pmb" data-method="credit">💳 אשראי (סליקה)</button><button class="btn btn-dark pmb" data-method="cash">💵 מזומן</button><button class="btn btn-dark pmb" data-method="custom">✏️ מותאם אישית</button></div><div id="custom-pay-input" style="display:none;margin-top:12px"><input type="text" id="custom-pay-text" placeholder="פרט אמצעי תשלום..." style="width:100%;padding:10px;border:2px solid #e0e0e0;border-radius:7px"></div><button class="btn btn-success" id="confirm-pay-method" style="width:100%;margin-top:16px;padding:12px">✅ אשר תשלום</button></div>`;
+    document.body.appendChild(modal);
+    modal.querySelectorAll('.pmb').forEach(b=>b.addEventListener('click',()=>{modal.querySelectorAll('.pmb').forEach(x=>{x.style.background='#2c3e50';x.style.outline='none';});b.style.outline='3px solid #27ae60';modal.dataset.method=b.dataset.method;$('custom-pay-input').style.display=b.dataset.method==='custom'?'block':'none';}));
+    $('confirm-pay-method').addEventListener('click',async()=>{const method=modal.dataset.method;if(!method){alert('בחר אמצעי תשלום');return;}const customText=method==='custom'?($('custom-pay-text').value.trim()||'מותאם אישית'):'';const payLabel=method==='bit'?'ביט':method==='credit'?'אשראי (סליקה)':method==='cash'?'מזומן':customText;try{await db.collection('yr_orders').doc(pendingPaymentOrderId).update({status:'paid',paymentMethod:method,paymentMethodLabel:payLabel,paidAt:firebase.firestore.FieldValue.serverTimestamp()});modal.classList.remove('active');adminSendInvoiceEmail(pendingPaymentOrderId);if(cb)cb();}catch(e){alert('שגיאה');}});
+    modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.remove('active');});
+  } else {
+    modal.classList.add('active');modal.dataset.method='';
+    modal.querySelectorAll('.pmb').forEach(x=>{x.style.outline='none';});
+    $('custom-pay-input').style.display='none';
+  }
+  modal.dataset.cb=cb;
+}
+
+function payMethodBadge(o){if(!o.paymentMethod||o.paymentMethod==='bit')return '';return `<span style="display:inline-block;background:#e8f4fd;color:#1a5f8a;padding:2px 8px;border-radius:10px;font-size:.78em;font-weight:700;margin-right:5px">💳 ${o.paymentMethodLabel||o.paymentMethod}</span>`;}
+function notPaidBadge(o){if(o.status==='paid'||o.status==='paid_bit'||o.completed)return '';return '<span style="display:inline-block;background:#ffeaea;color:#c0392b;padding:2px 8px;border-radius:10px;font-size:.78em;font-weight:700;margin-right:5px">⚠️ לא שולם</span>';}
+
+async function fetchOrders(search=''){const list=$('orders-list');list.innerHTML='<p>טוען הזמנות...</p>';try{const snap=await db.collection('yr_orders').orderBy('orderDate','desc').get();let orders=snap.docs.map(d=>({id:d.id,...d.data()}));const filt=$('order-filter').value;if(search){orders=orders.filter(o=>['customerName','customerEmail','customerPhone','customerAddress'].some(k=>(o[k]||'').toLowerCase().includes(search)));}else{if(filt==='awaiting')orders=orders.filter(o=>o.status==='bit_pending');else if(filt==='paid')orders=orders.filter(o=>o.status==='paid');else if(filt==='completed')orders=orders.filter(o=>o.completed);else if(filt==='active')orders=orders.filter(o=>!o.completed);}if(!orders.length){list.innerHTML='<p style="color:#888">אין הזמנות להצגה.</p>';return;}list.innerHTML='';orders.forEach(order=>{const card=document.createElement('div');card.className='order-card';const total=typeof order.totalAmount==='number'?order.totalAmount.toFixed(2):'0.00';const isPending=order.status==='bit_pending';const isUnpaid=order.status!=='paid'&&order.status!=='paid_bit'&&!order.completed;card.innerHTML=`<div class="order-card-top"><div class="order-info"><strong style="font-size:1.01em">הזמנה #${order.id.substring(0,9)}...</strong><p style="margin:5px 0">${sBadge(order)}${notPaidBadge(order)}${payMethodBadge(order)}</p><p><strong>לקוח:</strong> ${order.customerName||'-'}</p><p><strong>טלפון:</strong> ${order.customerPhone||'-'}</p><p><strong>סה"כ:</strong> <strong style="color:#dc3545">${total} ₪</strong></p><p style="color:#888;font-size:.83em">📅 ${fmtDate(order.orderDate)}</p></div><div class="order-btns" onclick="event.stopPropagation()">${isPending?`<button class="btn btn-success btn-confirm-pay" data-id="${order.id}">✅ אשר תשלום</button>`:`<button class="btn btn-outline-green btn-mark-paid" data-id="${order.id}">✅ שולם</button>`}<button class="btn btn-info btn-mark-sent" data-id="${order.id}">📦 נשלח</button><button class="btn btn-dark btn-view-order" data-id="${order.id}">🔍 פרטים</button><button class="btn btn-secondary btn-inv" data-id="${order.id}">🔗 חשבונית</button></div></div><div class="order-notes" onclick="event.stopPropagation()"><textarea class="notes-ta" data-id="${order.id}" placeholder="הערות פנימיות...">${order.adminStatus||''}</textarea><button class="btn btn-dark btn-save-notes" data-id="${order.id}" style="margin-top:6px;width:100%;padding:7px;font-size:.82em">💾 שמור הערות</button></div>`;list.appendChild(card);});list.querySelectorAll('.btn-confirm-pay').forEach(btn=>btn.addEventListener('click',()=>{openPaymentMethodModal(btn.dataset.id,()=>fetchOrders(search));}));list.querySelectorAll('.btn-mark-paid').forEach(btn=>btn.addEventListener('click',()=>{openPaymentMethodModal(btn.dataset.id,()=>fetchOrders(search));}));list.querySelectorAll('.btn-mark-sent').forEach(btn=>btn.addEventListener('click',async()=>{if(!confirm('סמן כנשלח / הושלם?'))return;try{await db.collection('yr_orders').doc(btn.dataset.id).update({completed:true,completedAt:firebase.firestore.FieldValue.serverTimestamp()});fetchOrders(search);}catch(e){alert('שגיאה');}}));list.querySelectorAll('.btn-view-order').forEach(btn=>btn.addEventListener('click',()=>{const o=orders.find(x=>x.id===btn.dataset.id);if(o)showOrderModal(o);}));list.querySelectorAll('.btn-inv').forEach(btn=>btn.addEventListener('click',async()=>{const url=`${window.location.origin}/invoice.html#${btn.dataset.id}`;const ok=await clip(url);if(ok){const o=btn.innerHTML;btn.innerHTML='✓';setTimeout(()=>{btn.innerHTML=o;},2000);}}));list.querySelectorAll('.btn-save-notes').forEach(btn=>btn.addEventListener('click',async()=>{const ta=btn.closest('.order-notes').querySelector('.notes-ta');try{await db.collection('yr_orders').doc(btn.dataset.id).update({adminStatus:ta.value});const orig=btn.textContent;btn.textContent='✓ נשמר!';btn.style.background='#27ae60';setTimeout(()=>{btn.textContent=orig;btn.style.background='';},1500);}catch(e){alert('שגיאה בשמירה');console.error(e);}}));}catch(e){list.innerHTML='<p style="color:#dc3545">שגיאה בטעינת הזמנות.</p>';console.error(e);}}
+function showOrderModal(order){currentOrderId=order.id;const isPending=order.status==='bit_pending';$('order-modal-title').textContent=`הזמנה #${order.id}`;$('order-modal-status-bar').innerHTML=`${sBadge(order)}<span style="color:#888;font-size:.86em">📅 ${fmtDate(order.orderDate)}</span>`;const payDisplay=order.paymentMethodLabel?order.paymentMethodLabel:order.paymentType==='bit'?'💳 ביט':order.paymentType||'—';const notPaid=order.status!=='paid'&&order.status!=='paid_bit'&&!order.completed?'<span style="color:#c0392b;font-weight:900;"> ⚠️ לא שולם</span>':'';
+$('order-detail-grid').innerHTML=`<div class="detail-box"><h4>פרטי לקוח</h4><p><strong>שם:</strong> ${order.customerName||'-'}</p><p><strong>אימייל:</strong> ${order.customerEmail||'-'}</p><p><strong>טלפון:</strong> ${order.customerPhone||'-'}</p>${order.clubMemberName?`<p><strong>⭐ מועדון:</strong> ${order.clubMemberName}</p>`:''}</div><div class="detail-box"><h4>כתובת משלוח</h4><p>${order.customerAddress||'לא הוזנה'}</p>${order.shippingMethod?`<p style="margin-top:7px"><strong>משלוח:</strong> ${order.shippingMethod}</p>`:''}<p><strong>אמצעי תשלום:</strong> ${payDisplay}${notPaid}</p></div>`;
 let rows=`<tr><td>סה"כ מוצרים</td><td>${(order.subtotal||0).toFixed(2)} ₪</td></tr><tr><td>דמי משלוח</td><td>${(order.shippingCost||0).toFixed(2)} ₪</td></tr>`;
 if(order.appliedCoupon){const cd=order.couponType==='percentage_discount'?`${order.couponValue}%`:order.couponType==='fixed_discount'?`${order.couponValue}₪`:order.couponType==='free_shipping'?'משלוח חינם':'מוצר חינם';rows+=`<tr class="row-discount"><td>קופון: <strong>${order.appliedCoupon}</strong> (${cd})</td><td>-${(order.couponDiscount||0).toFixed(2)} ₪</td></tr>`;}
 if(order.pointsUsed>0)rows+=`<tr class="row-discount"><td>נקודות מועדון (${order.pointsUsed} נקודות)</td><td>-${(order.pointsDiscount||0).toFixed(2)} ₪</td></tr>`;
@@ -655,7 +704,7 @@ if(order.pointsEarned>0)rows+=`<tr class="row-total"><td>נקודות שנצבר
 $('order-price-tbody').innerHTML=rows;
 const tbody=$('order-items-tbody');tbody.innerHTML='';(order.items||[]).forEach(item=>{const opts=item.selectedOptions?Object.entries(item.selectedOptions).filter(([,v])=>v).map(([k,v])=>`<span class="opt-chip">${k}: ${v}</span>`).join(''):'';const freebie=item.isFreebie?'<span class="freebie-chip">מתנה</span>':'';const up=typeof item.unitPrice==='number'?item.unitPrice:typeof item.price==='number'?item.price:0;const tp=typeof item.totalPrice==='number'?item.totalPrice:up*(item.quantity||1);tbody.innerHTML+=`<tr><td><img src="${item.image||item.displayImage||''}" class="item-thumb" onerror="this.style.display='none'" alt=""></td><td>${freebie}<strong>${item.productName||item.name||'מוצר'}</strong></td><td>${opts||'-'}</td><td>${item.quantity||1}</td><td>${up.toFixed(2)} ₪</td><td><strong>${tp.toFixed(2)} ₪</strong></td></tr>`;});
 $('order-modal-notes').value=order.adminStatus||'';$('om-paid-btn').textContent=isPending?'✅ אשר קבלת תשלום ביט':'✅ סמן כשולם';openModal('order-modal');}
-$('om-paid-btn').addEventListener('click',async()=>{if(!currentOrderId||!confirm('לאשר תשלום?'))return;try{await db.collection('yr_orders').doc(currentOrderId).update({status:'paid',adminConfirmedAt:firebase.firestore.FieldValue.serverTimestamp()});alert('אושר!');closeModal('order-modal');fetchOrders();}catch(e){alert('שגיאה');}});
+$('om-paid-btn').addEventListener('click',()=>{if(!currentOrderId)return;openPaymentMethodModal(currentOrderId,()=>{closeModal('order-modal');fetchOrders();});});
 $('om-completed-btn').addEventListener('click',async()=>{if(!currentOrderId||!confirm('סמן כנשלח / הושלם?'))return;try{await db.collection('yr_orders').doc(currentOrderId).update({completed:true,completedAt:firebase.firestore.FieldValue.serverTimestamp()});alert('סומן!');closeModal('order-modal');fetchOrders();}catch(e){alert('שגיאה');}});
 $('om-save-notes-btn').addEventListener('click',async()=>{if(!currentOrderId)return;try{await db.collection('yr_orders').doc(currentOrderId).update({adminStatus:$('order-modal-notes').value});alert('נשמר!');}catch(e){alert('שגיאה');}});
 $('om-invoice-btn').addEventListener('click',async()=>{if(!currentOrderId)return;const url=`${window.location.origin}/invoice.html#${currentOrderId}`;const ok=await clip(url);if(ok){const b=$('om-invoice-btn');const o=b.innerHTML;b.innerHTML='✓ הועתק';setTimeout(()=>{b.innerHTML=o;},2000);}});
@@ -893,8 +942,75 @@ $('add-deal-btn').addEventListener('click',async()=>{
     await loadDeals();
   }catch(e){alert('שגיאה');console.error(e);}
 });
-$('save-ship-btn').addEventListener('click',async()=>{try{await db.collection('yr_settings').doc('main').update({Shipping:{Method:$('ship-method').value,Value:parseFloat($('ship-val').value)||0,FreeThreshold:parseFloat($('ship-free').value)||0}});alert('הגדרות המשלוח נשמרו!');}catch(e){alert('שגיאה');}});
+  
+// ===== NEWS ADMIN =====
+async function loadNewsAdmin(){
+  try{
+    const snap=await db.collection('yr_news').orderBy('createdAt','desc').get();
+    const list=$('news-list-admin');list.innerHTML='';
+    if(snap.empty){list.innerHTML='<p style="color:#888">אין פריטי חדשות.</p>';return;}
+    snap.docs.forEach(doc=>{
+      const d=doc.data();
+      const item=document.createElement('div');item.className='list-item';item.style.cssText='flex-direction:column;align-items:stretch;gap:10px;';
+      const mediaPreview=d.mediaType==='video'?`<video src="${d.mediaUrl}" muted style="width:100px;height:65px;object-fit:cover;border-radius:5px;border:2px solid #eee;"></video>`:`<img src="${d.mediaUrl}" style="width:100px;height:65px;object-fit:cover;border-radius:5px;border:2px solid #eee;">`;
+      item.innerHTML=`<div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">${mediaPreview}<div style="flex:1"><strong>${d.title}</strong><br><span style="font-size:.82em;color:#888">${d.mediaType==='video'?'🎥 וידאו':'🖼️ תמונה'}${d.linkedProductName?' | 🔗 '+d.linkedProductName:''}</span><br><span style="font-size:.78em;color:${d.active?'#27ae60':'#dc3545'};font-weight:700">${d.active?'● פעיל':'● מושבת'}</span></div><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn ${d.active?'btn-warning':'btn-success'}" style="padding:5px 10px;font-size:.8em" onclick="toggleNews('${doc.id}',${d.active})">${d.active?'השבת':'הפעל'}</button><button class="btn btn-danger" style="padding:5px 10px;font-size:.8em" onclick="deleteNews('${doc.id}')">🗑</button></div></div>`;
+      list.appendChild(item);
+    });
+  }catch(e){console.error(e);}
+}
+function updateNewsProductSelect(){
+  const sel=$('news-product-link');if(!sel)return;
+  sel.innerHTML='<option value="">ללא קישור</option>';
+  products.forEach(p=>{const o=document.createElement('option');o.value=p.name;o.textContent=p.name;sel.appendChild(o);});
+}
+window.toggleNews=async function(id,active){
+  try{await db.collection('yr_news').doc(id).update({active:!active});await loadNewsAdmin();}catch(e){alert('שגיאה');}
+};
+window.deleteNews=async function(id){
+  if(!confirm('למחוק?'))return;
+  try{await db.collection('yr_news').doc(id).delete();await loadNewsAdmin();}catch(e){alert('שגיאה');}
+};
+document.addEventListener('DOMContentLoaded',()=>{
+  const addBtn=$('add-news-btn');
+  if(addBtn)addBtn.addEventListener('click',async()=>{
+    const title=$('news-title').value.trim(),mediaUrl=$('news-media-url').value.trim(),mediaType=$('news-media-type').value,linkedProductName=$('news-product-link').value;
+    if(!title||!mediaUrl){alert('מלא כותרת וURL מדיה');return;}
+    try{await db.collection('yr_news').add({title,mediaUrl,mediaType,linkedProductName:linkedProductName||null,active:true,createdAt:firebase.firestore.FieldValue.serverTimestamp()});alert('נוסף!');$('news-title').value='';$('news-media-url').value='';await loadNewsAdmin();}catch(e){alert('שגיאה');console.error(e);}
+  });
+});
 
+async function adminSendInvoiceEmail(orderId){
+  try{
+    const doc=await db.collection('yr_orders').doc(orderId).get();
+    if(!doc.exists)return;
+    const o=doc.data();
+    const itemsText=(o.items||[]).map(i=>`${i.quantity}x ${i.productName||i.name}${i.isFreebie?' (מתנה)':''} - ${i.isFreebie?'0.00':((i.unitPrice||i.price||0)*(i.quantity||1)).toFixed(2)}₪`).join('\n');
+    const optionsText=(o.items||[]).map(i=>{const opts=i.selectedOptions?Object.entries(i.selectedOptions).filter(([,v])=>v).map(([k,v])=>`${k}: ${v}`).join(', '):'';return opts?`${i.productName||i.name}: ${opts}`:'';}).filter(Boolean).join('\n');
+    const invoiceUrl=`${window.location.origin}/invoice.html#${orderId}`;
+    await emailjs.send('service_pypll0n','yrjerseys',{
+      email:o.customerEmail,
+      order_id:orderId,
+      customer_name:o.customerName,
+      customer_phone:o.customerPhone||'',
+      customer_address:o.customerAddress||'',
+      items_list:itemsText,
+      options_list:optionsText||'ללא',
+      subtotal:(o.subtotal||0).toFixed(2),
+      shipping_cost:(o.shippingCost||0).toFixed(2),
+      coupon_code:o.appliedCoupon||'',
+      coupon_discount:o.couponDiscount>0?o.couponDiscount.toFixed(2):'',
+      points_used:o.pointsUsed>0?o.pointsUsed:'',
+      points_discount:o.pointsDiscount>0?o.pointsDiscount.toFixed(2):'',
+      total_amount:(o.totalAmount||0).toFixed(2),
+      invoice_url:invoiceUrl
+    });
+    console.log('Invoice email sent for order',orderId);
+  }catch(e){
+    console.error('Email send error:',e);
+  }
+}
+
+$('save-ship-btn').addEventListener('click',async()=>{try{await db.collection('yr_settings').doc('main').update({Shipping:{Method:$('ship-method').value,Value:parseFloat($('ship-val').value)||0,FreeThreshold:parseFloat($('ship-free').value)||0}});alert('הגדרות המשלוח נשמרו!');}catch(e){alert('שגיאה');}});
 async function loadMemberAnnouncements(){try{const d=await db.collection('yr_settings').doc('main').get();const list=(d.data()&&d.data().MemberAnnouncements)||[];const el=$('member-ann-list');el.innerHTML='';if(!list.length){el.innerHTML='<p style="color:#888">אין הודעות לחברי מועדון.</p>';return;}list.forEach((ann,idx)=>{const item=document.createElement('div');item.className='list-item';item.innerHTML=`<span>🔒 ${ann}</span><div class="list-item-actions"><button class="btn btn-danger" onclick="deleteMemberAnn(${idx})">🗑</button></div>`;el.appendChild(item);});}catch(e){console.error(e);}}
 window.deleteMemberAnn=async function(idx){if(!confirm('למחוק?'))return;const d=await db.collection('yr_settings').doc('main').get();const list=(d.data()&&d.data().MemberAnnouncements)||[];list.splice(idx,1);await db.collection('yr_settings').doc('main').update({MemberAnnouncements:list});loadMemberAnnouncements();};
 $('add-member-ann-btn').addEventListener('click',async()=>{const t=$('member-ann-text').value.trim();if(!t)return alert('הזן הודעה');const d=await db.collection('yr_settings').doc('main').get();const list=(d.data()&&d.data().MemberAnnouncements)||[];if(list.length>=2)return alert('מקסימום 2 הודעות לחברי מועדון');list.push(t);await db.collection('yr_settings').doc('main').update({MemberAnnouncements:list});$('member-ann-text').value='';loadMemberAnnouncements();});
