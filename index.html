@@ -1800,111 +1800,174 @@ currentClubMember = { id: snap.docs[0].id, ...snap.docs[0].data() };
             window.history.replaceState(null, '', '#' + encodeURIComponent(product.name));
         }
 
-        function updateModalPrice() {
-            const product = products.find(p => p.id === currentModalProductId);
-            if (!product) return;
-            let t = getEffectivePrice(product);
-            if (product.customFields) {
-                product.customFields.forEach((field, i) => {
-                    const el = document.getElementById(`custom-field-${i}`);
-                    if (!el) return;
-                    const fp = parseFloat(field.extraPrice) || 0;
-                    if (field.type === 'select' && el.value) { t += fp; t += parseFloat(el.options[el.selectedIndex].dataset.extraPrice) || 0; }
-                    else if (field.type === 'text' && el.value) t += fp;
-                });
+function updateModalPrice() {
+    const product = products.find(p => p.id === currentModalProductId);
+    if (!product) return;
+
+    let t = getEffectivePrice(product);
+
+    if (product.customFields) {
+        product.customFields.forEach((field, i) => {
+            const el = document.getElementById(`custom-field-${i}`);
+            if (!el) return;
+
+            const fp = parseFloat(field.extraPrice) || 0;
+
+            if (field.type === 'select' && el.value) {
+                t += fp;
+                t += parseFloat(el.options[el.selectedIndex].dataset.extraPrice) || 0;
+            } else if (field.type === 'text' && el.value) {
+                t += fp;
             }
-            currentProductPrice = t;
-            const onSale = isProductOnSale(product);
-            if (onSale) { const extra = t - getEffectivePrice(product); modalProductPrice.innerHTML = `<span class="price on-sale"><span class="original-price">${(product.price+extra).toFixed(2)} ₪</span><span class="sale-price">${t.toFixed(2)} ₪</span></span>`; }
-            else modalProductPrice.textContent = `${t.toFixed(2)} ₪`;
-        }
+        });
+    }
+
+    currentProductPrice = t;
+
+    const onSale = isProductOnSale(product);
+
+    if (onSale) {
+        const extra = t - getEffectivePrice(product);
+        modalProductPrice.innerHTML = `
+            <span class="price on-sale">
+                <span class="original-price">${(product.price + extra).toFixed(2)} ₪</span>
+                <span class="sale-price">${t.toFixed(2)} ₪</span>
+            </span>
+        `;
+    } else {
+        modalProductPrice.textContent = `${t.toFixed(2)} ₪`;
+    }
+}
+
 modalAddToCartBtn.addEventListener('click', () => {
-            const product = products.find(p => p.id === currentModalProductId);
-            if (!product) return;
-            if (product.customFields) {
-                for (const field of product.customFields) {
-                    if (field.required && !currentProductOptions[field.name]) { alert('אנא מלא את השדה: ' + field.name); return; }
-                }
-            }
+    const product = products.find(p => p.id === currentModalProductId);
+    if (!product) return;
 
-            if (window._dealFreebieMode && window._pendingDealFreebieAfterOptions) {
-                const { deal, qty } = window._pendingDealFreebieAfterOptions;
-                for (let i = 0; i < qty; i++) {
-                    cart.push({
-                        ...product,
-                        quantity: 1,
-                        price: 0,
-                        isDealFreebie: true,
-                        dealName: deal.name,
-                        selectedOptions: { ...currentProductOptions },
-                        displayImage: modalProductImage.src,
-                        isFreebie: true
-                    });
-                }
-                window._pendingDealFreebieAfterOptions = null;
-                window._dealFreebieMode = false;
-                modalAddToCartBtn.textContent = 'הוסף לעגלה';
-                closeProductModal();
-                updateCartDisplay();
-                openCart();
-                if (dealGiftQueue.length > 0) setTimeout(processGiftQueue, 300);
+    // בדיקת שדות חובה
+    if (product.customFields) {
+        for (const field of product.customFields) {
+            if (field.required && !currentProductOptions[field.name]) {
+                alert('אנא מלא את השדה: ' + field.name);
                 return;
             }
+        }
+    }
 
-            addToCart(currentModalProductId, { ...currentProductOptions }, modalProductImage.src, currentProductPrice, isCouponProduct);
-            if (isCouponProduct) { couponMessage.innerHTML = '<span class="coupon-applied">✓ קופון הוחל בהצלחה!</span>'; isCouponProduct = false; couponLockedOptions = null; }
-            closeProductModal();
-        });
+    // 🎁 מתנת דיל (רגיל)
+    if (window._dealFreebieMode && window._pendingDealFreebieAfterOptions) {
+        const { deal, qty } = window._pendingDealFreebieAfterOptions;
 
-            // טיפול במתנת דיל עם אופציות
-            if (modalAddToCartBtn._dealFreebieOverride && window._pendingDealFreebieAfterOptions) {
-                const { deal, qty } = window._pendingDealFreebieAfterOptions;
-                for(let i = 0; i < qty; i++){
-                    cart.push({
-                        ...product,
-                        quantity: 1,
-                        price: 0,
-                        isDealFreebie: true,
-                        dealName: deal.name,
-                        selectedOptions: { ...currentProductOptions },
-                        displayImage: modalProductImage.src,
-                        isFreebie: true
-                    });
-                }
-                window._pendingDealFreebieAfterOptions = null;
-                modalAddToCartBtn._dealFreebieOverride = false;
-                modalAddToCartBtn.textContent = 'הוסף לעגלה';
-                isCouponProduct = false;
-                couponLockedOptions = null;
-                closeProductModal();
-                updateCartDisplay();
-                openCart();
-                if(dealGiftQueue.length>0)setTimeout(processGiftQueue,300);
-                return;
-            }
+        for (let i = 0; i < qty; i++) {
+            cart.push({
+                ...product,
+                quantity: 1,
+                price: 0,
+                isDealFreebie: true,
+                dealName: deal.name,
+                selectedOptions: { ...currentProductOptions },
+                displayImage: modalProductImage.src,
+                isFreebie: true
+            });
+        }
 
-            addToCart(currentModalProductId, { ...currentProductOptions }, modalProductImage.src, currentProductPrice, isCouponProduct);
-            if (isCouponProduct) { couponMessage.innerHTML = '<span class="coupon-applied">✓ קופון הוחל בהצלחה!</span>'; isCouponProduct = false; couponLockedOptions = null; }
-            closeProductModal();
-        });
+        window._pendingDealFreebieAfterOptions = null;
+        window._dealFreebieMode = false;
+        modalAddToCartBtn.textContent = 'הוסף לעגלה';
+
+        closeProductModal();
+        updateCartDisplay();
+        openCart();
+
+        if (dealGiftQueue.length > 0) {
+            setTimeout(processGiftQueue, 300);
+        }
+        return;
+    }
+
+    // 🎁 מתנת דיל (override)
+    if (modalAddToCartBtn._dealFreebieOverride && window._pendingDealFreebieAfterOptions) {
+        const { deal, qty } = window._pendingDealFreebieAfterOptions;
+
+        for (let i = 0; i < qty; i++) {
+            cart.push({
+                ...product,
+                quantity: 1,
+                price: 0,
+                isDealFreebie: true,
+                dealName: deal.name,
+                selectedOptions: { ...currentProductOptions },
+                displayImage: modalProductImage.src,
+                isFreebie: true
+            });
+        }
+
+        window._pendingDealFreebieAfterOptions = null;
+        modalAddToCartBtn._dealFreebieOverride = false;
+        modalAddToCartBtn.textContent = 'הוסף לעגלה';
+
+        isCouponProduct = false;
+        couponLockedOptions = null;
+
+        closeProductModal();
+        updateCartDisplay();
+        openCart();
+
+        if (dealGiftQueue.length > 0) {
+            setTimeout(processGiftQueue, 300);
+        }
+        return;
+    }
+
+    // 🛒 הוספה רגילה
+    addToCart(
+        currentModalProductId,
+        { ...currentProductOptions },
+        modalProductImage.src,
+        currentProductPrice,
+        isCouponProduct
+    );
+
+    if (isCouponProduct) {
+        couponMessage.innerHTML = '<span class="coupon-applied">✓ קופון הוחל בהצלחה!</span>';
+        isCouponProduct = false;
+        couponLockedOptions = null;
+    }
+
+    closeProductModal();
+});
 
 function closeProductModal() {
-            productModal.style.display = 'none';
-            currentProductOptions = {}; isCouponProduct = false; couponLockedOptions = null;
-            if (window._dealFreebieMode) {
-                window._dealFreebieMode = false;
-                window._pendingDealFreebieAfterOptions = null;
-                modalAddToCartBtn.textContent = 'הוסף לעגלה';
-            }
-            window.history.replaceState(null, '', window.location.pathname);
-        }
+    productModal.style.display = 'none';
 
-        closeProductModalBtn.addEventListener('click', closeProductModal);
-        productModal.addEventListener('mousedown', e => { if (e.target === productModal) closeProductModal(); });
-        window.addEventListener('keydown', e => {
-            if (productModal.style.display === 'flex' && e.key === 'Escape') closeProductModal();
-            if (document.getElementById('club-modal').classList.contains('active') && e.key === 'Escape') closeClubModal();
-        });
+    currentProductOptions = {};
+    isCouponProduct = false;
+    couponLockedOptions = null;
+
+    if (window._dealFreebieMode) {
+        window._dealFreebieMode = false;
+        window._pendingDealFreebieAfterOptions = null;
+        modalAddToCartBtn.textContent = 'הוסף לעגלה';
+    }
+
+    window.history.replaceState(null, '', window.location.pathname);
+}
+
+// אירועים
+closeProductModalBtn.addEventListener('click', closeProductModal);
+
+productModal.addEventListener('mousedown', e => {
+    if (e.target === productModal) closeProductModal();
+});
+
+window.addEventListener('keydown', e => {
+    if (productModal.style.display === 'flex' && e.key === 'Escape') {
+        closeProductModal();
+    }
+
+    if (document.getElementById('club-modal').classList.contains('active') && e.key === 'Escape') {
+        closeClubModal();
+    }
+});
 
         document.getElementById('close-zoom-btn').addEventListener('click', () => document.getElementById('size-chart-zoom-modal').classList.remove('active'));
         document.getElementById('size-chart-zoom-modal').addEventListener('click', e => { if (e.target === document.getElementById('size-chart-zoom-modal')) document.getElementById('size-chart-zoom-modal').classList.remove('active'); });
@@ -2039,42 +2102,6 @@ window.confirmGiftSelection=function(){
   if(dealGiftQueue.length>0)setTimeout(processGiftQueue,300);
 };
 
-  // בדוק אם יש customFields — אם כן, פתח מודל אופציות
-  const hasFields = product.customFields && product.customFields.length > 0;
-  if(hasFields){
-    closeGiftModal();
-    // שמור את הדיל הממתין לאחר בחירת אופציות
-    window._pendingDealFreebieAfterOptions = {
-      product,
-      deal: pendingGiftDeal.deal,
-      qty: pendingGiftDeal.qty
-    };
-    // פתח מודל המוצר במצב freebie ללא נעילת אופציות
-    isCouponProduct = true;
-    couponLockedOptions = null;
-    openProductModal(product.id, true);
-
-    // החלף את כפתור "הוסף לעגלה" לכפתור אישור עם לוגיקת דיל
-    const addBtn = document.getElementById('modal-add-to-cart');
-    addBtn.textContent = '✅ אשר בחירה והוסף מתנה';
-    addBtn._dealFreebieOverride = true;
-    return;
-  }
-
-  addDealFreebie(product,pendingGiftDeal.deal,pendingGiftDeal.qty);
-  closeGiftModal();
-  updateCartDisplay();
-  if(dealGiftQueue.length>0)setTimeout(processGiftQueue,300);
-};
-
-window.closeGiftModal=function(){
-  document.getElementById('deal-gift-modal').style.display='none';
-  pendingGiftDeal=null;selectedGiftProductId=null;
-};
-
-document.getElementById('deal-gift-modal').addEventListener('click',e=>{
-  if(e.target===document.getElementById('deal-gift-modal'))closeGiftModal();
-});
 
         // ===== DEAL FREEBIE OPTIONS MODAL =====
 function openDealFreebieOptionsModal(product) {
