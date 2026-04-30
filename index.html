@@ -700,6 +700,7 @@
                     <button type="button" id="bit-payment-btn" onclick="handleBitPayment()">
                         שלם בביט
                     </button>
+                    <button type="button" id="no-payment-btn" onclick="handleNoPayment()" style="display:block;width:100%;background:#6c757d;color:white;border:var(--border-val);padding:13px;font-size:.95em;font-weight:900;cursor:pointer;text-transform:uppercase;margin-top:8px;touch-action:manipulation;">📋 שלח הזמנה ללא תשלום</button>
                     <div class="bit-note">
                         📱 לחיצה על הכפתור תפתח את ביט לתשלום.<br>
                         לאחר ביצוע התשלום — חזור לכאן ולחץ "אישור תשלום".
@@ -1950,7 +1951,32 @@ document.getElementById('deal-gift-modal').addEventListener('click',e=>{
             const product = products.find(p => p.name.trim().toLowerCase() === name.toLowerCase());
             if (product) openProductModal(product.id);
         }
-// ===== NEWS =====
+// ===== NO PAYMENT ORDER =====
+        async function handleNoPayment() {
+            if (cart.length === 0) { alert('העגלה ריקה'); return; }
+            if (!validateCheckoutForm()) return;
+            if (!confirm('לשלוח את ההזמנה ללא ביצוע תשלום? המוכר יצור איתך קשר לגבי התשלום.')) return;
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const address = getFullAddress();
+            try {
+                const pointsEarned = Math.floor(total * 0.01);
+                const orderData = buildOrderData(name, email, phone, address, pointsEarned, 'unpaid');
+                const shortId = Math.floor(10000 + Math.random() * 90000).toString();
+                const orderData2 = { ...orderData, orderId: shortId, paymentType: 'none' };
+                await db.collection('yr_orders').doc(shortId).set(orderData2);
+                document.getElementById('success-name').textContent = `תודה ${name}! 🎉`;
+                document.getElementById('success-order-id').textContent = shortId;
+                document.getElementById('success-overlay').classList.add('active');
+                cart = []; appliedCoupon = null; pointsToUse = 0; pointsDiscount = 0; couponDiscountAmount = 0;
+                localStorage.removeItem('yr_jerseys_cart'); localStorage.removeItem('yr_jerseys_coupon');
+                updateCartDisplay(); closeCart();
+                const form = document.getElementById('checkout-form'); if (form) form.reset();
+            } catch(e) { console.error(e); alert('שגיאה בשמירת ההזמנה'); }
+        }
+
+        // ===== NEWS =====
         async function loadNews() {
             try {
                 const snap = await db.collection('yr_news').where('active', '==', true).get();
