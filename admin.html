@@ -385,14 +385,22 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f0f0;color:#333;direction:r
       <div class="settings-box" style="margin-bottom:20px;">
         <h3>הוסף פריט חדשות</h3>
         <div class="form-group"><label>כותרת *</label><input type="text" id="news-title" placeholder="כותרת הפריט"></div>
-        <div class="form-group"><label>סוג מדיה</label>
-          <select id="news-media-type" onchange="document.getElementById('news-media-hint').textContent=this.value==='video'?'קישור ישיר לוידאו (mp4)':'קישור לתמונה'">
+<div class="form-group"><label>סוג מדיה</label>
+          <select id="news-media-type" onchange="onNewsMediaTypeChange()">
             <option value="image">תמונה</option>
             <option value="video">סרטון (mp4)</option>
           </select>
-          <small id="news-media-hint" style="color:#888;margin-top:3px;display:block;">קישור לתמונה</small>
         </div>
-        <div class="form-group"><label>URL מדיה *</label><input type="text" id="news-media-url" placeholder="https://..."></div>
+        <div class="form-group">
+          <label>העלאת קובץ מדיה *</label>
+          <div class="img-upload-zone" id="news-upload-zone" onclick="document.getElementById('news-media-file').click()">
+            <p id="news-upload-hint">לחץ או גרור תמונה לכאן</p>
+            <input type="file" id="news-media-file" accept="image/*" style="display:none">
+            <div id="news-upload-preview" style="margin-top:8px"></div>
+            <div id="news-upload-status" class="upload-status"></div>
+            <input type="hidden" id="news-media-url">
+          </div>
+        </div>
         <div class="form-group"><label>שם מוצר לקישור (אופציונלי)</label>
           <select id="news-product-link"><option value="">ללא קישור</option></select>
         </div>
@@ -970,12 +978,93 @@ window.deleteNews=async function(id){
   if(!confirm('למחוק?'))return;
   try{await db.collection('yr_news').doc(id).delete();await loadNewsAdmin();}catch(e){alert('שגיאה');}
 };
+const CLOUDINARY_CLOUD_NAME = "dxvltuaae";
+const CLOUDINARY_UPLOAD_PRESET = "ml_default";
+
+function onNewsMediaTypeChange(){
+  const type=$('news-media-type').value;
+  const hint=$('news-upload-hint');
+  const fileInput=$('news-media-file');
+  const preview=$('news-upload-preview');
+  if(type==='video'){
+    hint.textContent='לחץ או גרור סרטון mp4 לכאן';
+    fileInput.accept='video/mp4,video/*';
+  } else {
+    hint.textContent='לחץ או גרור תמונה לכאן';
+    fileInput.accept='image/*';
+  }
+  $('news-media-url').value='';
+  $('news-upload-status').textContent='';
+  preview.innerHTML='';
+}
+
+async function uploadToCloudinary(file){
+  const type=$('news-media-type').value;
+  const resourceType=type==='video'?'video':'image';
+  const fd=new FormData();
+  fd.append('file',file);
+  fd.append('upload_preset',CLOUDINARY_UPLOAD_PRESET);
+  const r=await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${resourceType}/upload`,{method:'POST',body:fd});
+  const d=await r.json();
+  if(d.secure_url)return d.secure_url;
+  throw new Error('Cloudinary upload failed');
+}
+
 document.addEventListener('DOMContentLoaded',()=>{
+  const fileInput=$('news-media-file');
+  const zone=$('news-upload-zone');
+  const status=$('news-upload-status');
+  const preview=$('news-upload-preview');
+
+  async function handleNewsFile(file){
+    if(!file)return;
+    status.textContent='מעלה...';status.className='upload-status';
+    zone.classList.add('uploading');
+    preview.innerHTML='';
+    try{
+      const type=$('news-media-type').value;
+      if(type==='video'){
+        const vid=document.createElement('video');vid.muted=true;vid.controls=true;vid.style.cssText='max-width:220px;max-height:140px;border-radius:6px;border:2px solid #eee;margin:6px auto;display:block';
+        vid.src=URL.createObjectURL(file);preview.appendChild(vid);
+      } else {
+        const img=document.createElement('img');img.style.cssText='max-width:200px;max-height:140px;border-radius:6px;border:2px solid #eee;margin:6px auto;display:block';
+        img.src=URL.createObjectURL(file);preview.appendChild(img);
+      }
+      const url=await uploadToCloudinary(file);
+      $('news-media-url').value=url;
+      status.textContent='✓ הועלה בהצלחה!';status.className='upload-status ok';
+    }catch(e){
+      status.textContent='שגיאה בהעלאה';status.className='upload-status err';
+      $('news-media-url').value='';
+      console.error(e);
+    }
+    zone.classList.remove('uploading');
+  }
+
+  if(fileInput)fileInput.addEventListener('change',e=>{if(e.target.files[0])handleNewsFile(e.target.files[0]);});
+
+  if(zone){
+    zone.addEventListener('dragover',e=>{e.preventDefault();zone.style.borderColor='#dc3545';});
+    zone.addEventListener('dragleave',()=>{zone.style.borderColor='';});
+    zone.addEventListener('drop',async e=>{e.preventDefault();zone.style.borderColor='';const f=e.dataTransfer.files[0];if(f)handleNewsFile(f);});
+  }
+
   const addBtn=$('add-news-btn');
   if(addBtn)addBtn.addEventListener('click',async()=>{
-    const title=$('news-title').value.trim(),mediaUrl=$('news-media-url').value.trim(),mediaType=$('news-media-type').value,linkedProductName=$('news-product-link').value;
-    if(!title||!mediaUrl){alert('מלא כותרת וURL מדיה');return;}
-    try{await db.collection('yr_news').add({title,mediaUrl,mediaType,linkedProductName:linkedProductName||null,active:true,createdAt:firebase.firestore.FieldValue.serverTimestamp()});alert('נוסף!');$('news-title').value='';$('news-media-url').value='';await loadNewsAdmin();}catch(e){alert('שגיאה');console.error(e);}
+    const title=$('news-title').value.trim();
+    const mediaUrl=$('news-media-url').value.trim();
+    const mediaType=$('news-media-type').value;
+    const linkedProductName=$('news-product-link').value;
+    if(!title||!mediaUrl){alert('מלא כותרת והעלה קובץ מדיה');return;}
+    try{
+      await db.collection('yr_news').add({title,mediaUrl,mediaType,linkedProductName:linkedProductName||null,active:true,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+      alert('נוסף!');
+      $('news-title').value='';
+      $('news-media-url').value='';
+      $('news-upload-status').textContent='';
+      $('news-upload-preview').innerHTML='';
+      await loadNewsAdmin();
+    }catch(e){alert('שגיאה');console.error(e);}
   });
 });
 
