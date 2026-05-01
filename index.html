@@ -2276,7 +2276,7 @@ function initNewsSlider() {
     const slidesHTML = newsItems.map((item, index) => `
         <div class="news-slide">
             ${item.mediaType === 'video'
-                ? `<video class="news-media-element" src="${item.mediaUrl}" muted playsinline preload="${index === 0 ? 'auto' : 'none'}" onended="newsGo(1)"></video>`
+                ? `<video class="news-media-element" src="${item.mediaUrl}" muted autoplay playsinline preload="${index === 0 ? 'auto' : 'none'}" onended="newsGo(1)"></video>`
                 : `<img src="${item.mediaUrl}" class="news-media-element" alt="${item.title}" loading="${index === 0 ? 'eager' : 'lazy'}">`
             }
             <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 55%);z-index:1;pointer-events:none;"></div>
@@ -2331,12 +2331,19 @@ document.querySelectorAll('.news-dot').forEach((dot, i) => {
         const video = slide.querySelector('video');
         const img = slide.querySelector('img');
 
-        if (i === newsCurrentIndex) {
-            // סלייד נוכחי
-            if (video) {
-                if (video.preload === 'none') video.preload = 'auto';
-                video.currentTime = 0;
-                video.play().catch(() => {});
+if (i === newsCurrentIndex) {
+    // סלייד נוכחי
+    if (video) {
+        if (video.preload === 'none') video.preload = 'auto';
+        video.currentTime = 0;
+        video.muted = true;
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(() => {
+                setTimeout(() => newsGo(1), 3000);
+            });
+        }
+    }
             } else if (img) {
                 clearTimeout(window.newsImgTimeout);
                 window.newsImgTimeout = setTimeout(() => {
