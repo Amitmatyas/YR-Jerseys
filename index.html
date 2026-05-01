@@ -2330,7 +2330,7 @@ document.querySelectorAll('.news-dot').forEach((dot, i) => {
     slides.forEach((slide, i) => {
         const video = slide.querySelector('video');
         const img = slide.querySelector('img');
-
+        
 if (i === newsCurrentIndex) {
     // סלייד נוכחי
     if (video) {
@@ -2343,8 +2343,7 @@ if (i === newsCurrentIndex) {
                 setTimeout(() => newsGo(1), 3000);
             });
         }
-    }
-            } else if (img) {
+    } else if (img) {
                 clearTimeout(window.newsImgTimeout);
                 window.newsImgTimeout = setTimeout(() => {
                     if (newsCurrentIndex === i) newsGo(1);
