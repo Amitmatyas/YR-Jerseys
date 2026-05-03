@@ -197,8 +197,30 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f0f0;color:#333;direction:r
 .subcat-select-wrapper label{font-size:.85em;color:#555;font-weight:600;display:block;margin-bottom:5px}
 .subcat-select-wrapper select{width:100%;padding:8px;border:2px solid #e0e0e0;border-radius:6px;font-size:.9em}
 @media(max-width:1024px){.sidebar{width:195px}.main-content{margin-right:195px;width:calc(100% - 195px);padding:22px 14px}.detail-grid{grid-template-columns:1fr}}
-@media(max-width:768px){.admin-layout.active{flex-direction:column}.sidebar{width:100%;position:relative;min-height:auto}.sidebar-menu{display:flex;flex-wrap:wrap;padding:5px 0}.menu-item{padding:9px 12px;font-size:.85em;border-right:none;border-bottom:3px solid transparent}.menu-item.active{border-right:none;border-bottom-color:#dc3545}.main-content{margin-right:0;width:100%;padding:14px 10px}.products-grid{grid-template-columns:1fr}.order-card-top,.customer-top{flex-direction:column}.order-btns,.customer-btns{width:100%;flex-direction:row;flex-wrap:wrap}.order-btns button,.customer-btns button{flex:1;min-width:100px}.detail-grid{grid-template-columns:1fr}.modal-actions button{min-width:95px}.items-table td:first-child{display:none}}
 @media(max-width:480px){.content-header h2{font-size:1.35em}.modal-box{padding:18px 12px}}
+.event-card{background:#fafafa;border:2px solid #eee;border-radius:9px;padding:16px;cursor:pointer;transition:all .2s;position:relative;}
+.event-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.12);border-color:#dc3545;transform:translateY(-2px);}
+.event-card-banner{width:100%;height:110px;object-fit:cover;border-radius:6px;margin-bottom:10px;border:1px solid #eee;}
+.event-card-banner-placeholder{width:100%;height:110px;background:linear-gradient(135deg,#1a1a1a,#dc3545);border-radius:6px;margin-bottom:10px;display:flex;align-items:center;justify-content:center;font-size:2em;}
+.event-card h3{margin:0 0 8px;font-size:1.05em;color:#1a1a1a;}
+.event-card-meta{font-size:.82em;color:#888;margin:4px 0;}
+.event-card-actions{display:flex;gap:6px;margin-top:10px;}
+.event-inactive{opacity:.55;}
+.ev-tab-btn{padding:10px 16px;border:none;border-bottom:3px solid transparent;background:transparent;cursor:pointer;font-size:.93em;font-weight:700;color:#555;transition:all .2s;touch-action:manipulation;}
+.ev-tab-btn:hover{color:#dc3545;}
+.ev-tab-btn.active{color:#dc3545;border-bottom-color:#dc3545;font-weight:900;}
+.ev-tab-content{display:none;}
+.ev-tab-content.active{display:block;}
+.ev-store-product-item{background:#fff;border:2px solid #eee;border-radius:7px;padding:8px;text-align:center;cursor:pointer;transition:all .18s;}
+.ev-store-product-item:hover,.ev-store-product-item.selected{border-color:#dc3545;background:#fff5f5;}
+.ev-store-product-item.selected::before{content:'✓ ';color:#dc3545;font-weight:900;}
+.ev-store-product-item img{width:100%;height:80px;object-fit:cover;border-radius:5px;margin-bottom:5px;}
+.ev-store-product-item span{font-size:.78em;font-weight:600;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ev-exc-card{background:#fff;border:2px solid #f0c000;border-radius:7px;padding:10px;text-align:center;position:relative;}
+.ev-exc-card img{width:100%;height:90px;object-fit:cover;border-radius:5px;margin-bottom:6px;}
+.ev-exc-card h4{font-size:.85em;margin:0 0 4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ev-exc-card .price{color:#dc3545;font-weight:900;font-size:.88em;margin-bottom:6px;}
+.ev-exc-card .del-btn{background:#dc3545;color:#fff;border:none;cursor:pointer;padding:4px 10px;font-size:.78em;border-radius:4px;font-weight:700;}
 </style>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
@@ -238,6 +260,7 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f0f0;color:#333;direction:r
       <div class="menu-item" data-section="customers">⭐ מועדון לקוחות</div>
       <div class="menu-item" data-section="bulk-edit">✏️ עריכה מרובה</div>
       <div class="menu-item" data-section="news">📰 חדשות</div>
+<div class="menu-item" data-section="events">🎪 אירועים</div>
       <div class="menu-item" data-section="settings">⚙️ הגדרות</div>
     </div>
     <div class="sidebar-footer">
@@ -473,6 +496,199 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f0f0;color:#333;direction:r
       </div>
     </div>
 
+<!-- EVENTS -->
+    <div class="content-section" id="events-section">
+  <div class="content-header">
+    <h2>ניהול אירועים</h2>
+  </div>
+
+  <!-- MAIN EVENTS VIEW -->
+  <div id="events-main-view">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center;">
+      <button class="btn btn-success" id="create-event-btn" style="font-size:1em;padding:12px 20px;">+ צור אירוע חדש</button>
+      <span style="color:#888;font-size:.9em;">לחץ על אירוע קיים לניהולו</span>
+    </div>
+    <div id="events-list-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-top:10px;">
+      <p style="color:#888;">טוען אירועים...</p>
+    </div>
+  </div>
+
+  <!-- SINGLE EVENT MANAGEMENT VIEW -->
+  <div id="event-manage-view" style="display:none;">
+    <div style="margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <button class="btn btn-secondary" id="back-to-events-btn">← חזרה לאירועים</button>
+      <h3 id="event-manage-title" style="margin:0;font-size:1.3em;"></h3>
+      <span id="event-manage-status" class="status-badge"></span>
+    </div>
+
+    <!-- Tabs -->
+    <div style="display:flex;gap:0;border-bottom:3px solid #e0e0e0;margin-bottom:18px;flex-wrap:wrap;">
+      <button class="ev-tab-btn active" data-etab="ev-details">📋 פרטי האירוע</button>
+      <button class="ev-tab-btn" data-etab="ev-products">👕 מוצרים</button>
+      <button class="ev-tab-btn" data-etab="ev-coupons">🏷️ קופונים</button>
+      <button class="ev-tab-btn" data-etab="ev-orders">📦 הזמנות</button>
+    </div>
+
+    <!-- TAB: DETAILS -->
+    <div id="ev-details" class="ev-tab-content active">
+      <div class="settings-box">
+        <h3>פרטי האירוע</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="form-group"><label>שם האירוע *</label><input type="text" id="ev-name" placeholder="לדוגמה: כנס 2026"></div>
+          <div class="form-group"><label>תאריך יעד (סיום)</label><input type="date" id="ev-end-date"></div>
+          <div class="form-group"><label>מיקום (אופציונלי)</label><input type="text" id="ev-location" placeholder="עיר / כתובת / אונליין"></div>
+          <div class="form-group"><label>מידע נוסף לתצוגה</label><input type="text" id="ev-extra-meta" placeholder="לדוגמה: 50 משתתפים"></div>
+        </div>
+        <div class="form-group"><label>תיאור האירוע</label><textarea id="ev-description" rows="3" placeholder="תיאור שיוצג ללקוחות..."></textarea></div>
+        
+        <!-- Banner -->
+        <div class="form-group">
+          <label>תמונת באנר (אופציונלי)</label>
+          <div class="img-upload-zone" id="ev-banner-zone">
+            <p>לחץ או גרור תמונה</p>
+            <input type="file" id="ev-banner-file" accept="image/*" style="display:none;">
+            <img id="ev-banner-preview" class="img-preview" style="">
+            <div id="ev-banner-status" class="upload-status"></div>
+            <input type="hidden" id="ev-banner-url">
+          </div>
+        </div>
+
+        <!-- Shipping for event -->
+        <div class="info-box">
+          <h4>🚚 הגדרות משלוח לאירוע</h4>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <div class="form-group" style="flex:1;min-width:140px;">
+              <label>שיטה</label>
+              <select id="ev-ship-method">
+                <option value="fixed">מחיר קבוע (₪)</option>
+                <option value="per_item">לפי מוצר (₪)</option>
+                <option value="percentage">אחוז (%)</option>
+              </select>
+            </div>
+            <div class="form-group" style="flex:0 0 110px;">
+              <label>ערך</label>
+              <input type="number" id="ev-ship-value" step="0.01" min="0" value="30">
+            </div>
+            <div class="form-group" style="flex:1;min-width:140px;">
+              <label>משלוח חינם מעל (₪)</label>
+              <input type="number" id="ev-ship-free" step="0.01" min="0" placeholder="0 = ללא" value="0">
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment link -->
+        <div class="info-box">
+          <h4>💳 לינק תשלום (אופציונלי)</h4>
+          <div class="form-group">
+            <label>לינק ביט / כרטיס אשראי / PayPal</label>
+            <input type="text" id="ev-payment-link" placeholder="https://... (ריק = ללא כפתור תשלום)">
+            <small>אם ריק — יופיע רק כפתור "שלח הזמנה ללא תשלום"</small>
+          </div>
+        </div>
+
+        <!-- Active toggle -->
+        <div class="form-group">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:1em;">
+            <input type="checkbox" id="ev-active" style="width:18px;height:18px;cursor:pointer;">
+            <span>האירוע פעיל (גלוי ללקוחות)</span>
+          </label>
+        </div>
+
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;">
+          <button class="btn btn-dark" id="save-event-details-btn" style="flex:1;padding:12px;">💾 שמור פרטים</button>
+          <button class="btn btn-success" id="copy-event-link-btn" style="flex:1;padding:12px;">🔗 העתק לינק לאירוע</button>
+          <button class="btn btn-danger" id="delete-event-btn" style="padding:12px 16px;">🗑 מחק</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: PRODUCTS -->
+    <div id="ev-products" class="ev-tab-content" style="display:none;">
+      <div class="settings-box" style="margin-bottom:16px;">
+        <h3>מוצרים מהחנות הרגילה</h3>
+        <p style="color:#888;font-size:.9em;margin-bottom:10px;">בחר מוצרים מהחנות שיופיעו באירוע זה:</p>
+        <div class="search-bar" style="margin-bottom:10px;">
+          <input type="text" id="ev-store-search" placeholder="חפש מוצר מהחנות..." style="flex:1;">
+        </div>
+        <div id="ev-store-products-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;max-height:360px;overflow-y:auto;border:2px solid #eee;border-radius:8px;padding:10px;background:#fafafa;"></div>
+        <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+          <span id="ev-store-sel-count" style="font-weight:700;color:#dc3545;font-size:.9em;">0 נבחרו</span>
+          <button class="btn btn-dark" id="save-ev-store-products-btn">💾 שמור בחירה</button>
+        </div>
+      </div>
+
+      <div class="settings-box">
+        <h3>מוצרים בלעדיים לאירוע ⭐</h3>
+        <p style="color:#888;font-size:.9em;margin-bottom:12px;">מוצרים שלא מופיעים בחנות הרגילה — רק באירוע זה:</p>
+        
+        <div class="info-box" id="ev-exc-form">
+          <h4>הוסף מוצר בלעדי</h4>
+          <div class="form-group"><label>שם המוצר *</label><input type="text" id="eep-name"></div>
+          <div class="form-group"><label>תיאור *</label><textarea id="eep-desc" rows="2"></textarea></div>
+          <div class="form-group"><label>מחיר *</label><input type="number" id="eep-price" step="0.01" min="0"></div>
+          <div class="form-group"><label>מחיר מבצע</label><input type="number" id="eep-sale" step="0.01" min="0" placeholder="ריק = ללא"></div>
+          <div class="form-group"><label>תמונה *</label>
+            <div class="img-upload-zone" id="eep-img-zone">
+              <p>לחץ לגרור תמונה</p>
+              <input type="file" id="eep-img-file" accept="image/*" style="display:none;">
+              <img id="eep-img-preview" class="img-preview">
+              <div id="eep-img-status" class="upload-status"></div>
+              <input type="hidden" id="eep-img-url">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>שדות מותאמים אישית</label>
+            <button type="button" class="btn btn-success" id="eep-add-cf-btn" style="margin-bottom:8px;">+ הוסף שדה</button>
+            <div id="eep-cf-container"></div>
+          </div>
+          <button class="btn btn-success" id="add-exc-product-btn">+ הוסף מוצר בלעדי</button>
+        </div>
+
+        <div id="ev-exc-products-list" style="margin-top:14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;"></div>
+      </div>
+    </div>
+
+    <!-- TAB: COUPONS -->
+    <div id="ev-coupons" class="ev-tab-content" style="display:none;">
+      <div class="settings-box">
+        <h3>קופונים לאירוע</h3>
+        <p style="color:#888;font-size:.88em;margin-bottom:14px;">הקופונים פועלים רק עבור אירוע זה ואינם משפיעים על החנות הרגילה.</p>
+        <div class="form-group"><label>קוד קופון</label><input type="text" id="evcoup-code" placeholder="EVENT10"></div>
+        <div class="form-group"><label>סוג</label>
+          <select id="evcoup-type" onchange="onEvCoupTypeChange()">
+            <option value="fixed_discount">הנחה בשקלים</option>
+            <option value="percentage_discount">הנחה באחוזים</option>
+            <option value="free_shipping">משלוח חינם</option>
+            <option value="free_product">מוצר חינם</option>
+          </select>
+        </div>
+        <div class="form-group" id="evcoup-val-group"><label>ערך</label><input type="number" id="evcoup-val" step="0.01" min="0"></div>
+        <div class="form-group" id="evcoup-prod-group" style="display:none;"><label>מוצר</label><select id="evcoup-prod"></select></div>
+        <div class="form-group"><label>תאריך תפוגה</label><input type="date" id="evcoup-expiry"></div>
+        <button class="btn btn-success" id="add-evcoup-btn">+ הוסף קופון</button>
+        <div id="evcoup-list" style="margin-top:13px;"></div>
+      </div>
+    </div>
+
+    <!-- TAB: ORDERS -->
+    <div id="ev-orders" class="ev-tab-content" style="display:none;">
+      <div class="search-bar" style="margin-bottom:14px;">
+        <input type="text" id="ev-order-search" placeholder="חיפוש לפי שם, טלפון, אימייל...">
+        <select id="ev-order-filter">
+          <option value="active">פעילות (לא הושלמו)</option>
+          <option value="awaiting">ממתינות לאישור תשלום</option>
+          <option value="paid">✅ שולמו</option>
+          <option value="completed">📦 נשלחו / הושלמו</option>
+          <option value="all">הכל</option>
+        </select>
+        <button class="btn btn-primary" id="ev-order-search-btn">חפש</button>
+        <button class="btn btn-secondary" id="ev-order-clear-btn">נקה</button>
+      </div>
+      <div id="ev-orders-list"><p>טוען הזמנות...</p></div>
+    </div>
+  </div>
+</div>
+
   </div><!-- /main-content -->
 </div><!-- /admin-layout -->
 
@@ -540,6 +756,40 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f0f0;color:#333;direction:r
 
 <div id="customer-leads-modal" class="modal">
   <div class="modal-box"><button class="modal-close" id="close-cust-leads">&times;</button><h3>פניות לקוח</h3><div id="cust-leads-list"></div></div>
+</div>
+
+<!-- EVENT ORDER MODAL -->
+<div id="event-order-modal" class="modal">
+  <div class="modal-box" style="max-width:800px">
+    <button class="modal-close" id="close-event-order-modal">&times;</button>
+    <h3 id="ev-order-modal-title">פרטי הזמנה - אירוע</h3>
+    <div id="ev-order-status-bar" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;"></div>
+    <div class="detail-grid" id="ev-order-detail-grid"></div>
+    <h4 style="font-size:.82em;text-transform:uppercase;color:#888;margin:0 0 8px;font-weight:700;">פירוט מחיר</h4>
+    <table class="price-table"><thead><tr><th>פריט</th><th>סכום</th></tr></thead><tbody id="ev-order-price-tbody"></tbody></table>
+    <h4 style="font-size:.82em;text-transform:uppercase;color:#888;margin:0 0 8px;font-weight:700;">פריטים</h4>
+    <table class="items-table"><thead><tr><th>תמונה</th><th>מוצר</th><th>אפשרויות</th><th>כמות</th><th>מחיר</th><th>סה"כ</th></tr></thead><tbody id="ev-order-items-tbody"></tbody></table>
+    <label style="font-weight:700;display:block;margin-bottom:5px;font-size:.9em;">הערות פנימיות:</label>
+    <textarea id="ev-order-notes" rows="3" style="width:100%;padding:8px;border:2px solid #e0e0e0;border-radius:7px;font-family:inherit;resize:vertical;margin-bottom:10px;" placeholder="הערות..."></textarea>
+    <div class="modal-actions">
+      <button class="btn btn-success" id="ev-om-paid-btn">✅ אשר תשלום</button>
+      <button class="btn btn-info" id="ev-om-sent-btn">📦 סמן כנשלח</button>
+      <button class="btn btn-dark" id="ev-om-save-notes-btn">💾 שמור הערות</button>
+      <button class="btn btn-danger" id="ev-om-delete-btn">🗑 מחק</button>
+    </div>
+  </div>
+</div>
+
+<!-- CREATE EVENT MODAL -->
+<div id="create-event-modal" class="modal">
+  <div class="modal-box" style="max-width:480px;">
+    <button class="modal-close" id="close-create-event-modal">&times;</button>
+    <h3>צור אירוע חדש</h3>
+    <div class="form-group"><label>שם האירוע *</label><input type="text" id="new-event-name" placeholder="לדוגמה: כנס קיץ 2026"></div>
+    <div class="form-group"><label>תאריך יעד (סיום)</label><input type="date" id="new-event-end-date"></div>
+    <div class="form-group"><label>תיאור קצר</label><textarea id="new-event-desc" rows="2" placeholder="תיאור האירוע..."></textarea></div>
+    <button class="btn btn-success" id="confirm-create-event-btn" style="width:100%;padding:13px;margin-top:8px;">✅ צור אירוע</button>
+  </div>
 </div>
 
 <script>
@@ -1100,7 +1350,498 @@ async function adminSendInvoiceEmail(orderId){
 }
 
 $('save-ship-btn').addEventListener('click',async()=>{try{await db.collection('yr_settings').doc('main').update({Shipping:{Method:$('ship-method').value,Value:parseFloat($('ship-val').value)||0,FreeThreshold:parseFloat($('ship-free').value)||0}});alert('הגדרות המשלוח נשמרו!');}catch(e){alert('שגיאה');}});
-async function loadMemberAnnouncements(){try{const d=await db.collection('yr_settings').doc('main').get();const list=(d.data()&&d.data().MemberAnnouncements)||[];const el=$('member-ann-list');el.innerHTML='';if(!list.length){el.innerHTML='<p style="color:#888">אין הודעות לחברי מועדון.</p>';return;}list.forEach((ann,idx)=>{const item=document.createElement('div');item.className='list-item';item.innerHTML=`<span>🔒 ${ann}</span><div class="list-item-actions"><button class="btn btn-danger" onclick="deleteMemberAnn(${idx})">🗑</button></div>`;el.appendChild(item);});}catch(e){console.error(e);}}
+
+// ===== EVENTS ADMIN =====
+let currentEventId = null;
+let currentEventData = null;
+let evStoreSelectedIds = new Set();
+let currentEvOrderId = null;
+
+document.querySelectorAll('.menu-item').forEach(item => {
+  item.addEventListener('click', () => {
+    if (item.dataset.section === 'events') { loadEventsList(); }
+  });
+});
+
+document.querySelectorAll('.ev-tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.ev-tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.ev-tab-content').forEach(c => { c.classList.remove('active'); c.style.display='none'; });
+    btn.classList.add('active');
+    const tabId = btn.dataset.etab;
+    const tabEl = document.getElementById(tabId);
+    if (tabEl) { tabEl.classList.add('active'); tabEl.style.display='block'; }
+    if (tabId === 'ev-orders') loadEvOrders();
+    if (tabId === 'ev-products') { loadEvStoreProducts(); loadEvExclusiveProducts(); buildEvCouponProductSelect(); }
+    if (tabId === 'ev-coupons') { renderEvCoupons(); buildEvCouponProductSelect(); }
+  });
+});
+
+async function loadEventsList() {
+  const grid = document.getElementById('events-list-grid');
+  grid.innerHTML = '<p style="color:#888;grid-column:1/-1;">טוען...</p>';
+  try {
+    const snap = await db.collection('yr_events').orderBy('createdAt','desc').get();
+    if (snap.empty) { grid.innerHTML = '<p style="color:#888;">אין אירועים. צור את הראשון!</p>'; return; }
+    grid.innerHTML = '';
+    snap.docs.forEach(doc => {
+      const ev = { id: doc.id, ...doc.data() };
+      const card = document.createElement('div');
+      card.className = 'event-card' + (ev.active ? '' : ' event-inactive');
+      const bannerHtml = ev.bannerUrl
+        ? `<img src="${ev.bannerUrl}" class="event-card-banner" alt="">`
+        : `<div class="event-card-banner-placeholder">🎪</div>`;
+      const endDate = ev.endDate ? `📅 מסתיים: ${new Date(ev.endDate).toLocaleDateString('he-IL')}` : '';
+      card.innerHTML = `${bannerHtml}
+        <h3>${ev.name}</h3>
+        <p class="event-card-meta">${endDate}</p>
+        <p class="event-card-meta">${ev.active ? '🟢 פעיל' : '⚪ לא פעיל'}</p>
+        <div class="event-card-actions">
+          <button class="btn btn-dark" style="flex:1;padding:8px;font-size:.85em;" onclick="openEventManage('${doc.id}')">⚙️ נהל</button>
+          <button class="btn btn-success" style="padding:8px 12px;font-size:.85em;" onclick="copyEvLink('${doc.id}',this)">🔗</button>
+          <button class="btn btn-danger" style="padding:8px 12px;font-size:.85em;" onclick="deleteEvent('${doc.id}')">🗑</button>
+        </div>`;
+      grid.appendChild(card);
+    });
+  } catch(e) { console.error(e); grid.innerHTML = '<p style="color:#dc3545;">שגיאה בטעינת אירועים.</p>'; }
+}
+
+window.copyEvLink = async function(id, btn) {
+  const url = `${location.origin}/event.html?event=${id}`;
+  const ok = await clip(url);
+  if (ok) { const o = btn.innerHTML; btn.innerHTML = '✓'; setTimeout(() => btn.innerHTML = o, 1500); }
+};
+
+document.getElementById('create-event-btn').addEventListener('click', () => openModal('create-event-modal'));
+document.getElementById('close-create-event-modal').addEventListener('click', () => closeModal('create-event-modal'));
+
+document.getElementById('confirm-create-event-btn').addEventListener('click', async () => {
+  const name = document.getElementById('new-event-name').value.trim();
+  if (!name) { alert('הזן שם לאירוע'); return; }
+  const endDate = document.getElementById('new-event-end-date').value;
+  const desc = document.getElementById('new-event-desc').value.trim();
+  try {
+    const data = {
+      name, description: desc, endDate: endDate || null,
+      active: false, productIds: [], coupons: [],
+      shipping: { method: 'fixed', value: 30, freeThreshold: 0 },
+      paymentLink: null, bannerUrl: null, location: null, extraMeta: null,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    const ref = await db.collection('yr_events').add(data);
+    closeModal('create-event-modal');
+    document.getElementById('new-event-name').value = '';
+    document.getElementById('new-event-end-date').value = '';
+    document.getElementById('new-event-desc').value = '';
+    await loadEventsList();
+    openEventManage(ref.id);
+  } catch(e) { console.error(e); alert('שגיאה ביצירת האירוע'); }
+});
+
+window.openEventManage = async function(eventId) {
+  currentEventId = eventId;
+  try {
+    const doc = await db.collection('yr_events').doc(eventId).get();
+    if (!doc.exists) { alert('אירוע לא נמצא'); return; }
+    currentEventData = { id: doc.id, ...doc.data() };
+    document.getElementById('events-main-view').style.display = 'none';
+    document.getElementById('event-manage-view').style.display = 'block';
+    document.getElementById('event-manage-title').textContent = currentEventData.name;
+    const statusEl = document.getElementById('event-manage-status');
+    statusEl.textContent = currentEventData.active ? '🟢 פעיל' : '⚪ לא פעיל';
+    statusEl.className = 'status-badge ' + (currentEventData.active ? 's-paid' : 's-pending');
+    document.getElementById('ev-name').value = currentEventData.name || '';
+    document.getElementById('ev-end-date').value = currentEventData.endDate || '';
+    document.getElementById('ev-location').value = currentEventData.location || '';
+    document.getElementById('ev-extra-meta').value = currentEventData.extraMeta || '';
+    document.getElementById('ev-description').value = currentEventData.description || '';
+    document.getElementById('ev-payment-link').value = currentEventData.paymentLink || '';
+    document.getElementById('ev-active').checked = !!currentEventData.active;
+    document.getElementById('ev-banner-url').value = currentEventData.bannerUrl || '';
+    const bannerPreview = document.getElementById('ev-banner-preview');
+    if (currentEventData.bannerUrl) { bannerPreview.src = currentEventData.bannerUrl; bannerPreview.classList.add('show'); }
+    else bannerPreview.classList.remove('show');
+    const ship = currentEventData.shipping || { method:'fixed', value:30, freeThreshold:0 };
+    document.getElementById('ev-ship-method').value = ship.method || 'fixed';
+    document.getElementById('ev-ship-value').value = ship.value || 30;
+    document.getElementById('ev-ship-free').value = ship.freeThreshold || 0;
+    document.querySelectorAll('.ev-tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.ev-tab-content').forEach(c => { c.classList.remove('active'); c.style.display = 'none'; });
+    document.querySelector('.ev-tab-btn[data-etab="ev-details"]').classList.add('active');
+    const detTab = document.getElementById('ev-details');
+    detTab.classList.add('active'); detTab.style.display = 'block';
+    setupUpload('ev-banner-file','ev-banner-preview','ev-banner-status','ev-banner-url','ev-banner-zone');
+  } catch(e) { console.error(e); alert('שגיאה בטעינת האירוע'); }
+};
+
+document.getElementById('back-to-events-btn').addEventListener('click', () => {
+  document.getElementById('event-manage-view').style.display = 'none';
+  document.getElementById('events-main-view').style.display = 'block';
+  currentEventId = null; currentEventData = null;
+  loadEventsList();
+});
+
+document.getElementById('save-event-details-btn').addEventListener('click', async () => {
+  if (!currentEventId) return;
+  const name = document.getElementById('ev-name').value.trim();
+  if (!name) { alert('הזן שם לאירוע'); return; }
+  const data = {
+    name,
+    endDate: document.getElementById('ev-end-date').value || null,
+    location: document.getElementById('ev-location').value.trim() || null,
+    extraMeta: document.getElementById('ev-extra-meta').value.trim() || null,
+    description: document.getElementById('ev-description').value.trim() || null,
+    paymentLink: document.getElementById('ev-payment-link').value.trim() || null,
+    active: document.getElementById('ev-active').checked,
+    bannerUrl: document.getElementById('ev-banner-url').value || null,
+    shipping: {
+      method: document.getElementById('ev-ship-method').value,
+      value: parseFloat(document.getElementById('ev-ship-value').value) || 0,
+      freeThreshold: parseFloat(document.getElementById('ev-ship-free').value) || 0
+    }
+  };
+  try {
+    await db.collection('yr_events').doc(currentEventId).update(data);
+    currentEventData = { ...currentEventData, ...data };
+    document.getElementById('event-manage-title').textContent = name;
+    const statusEl = document.getElementById('event-manage-status');
+    statusEl.textContent = data.active ? '🟢 פעיל' : '⚪ לא פעיל';
+    statusEl.className = 'status-badge ' + (data.active ? 's-paid' : 's-pending');
+    alert('פרטי האירוע נשמרו!');
+  } catch(e) { console.error(e); alert('שגיאה בשמירה'); }
+});
+
+document.getElementById('copy-event-link-btn').addEventListener('click', async () => {
+  if (!currentEventId) return;
+  const url = `${location.origin}/event.html?event=${currentEventId}`;
+  const ok = await clip(url);
+  if (ok) { const b = document.getElementById('copy-event-link-btn'); const o = b.innerHTML; b.innerHTML = '✓ הועתק!'; setTimeout(() => b.innerHTML = o, 2000); }
+});
+
+document.getElementById('delete-event-btn').addEventListener('click', async () => {
+  if (!currentEventId || !confirm(`למחוק את האירוע "${currentEventData?.name}"? פעולה זו בלתי הפיכה.`)) return;
+  try {
+    await db.collection('yr_events').doc(currentEventId).delete();
+    alert('האירוע נמחק!');
+    document.getElementById('back-to-events-btn').click();
+  } catch(e) { console.error(e); alert('שגיאה'); }
+});
+
+window.deleteEvent = async function(id) {
+  if (!confirm('למחוק אירוע זה?')) return;
+  try { await db.collection('yr_events').doc(id).delete(); alert('נמחק!'); loadEventsList(); } catch(e) { alert('שגיאה'); }
+};
+
+async function loadEvStoreProducts() {
+  const grid = document.getElementById('ev-store-products-grid');
+  const selCount = document.getElementById('ev-store-sel-count');
+  grid.innerHTML = '<p style="color:#888;grid-column:1/-1;">טוען מוצרים...</p>';
+  evStoreSelectedIds = new Set(currentEventData?.productIds || []);
+  function renderGrid(list) {
+    grid.innerHTML = '';
+    list.forEach(p => {
+      const item = document.createElement('div');
+      item.className = 'ev-store-product-item' + (evStoreSelectedIds.has(p.id) ? ' selected' : '');
+      item.dataset.id = p.id;
+      item.innerHTML = `<img src="${p.image}" alt="${p.name}"><span title="${p.name}">${p.name}</span><div style="font-size:.75em;color:#dc3545;font-weight:700;margin-top:3px;">${(p.salePrice||p.price||0).toFixed(2)} ₪</div>`;
+      item.addEventListener('click', () => {
+        if (evStoreSelectedIds.has(p.id)) evStoreSelectedIds.delete(p.id);
+        else evStoreSelectedIds.add(p.id);
+        item.classList.toggle('selected', evStoreSelectedIds.has(p.id));
+        selCount.textContent = `${evStoreSelectedIds.size} נבחרו`;
+      });
+      grid.appendChild(item);
+    });
+    selCount.textContent = `${evStoreSelectedIds.size} נבחרו`;
+  }
+  renderGrid(products);
+  document.getElementById('ev-store-search').oninput = e => {
+    const q = e.target.value.toLowerCase();
+    renderGrid(q ? products.filter(p => p.name.toLowerCase().includes(q)) : products);
+  };
+}
+
+document.getElementById('save-ev-store-products-btn').addEventListener('click', async () => {
+  if (!currentEventId) return;
+  try {
+    await db.collection('yr_events').doc(currentEventId).update({ productIds: Array.from(evStoreSelectedIds) });
+    currentEventData.productIds = Array.from(evStoreSelectedIds);
+    alert('מוצרים נשמרו!');
+  } catch(e) { console.error(e); alert('שגיאה'); }
+});
+
+async function loadEvExclusiveProducts() {
+  const list = document.getElementById('ev-exc-products-list');
+  list.innerHTML = '<p style="color:#888;">טוען...</p>';
+  try {
+    const snap = await db.collection('yr_events').doc(currentEventId).collection('products').get();
+    list.innerHTML = '';
+    if (snap.empty) { list.innerHTML = '<p style="color:#888;font-size:.9em;">אין מוצרים בלעדיים.</p>'; return; }
+    snap.docs.forEach(doc => {
+      const p = { id: doc.id, ...doc.data() };
+      const card = document.createElement('div');
+      card.className = 'ev-exc-card';
+      const ep = p.salePrice && p.salePrice < p.price ? p.salePrice : p.price;
+      card.innerHTML = `<div style="position:absolute;top:5px;right:5px;background:#f0c000;color:#000;padding:2px 6px;font-size:.7em;border-radius:3px;font-weight:900;">בלעדי</div>
+        <img src="${p.image}" alt="${p.name}">
+        <h4 title="${p.name}">${p.name}</h4>
+        <div class="price">${ep.toFixed(2)} ₪</div>
+        <button class="del-btn" onclick="deleteEvExcProduct('${doc.id}')">🗑 מחק</button>`;
+      list.appendChild(card);
+    });
+  } catch(e) { console.error(e); list.innerHTML = '<p style="color:#dc3545;">שגיאה</p>'; }
+}
+
+window.deleteEvExcProduct = async function(id) {
+  if (!confirm('למחוק מוצר בלעדי זה?')) return;
+  try { await db.collection('yr_events').doc(currentEventId).collection('products').doc(id).delete(); await loadEvExclusiveProducts(); } catch(e) { alert('שגיאה'); }
+};
+
+setTimeout(() => {
+  setupUpload('eep-img-file','eep-img-preview','eep-img-status','eep-img-url','eep-img-zone');
+}, 500);
+
+document.getElementById('eep-add-cf-btn').addEventListener('click', () => addCFUI(null, document.getElementById('eep-cf-container')));
+
+document.getElementById('add-exc-product-btn').addEventListener('click', async () => {
+  if (!currentEventId) return;
+  const name = document.getElementById('eep-name').value.trim();
+  const desc = document.getElementById('eep-desc').value.trim();
+  const price = parseFloat(document.getElementById('eep-price').value);
+  const salePrice = parseFloat(document.getElementById('eep-sale').value) || null;
+  const img = document.getElementById('eep-img-url').value.trim();
+  if (!name || !desc || isNaN(price) || price < 0 || !img) { alert('מלא שדות חובה (שם, תיאור, מחיר, תמונה)'); return; }
+  const cfs = extractCFs(document.getElementById('eep-cf-container'));
+  const data = { name, description: desc, price, image: img, isEventExclusive: true, customFields: cfs.length ? cfs : null, createdAt: firebase.firestore.FieldValue.serverTimestamp() };
+  if (salePrice && salePrice < price) data.salePrice = salePrice;
+  try {
+    await db.collection('yr_events').doc(currentEventId).collection('products').add(data);
+    alert('מוצר בלעדי נוסף!');
+    document.getElementById('eep-name').value = '';
+    document.getElementById('eep-desc').value = '';
+    document.getElementById('eep-price').value = '';
+    document.getElementById('eep-sale').value = '';
+    document.getElementById('eep-img-url').value = '';
+    document.getElementById('eep-img-preview').classList.remove('show');
+    document.getElementById('eep-img-status').textContent = '';
+    document.getElementById('eep-cf-container').innerHTML = '';
+    await loadEvExclusiveProducts();
+  } catch(e) { console.error(e); alert('שגיאה'); }
+});
+
+window.onEvCoupTypeChange = function() {
+  const t = document.getElementById('evcoup-type').value;
+  document.getElementById('evcoup-val-group').style.display = (t==='free_shipping'||t==='free_product') ? 'none' : 'block';
+  document.getElementById('evcoup-prod-group').style.display = t==='free_product' ? 'block' : 'none';
+};
+
+async function buildEvCouponProductSelect() {
+  if (!currentEventId) return;
+  const sel = document.getElementById('evcoup-prod');
+  sel.innerHTML = '<option value="">בחר מוצר</option>';
+  (currentEventData?.productIds || []).forEach(id => {
+    const p = products.find(x => x.id === id);
+    if (p) { const o = document.createElement('option'); o.value = p.id; o.textContent = p.name; sel.appendChild(o); }
+  });
+  try {
+    const snap = await db.collection('yr_events').doc(currentEventId).collection('products').get();
+    snap.docs.forEach(doc => {
+      const p = doc.data();
+      const o = document.createElement('option');
+      o.value = 'exc_'+doc.id; o.textContent = '⭐ '+p.name;
+      sel.appendChild(o);
+    });
+  } catch(e) {}
+}
+
+async function renderEvCoupons() {
+  if (!currentEventData) return;
+  const list = document.getElementById('evcoup-list');
+  const coupons = currentEventData.coupons || [];
+  list.innerHTML = '';
+  if (!coupons.length) { list.innerHTML = '<p style="color:#888;">אין קופונים.</p>'; return; }
+  coupons.forEach((c, idx) => {
+    let desc = c.Type === 'fixed_discount' ? `הנחה ${c.Value}₪` : c.Type === 'percentage_discount' ? `הנחה ${c.Value}%` : c.Type === 'free_shipping' ? 'משלוח חינם' : 'מוצר חינם';
+    const exp = c.ExpiryDate ? ` | עד: ${c.ExpiryDate}` : '';
+    const item = document.createElement('div');
+    item.className = 'list-item';
+    item.innerHTML = `<div><strong>${c.Code}</strong> — ${desc}${exp}</div>
+      <div class="list-item-actions">
+        <button class="btn btn-danger" onclick="deleteEvCoupon(${idx})">🗑</button>
+      </div>`;
+    list.appendChild(item);
+  });
+}
+
+window.deleteEvCoupon = async function(idx) {
+  if (!confirm('למחוק קופון?')) return;
+  const coupons = [...(currentEventData.coupons || [])];
+  coupons.splice(idx, 1);
+  try {
+    await db.collection('yr_events').doc(currentEventId).update({ coupons });
+    currentEventData.coupons = coupons;
+    renderEvCoupons();
+  } catch(e) { alert('שגיאה'); }
+};
+
+document.getElementById('add-evcoup-btn').addEventListener('click', async () => {
+  const code = document.getElementById('evcoup-code').value.trim();
+  const type = document.getElementById('evcoup-type').value;
+  const val = parseFloat(document.getElementById('evcoup-val').value) || 0;
+  const prodId = document.getElementById('evcoup-prod').value;
+  const expiry = document.getElementById('evcoup-expiry').value;
+  if (!code) { alert('הזן קוד קופון'); return; }
+  if (type === 'free_product' && !prodId) { alert('בחר מוצר'); return; }
+  const coup = { Code: code, Type: type, Value: (type==='free_shipping'||type==='free_product') ? 0 : val, ProductId: type==='free_product' ? prodId : null, ExpiryDate: expiry || null };
+  const coupons = [...(currentEventData?.coupons || []), coup];
+  try {
+    await db.collection('yr_events').doc(currentEventId).update({ coupons });
+    currentEventData.coupons = coupons;
+    document.getElementById('evcoup-code').value = '';
+    document.getElementById('evcoup-val').value = '';
+    document.getElementById('evcoup-expiry').value = '';
+    renderEvCoupons();
+    alert('קופון נוסף!');
+  } catch(e) { console.error(e); alert('שגיאה'); }
+});
+
+async function loadEvOrders(search = '') {
+  if (!currentEventId) return;
+  const list = document.getElementById('ev-orders-list');
+  list.innerHTML = '<p>טוען הזמנות...</p>';
+  try {
+    const snap = await db.collection('yr_event_orders').where('eventId','==',currentEventId).orderBy('orderDate','desc').get();
+    let orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const filt = document.getElementById('ev-order-filter').value;
+    if (search) orders = orders.filter(o => ['customerName','customerEmail','customerPhone'].some(k => (o[k]||'').toLowerCase().includes(search)));
+    else {
+      if (filt === 'awaiting') orders = orders.filter(o => o.status === 'bit_pending');
+      else if (filt === 'paid') orders = orders.filter(o => o.status === 'paid');
+      else if (filt === 'completed') orders = orders.filter(o => o.completed);
+      else if (filt === 'active') orders = orders.filter(o => !o.completed);
+    }
+    if (!orders.length) { list.innerHTML = '<p style="color:#888;">אין הזמנות להצגה.</p>'; return; }
+    list.innerHTML = '';
+    orders.forEach(order => {
+      const card = document.createElement('div');
+      card.className = 'order-card';
+      const total = typeof order.totalAmount === 'number' ? order.totalAmount.toFixed(2) : '0.00';
+      const isPending = order.status === 'bit_pending';
+      card.innerHTML = `<div class="order-card-top">
+        <div class="order-info">
+          <strong>הזמנה #${order.id.substring(0,9)}...</strong>
+          <p style="margin:5px 0">${sBadge(order)}</p>
+          <p><strong>לקוח:</strong> ${order.customerName||'-'}</p>
+          <p><strong>טלפון:</strong> ${order.customerPhone||'-'}</p>
+          <p><strong>סה"כ:</strong> <strong style="color:#dc3545">${total} ₪</strong></p>
+          <p style="color:#888;font-size:.83em">📅 ${fmtDate(order.orderDate)}</p>
+        </div>
+        <div class="order-btns" onclick="event.stopPropagation()">
+          ${isPending?`<button class="btn btn-success" onclick="evConfirmPayment('${order.id}')">✅ אשר תשלום</button>`:`<button class="btn btn-outline-green" onclick="evConfirmPayment('${order.id}')">✅ שולם</button>`}
+          <button class="btn btn-info" onclick="evMarkSent('${order.id}')">📦 נשלח</button>
+          <button class="btn btn-dark" onclick="showEvOrderModal(${JSON.stringify(order).replace(/"/g,'&quot;')})">🔍 פרטים</button>
+        </div>
+      </div>
+      <div class="order-notes" onclick="event.stopPropagation()">
+        <textarea class="notes-ta" data-id="${order.id}" placeholder="הערות פנימיות...">${order.adminStatus||''}</textarea>
+        <button class="btn btn-dark btn-save-ev-notes" data-id="${order.id}" style="margin-top:6px;width:100%;padding:7px;font-size:.82em;">💾 שמור הערות</button>
+      </div>`;
+      list.appendChild(card);
+    });
+    list.querySelectorAll('.btn-save-ev-notes').forEach(btn => btn.addEventListener('click', async () => {
+      const ta = btn.closest('.order-notes').querySelector('.notes-ta');
+      try {
+        await db.collection('yr_event_orders').doc(btn.dataset.id).update({ adminStatus: ta.value });
+        const o = btn.textContent; btn.textContent = '✓ נשמר!'; btn.style.background = '#27ae60';
+        setTimeout(() => { btn.textContent = o; btn.style.background = ''; }, 1500);
+      } catch(e) { alert('שגיאה'); }
+    }));
+  } catch(e) { list.innerHTML = '<p style="color:#dc3545;">שגיאה בטעינת הזמנות.</p>'; console.error(e); }
+}
+
+window.evConfirmPayment = async function(orderId) {
+  if (!confirm('לאשר תשלום?')) return;
+  try {
+    await db.collection('yr_event_orders').doc(orderId).update({ status: 'paid', paidAt: firebase.firestore.FieldValue.serverTimestamp() });
+    try {
+      const doc = await db.collection('yr_event_orders').doc(orderId).get();
+      if (doc.exists) {
+        const o = doc.data();
+        const itemsText = (o.items||[]).map(i => `${i.quantity}x ${i.productName} - ${(i.unitPrice*i.quantity).toFixed(2)}₪`).join('\n');
+        await emailjs.send('service_pypll0n','yrjerseys',{
+          email: o.customerEmail, order_id: orderId,
+          customer_name: o.customerName, customer_phone: o.customerPhone||'',
+          customer_address: o.customerAddress||'', items_list: itemsText,
+          options_list: 'ראה פירוט', subtotal: (o.subtotal||0).toFixed(2),
+          shipping_cost: (o.shippingCost||0).toFixed(2),
+          coupon_code: o.appliedCoupon||'', coupon_discount: o.couponDiscount>0?o.couponDiscount.toFixed(2):'',
+          points_used: '', points_discount: '',
+          total_amount: (o.totalAmount||0).toFixed(2),
+          invoice_url: `${location.origin}/event-invoice.html#${orderId}`
+        });
+      }
+    } catch(e) { console.error('Email:', e); }
+    loadEvOrders(document.getElementById('ev-order-search').value.trim().toLowerCase());
+  } catch(e) { alert('שגיאה'); }
+};
+
+window.evMarkSent = async function(orderId) {
+  if (!confirm('לסמן כנשלח?')) return;
+  try {
+    await db.collection('yr_event_orders').doc(orderId).update({ completed: true, completedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    loadEvOrders(document.getElementById('ev-order-search').value.trim().toLowerCase());
+  } catch(e) { alert('שגיאה'); }
+};
+
+document.getElementById('ev-order-search-btn').addEventListener('click', () => loadEvOrders(document.getElementById('ev-order-search').value.trim().toLowerCase()));
+document.getElementById('ev-order-clear-btn').addEventListener('click', () => { document.getElementById('ev-order-search').value = ''; loadEvOrders(); });
+document.getElementById('ev-order-filter').addEventListener('change', () => loadEvOrders(document.getElementById('ev-order-search').value.trim().toLowerCase()));
+
+window.showEvOrderModal = function(order) {
+  if (typeof order === 'string') { try { order = JSON.parse(order); } catch(e) { return; } }
+  currentEvOrderId = order.id;
+  document.getElementById('ev-order-modal-title').textContent = `הזמנה #${order.id} — ${order.eventName||'אירוע'}`;
+  document.getElementById('ev-order-status-bar').innerHTML = `${sBadge(order)}<span style="color:#888;font-size:.86em">📅 ${fmtDate(order.orderDate)}</span>`;
+  document.getElementById('ev-order-detail-grid').innerHTML = `
+    <div class="detail-box"><h4>פרטי לקוח</h4>
+      <p><strong>שם:</strong> ${order.customerName||'-'}</p>
+      <p><strong>אימייל:</strong> ${order.customerEmail||'-'}</p>
+      <p><strong>טלפון:</strong> ${order.customerPhone||'-'}</p>
+    </div>
+    <div class="detail-box"><h4>כתובת משלוח</h4><p>${order.customerAddress||'לא הוזנה'}</p></div>`;
+  let priceRows = `<tr><td>סה"כ מוצרים</td><td>${(order.subtotal||0).toFixed(2)} ₪</td></tr>
+    <tr><td>דמי משלוח</td><td>${(order.shippingCost||0).toFixed(2)} ₪</td></tr>`;
+  if (order.couponDiscount > 0) priceRows += `<tr class="row-discount"><td>קופון: ${order.appliedCoupon}</td><td>-${order.couponDiscount.toFixed(2)} ₪</td></tr>`;
+  priceRows += `<tr class="row-grand"><td><strong>סה"כ לתשלום</strong></td><td><strong>${(order.totalAmount||0).toFixed(2)} ₪</strong></td></tr>`;
+  document.getElementById('ev-order-price-tbody').innerHTML = priceRows;
+  const tbody = document.getElementById('ev-order-items-tbody');
+  tbody.innerHTML = '';
+  (order.items||[]).forEach(item => {
+    const opts = item.selectedOptions ? Object.entries(item.selectedOptions).filter(([,v])=>v).map(([k,v])=>`<span class="opt-chip">${k}: ${v}</span>`).join('') : '';
+    const freebie = item.isFreebie ? '<span class="freebie-chip">מתנה</span>' : '';
+    const up = typeof item.unitPrice === 'number' ? item.unitPrice : 0;
+    const tp = typeof item.totalPrice === 'number' ? item.totalPrice : up * (item.quantity||1);
+    tbody.innerHTML += `<tr><td><img src="${item.image||''}" class="item-thumb" onerror="this.style.display='none'" alt=""></td><td>${freebie}<strong>${item.productName||'מוצר'}</strong></td><td>${opts||'-'}</td><td>${item.quantity||1}</td><td>${up.toFixed(2)} ₪</td><td><strong>${tp.toFixed(2)} ₪</strong></td></tr>`;
+  });
+  document.getElementById('ev-order-notes').value = order.adminStatus || '';
+  openModal('event-order-modal');
+};
+
+document.getElementById('close-event-order-modal').addEventListener('click', () => closeModal('event-order-modal'));
+document.getElementById('ev-om-paid-btn').addEventListener('click', () => { if (currentEvOrderId) evConfirmPayment(currentEvOrderId); closeModal('event-order-modal'); });
+document.getElementById('ev-om-sent-btn').addEventListener('click', async () => {
+  if (!currentEvOrderId || !confirm('לסמן כנשלח?')) return;
+  try { await db.collection('yr_event_orders').doc(currentEvOrderId).update({ completed: true, completedAt: firebase.firestore.FieldValue.serverTimestamp() }); closeModal('event-order-modal'); loadEvOrders(); } catch(e) { alert('שגיאה'); }
+});
+document.getElementById('ev-om-save-notes-btn').addEventListener('click', async () => {
+  if (!currentEvOrderId) return;
+  try { await db.collection('yr_event_orders').doc(currentEvOrderId).update({ adminStatus: document.getElementById('ev-order-notes').value }); alert('נשמר!'); } catch(e) { alert('שגיאה'); }
+});
+document.getElementById('ev-om-delete-btn').addEventListener('click', async () => {
+  if (!currentEvOrderId || !confirm('למחוק הזמנה זו לצמיתות?')) return;
+  try { await db.collection('yr_event_orders').doc(currentEvOrderId).delete(); closeModal('event-order-modal'); loadEvOrders(); } catch(e) { alert('שגיאה'); }
+});
+  async function loadMemberAnnouncements(){try{const d=await db.collection('yr_settings').doc('main').get();const list=(d.data()&&d.data().MemberAnnouncements)||[];const el=$('member-ann-list');el.innerHTML='';if(!list.length){el.innerHTML='<p style="color:#888">אין הודעות לחברי מועדון.</p>';return;}list.forEach((ann,idx)=>{const item=document.createElement('div');item.className='list-item';item.innerHTML=`<span>🔒 ${ann}</span><div class="list-item-actions"><button class="btn btn-danger" onclick="deleteMemberAnn(${idx})">🗑</button></div>`;el.appendChild(item);});}catch(e){console.error(e);}}
 window.deleteMemberAnn=async function(idx){if(!confirm('למחוק?'))return;const d=await db.collection('yr_settings').doc('main').get();const list=(d.data()&&d.data().MemberAnnouncements)||[];list.splice(idx,1);await db.collection('yr_settings').doc('main').update({MemberAnnouncements:list});loadMemberAnnouncements();};
 $('add-member-ann-btn').addEventListener('click',async()=>{const t=$('member-ann-text').value.trim();if(!t)return alert('הזן הודעה');const d=await db.collection('yr_settings').doc('main').get();const list=(d.data()&&d.data().MemberAnnouncements)||[];if(list.length>=2)return alert('מקסימום 2 הודעות לחברי מועדון');list.push(t);await db.collection('yr_settings').doc('main').update({MemberAnnouncements:list});$('member-ann-text').value='';loadMemberAnnouncements();});
 </script>
