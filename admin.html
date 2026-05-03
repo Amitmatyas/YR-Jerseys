@@ -1710,9 +1710,12 @@ async function loadEvOrders(search = '') {
   const list = document.getElementById('ev-orders-list');
   list.innerHTML = '<p>טוען הזמנות...</p>';
   try {
-    const snap = await db.collection('yr_event_orders').where('eventId','==',currentEventId).orderBy('orderDate','desc').get();
-    let orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    const filt = document.getElementById('ev-order-filter').value;
+    const snap = await db.collection('yr_event_orders').where('eventId','==',currentEventId).get();
+let orders = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => {
+  const da = a.orderDate ? a.orderDate.toDate() : new Date(0);
+  const db2 = b.orderDate ? b.orderDate.toDate() : new Date(0);
+  return db2 - da;
+});    const filt = document.getElementById('ev-order-filter').value;
     if (search) orders = orders.filter(o => ['customerName','customerEmail','customerPhone'].some(k => (o[k]||'').toLowerCase().includes(search)));
     else {
       if (filt === 'awaiting') orders = orders.filter(o => o.status === 'bit_pending');
