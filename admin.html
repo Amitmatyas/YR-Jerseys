@@ -803,7 +803,7 @@ const $=id=>document.getElementById(id);
 const getCats=p=>Array.isArray(p.categories)&&p.categories.length?p.categories:p.category?[p.category]:[];
 const onSale=p=>{if(!p.salePrice||p.salePrice<=0)return false;if(p.saleEndDate)return new Date(p.saleEndDate)>=new Date();return true;};
 const effPrice=p=>{if(p.salePrice&&p.salePrice>0){if(p.saleEndDate){if(new Date(p.saleEndDate)>=new Date())return p.salePrice;}else return p.salePrice;}return p.price;};
-const fmtDate=ts=>{if(!ts)return'לא ידוע';try{return new Date(ts.toDate()).toLocaleString('he-IL');}catch(e){return'לא ידוע';}};
+const fmtDate=ts=>{if(!ts)return'לא ידוע';try{if(ts.toDate)return new Date(ts.toDate()).toLocaleString('he-IL');if(ts.seconds)return new Date(ts.seconds*1000).toLocaleString('he-IL');if(ts._seconds)return new Date(ts._seconds*1000).toLocaleString('he-IL');return new Date(ts).toLocaleString('he-IL');}catch(e){return'לא ידוע';}};
 const siteBase=()=>{const u=new URL(location.href),p=u.pathname.replace(/\/[^\/]*$/,'');return u.origin+(p==='/'?'':p);};
 const clip=async t=>{if(navigator.clipboard&&window.isSecureContext){try{await navigator.clipboard.writeText(t);return true;}catch(e){}}try{const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;left:-9999px;top:0';document.body.appendChild(a);a.focus();a.select();const ok=document.execCommand('copy');document.body.removeChild(a);return ok;}catch(e){return false;}};
 const sBadge=o=>{const s=o.status||'',c=o.completed;if(c)return'<span class="status-badge s-completed">📦 נשלח / הושלם</span>';if(s==='paid'||s==='paid_bit')return'<span class="status-badge s-paid">✅ שולם</span>';if(s==='bit_pending')return'<span class="status-badge s-pending">🟡 ממתין לאישור תשלום</span>';return'<span class="status-badge s-pending">⏳ בטיפול</span>';};
@@ -1770,14 +1770,25 @@ window.evConfirmPayment = async function(orderId) {
       const doc = await db.collection('yr_event_orders').doc(orderId).get();
       if (doc.exists) {
         const o = doc.data();
-        const itemsText = (o.items||[]).map(i => `${i.quantity}x ${i.productName} - ${(i.unitPrice*i.quantity).toFixed(2)}₪`).join('\n');
+        const itemsText = (o.items||[]).map(i =>
+          `${i.quantity}x ${i.productName||i.name}${i.isFreebie?' (מתנה)':''} - ${i.isFreebie?'0.00':((i.unitPrice||0)*(i.quantity||1)).toFixed(2)}₪`
+        ).join('\n');
+        const optionsText = (o.items||[]).map(i => {
+          const opts = i.selectedOptions
+            ? Object.entries(i.selectedOptions).filter(([,v])=>v).map(([k,v])=>`${k}: ${v}`).join(', ')
+            : '';
+          return opts ? `${i.productName||i.name}: ${opts}` : '';
+        }).filter(Boolean).join('\n');
         await emailjs.send('service_pypll0n','yrjerseys',{
           email: o.customerEmail, order_id: orderId,
           customer_name: o.customerName, customer_phone: o.customerPhone||'',
-          customer_address: o.customerAddress||'', items_list: itemsText,
-          options_list: 'ראה פירוט', subtotal: (o.subtotal||0).toFixed(2),
+          customer_address: o.customerAddress||'',
+          items_list: itemsText,
+          options_list: optionsText || 'ללא',
+          subtotal: (o.subtotal||0).toFixed(2),
           shipping_cost: (o.shippingCost||0).toFixed(2),
-          coupon_code: o.appliedCoupon||'', coupon_discount: o.couponDiscount>0?o.couponDiscount.toFixed(2):'',
+          coupon_code: o.appliedCoupon||'',
+          coupon_discount: o.couponDiscount>0?o.couponDiscount.toFixed(2):'',
           points_used: '', points_discount: '',
           total_amount: (o.totalAmount||0).toFixed(2),
           invoice_url: `${location.origin}/event-invoice.html#${orderId}`
