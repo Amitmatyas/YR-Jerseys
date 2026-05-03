@@ -966,24 +966,33 @@ function resetAfterOrder() {
   const confirmBtn = $('confirm-payment-btn'); if (confirmBtn) confirmBtn.style.display = 'none';
 }
 
-// ===== EMAIL =====
 async function sendInvoiceEmail(orderId) {
   try {
     const doc = await db.collection('yr_event_orders').doc(orderId).get();
     if (!doc.exists) return;
     const o = doc.data();
-    const itemsText = (o.items||[]).map(i => `${i.quantity}x ${i.productName}${i.isFreebie?' (מתנה)':''} - ${i.isFreebie?'0.00':((i.unitPrice||0)*(i.quantity||1)).toFixed(2)}₪`).join('\n');
+    const itemsText = (o.items||[]).map(i =>
+      `${i.quantity}x ${i.productName}${i.isFreebie?' (מתנה)':''} - ${i.isFreebie?'0.00':((i.unitPrice||0)*(i.quantity||1)).toFixed(2)}₪`
+    ).join('\n');
+    const optionsText = (o.items||[]).map(i => {
+      const opts = i.selectedOptions
+        ? Object.entries(i.selectedOptions).filter(([,v])=>v).map(([k,v])=>`${k}: ${v}`).join(', ')
+        : '';
+      return opts ? `${i.productName}: ${opts}` : '';
+    }).filter(Boolean).join('\n');
     await emailjs.send('service_pypll0n','yrjerseys',{
       email: o.customerEmail, order_id: orderId,
       customer_name: o.customerName, customer_phone: o.customerPhone||'',
       customer_address: o.customerAddress||'',
-      items_list: itemsText, options_list: 'ראה פירוט',
+      items_list: itemsText,
+      options_list: optionsText || 'ללא',
       subtotal: (o.subtotal||0).toFixed(2),
       shipping_cost: (o.shippingCost||0).toFixed(2),
-      coupon_code: o.appliedCoupon||'', coupon_discount: o.couponDiscount>0?o.couponDiscount.toFixed(2):'',
+      coupon_code: o.appliedCoupon||'',
+      coupon_discount: o.couponDiscount>0?o.couponDiscount.toFixed(2):'',
       points_used: '', points_discount: '',
       total_amount: (o.totalAmount||0).toFixed(2),
-      invoice_url: `${location.origin}/event-invoice.html#${orderId}`
+      invoice_url: `https://yr-jerseys.ugo.si/event-invoice.html#${orderId}`
     });
   } catch(e) { console.error('Email error:', e); }
 }
