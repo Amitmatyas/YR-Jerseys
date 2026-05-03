@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>אירוע - YR Jerseys</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚽</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#e0e0e0;
+  --accent:#ff3e3e;
+  --border:4px solid #000;
+  --shadow:8px 8px 0 #000;
+  --shadow-hover:12px 12px 0 #000;
+  --cart-width:min(420px,90vw);
+}
+*{box-sizing:border-box;}
+body{
+  font-family:'Heebo',Arial,sans-serif;
+  margin:0;background:var(--bg);
+  background-image:url("https://www.transparenttextures.com/patterns/asfalt-dark.png");
+  color:#000;direction:rtl;overflow-x:hidden;
+  transition:margin-right .35s cubic-bezier(.4,0,.2,1);
+}
+body.cart-open{margin-right:var(--cart-width);}
+
+/* ===== EVENT NOT FOUND / LOADING ===== */
+#event-loading{display:flex;justify-content:center;align-items:center;min-height:60vh;font-size:1.5em;font-weight:900;text-transform:uppercase;}
+#event-not-found{display:none;text-align:center;padding:80px 20px;}
+
+/* ===== COUNTDOWN BAR ===== */
+#countdown-bar{
+  background:#000;color:#fff;padding:12px 20px;text-align:center;
+  font-weight:900;font-size:1.05em;border-bottom:var(--border);
+  position:sticky;top:0;z-index:999;letter-spacing:1px;text-transform:uppercase;
+}
+#countdown-bar .cd-urgent{color:var(--accent);}
+
+/* ===== HEADER ===== */
+header{
+  background:#fff;color:#000;padding:1.2em 0;text-align:center;
+  border-bottom:var(--border);font-weight:900;text-transform:uppercase;
+}
+header img{width:130px;display:block;margin:0 auto 8px;}
+header h1{margin:0;font-size:2.5em;letter-spacing:-2px;}
+#event-name-header{color:var(--accent);font-size:.5em;display:block;margin-top:4px;letter-spacing:0;}
+
+/* ===== EVENT HERO ===== */
+#event-hero{
+  background:#fff;border-bottom:var(--border);padding:28px 20px;
+  max-width:900px;margin:0 auto;text-align:center;
+}
+#event-hero h2{font-size:2em;font-weight:900;margin:0 0 10px;text-transform:uppercase;}
+#event-hero .event-desc{font-size:1em;font-weight:700;color:#444;white-space:pre-line;margin:0 0 18px;}
+.event-meta{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-bottom:8px;}
+.event-meta-item{
+  background:#f0f0f0;border:3px solid #000;padding:8px 16px;
+  font-weight:900;font-size:.88em;text-transform:uppercase;
+}
+.event-banner-img{width:100%;max-height:300px;object-fit:cover;border:var(--border);margin-bottom:18px;}
+
+/* ===== FLOATING BUTTONS ===== */
+#cart-toggle-button{
+  position:fixed;top:15px;left:15px;background:var(--accent);color:#fff;
+  border:var(--border);padding:10px 16px;font-size:.95em;font-weight:900;
+  cursor:pointer;box-shadow:var(--shadow);z-index:1001;
+  transition:all .2s;text-transform:uppercase;
+  display:flex;align-items:center;gap:8px;touch-action:manipulation;
+}
+#cart-toggle-button:hover{background:#000;transform:translate(-4px,-4px);box-shadow:var(--shadow-hover);}
+body.cart-open #cart-toggle-button{display:none!important;}
+.cart-count{background:#fff;color:var(--accent);padding:2px 7px;font-size:.75em;font-weight:900;min-width:20px;text-align:center;border:2px solid #000;}
+
+/* ===== CART PANEL ===== */
+#cart-container{
+  position:fixed;top:0;right:0;width:var(--cart-width);height:100vh;
+  background:#fff;border-left:var(--border);box-shadow:-6px 0 0 #000;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;z-index:1000;
+  transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);
+}
+#cart-container.open{transform:translateX(0);}
+.cart-header{background:#000;color:#fff;padding:18px 20px;position:sticky;top:0;z-index:10;}
+.cart-header h2{margin:0;font-size:1.3em;text-transform:uppercase;font-weight:900;display:flex;align-items:center;gap:10px;}
+.cart-close-btn{position:absolute;top:50%;left:15px;transform:translateY(-50%);background:var(--accent);color:#fff;border:3px solid #fff;width:35px;height:35px;font-size:1.3em;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:900;touch-action:manipulation;}
+.cart-close-btn:hover{background:#fff;color:#000;}
+.cart-content{padding:16px;}
+.cart-section{margin-bottom:18px;}
+.cart-section-title{font-size:.95em;font-weight:900;text-transform:uppercase;border-bottom:var(--border);padding-bottom:6px;margin-bottom:10px;}
+#cart-items{list-style:none;padding:0;margin:0;}
+#cart-items li{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:2px solid #000;font-size:.88em;gap:6px;}
+.cart-item-details{display:flex;align-items:center;min-width:0;flex:1;}
+.cart-item-details img{width:45px;height:45px;margin-left:8px;border:2px solid #000;object-fit:cover;flex-shrink:0;}
+.cart-item-info{flex-grow:1;text-align:right;min-width:0;}
+.cart-item-info span{display:block;margin-bottom:2px;font-weight:700;}
+.cart-item-quantity{display:flex;align-items:center;gap:4px;flex-shrink:0;}
+.cart-item-quantity button{background:#000;color:#fff;border:2px solid #000;padding:4px 9px;cursor:pointer;font-weight:900;font-size:1em;min-width:28px;min-height:36px;touch-action:manipulation;}
+.cart-item-quantity button:hover{background:var(--accent);}
+.cart-item-quantity span{min-width:22px;text-align:center;font-weight:700;}
+.remove-from-cart{background:var(--accent);color:#fff;border:2px solid #000;padding:5px 9px;cursor:pointer;font-weight:900;font-size:1em;flex-shrink:0;min-height:36px;touch-action:manipulation;}
+.remove-from-cart:hover{background:#000;}
+.cart-totals{background:#f0f0f0;border:var(--border);padding:12px;margin:12px 0;}
+.total-row{display:flex;justify-content:space-between;padding:5px 0;font-size:.9em;font-weight:700;border-bottom:1px solid #ccc;}
+.total-row:last-child{border-bottom:none;}
+.total-row.grand-total{font-size:1.1em;font-weight:900;color:var(--accent);border-top:var(--border);padding-top:10px;margin-top:6px;border-bottom:none;}
+.shipping-info{background:#f0f0f0;border:2px solid #000;padding:10px;font-size:.9em;font-weight:700;margin:10px 0;}
+
+/* Coupon */
+.coupon-section{background:#f0f0f0;border:2px solid #000;padding:12px;}
+.coupon-section input{width:100%;padding:10px;border:var(--border);font-size:.95em;font-weight:700;margin-bottom:8px;background:#fff;}
+.coupon-section button{background:#28a745;color:#fff;border:var(--border);padding:10px;cursor:pointer;font-weight:900;width:100%;text-transform:uppercase;font-size:.9em;}
+.coupon-section button:hover{background:#000;}
+.coupon-applied{color:#28a745;font-weight:900;margin-top:8px;display:block;text-align:center;font-size:.9em;}
+
+/* Checkout */
+.checkout-section{background:#fff;border:var(--border);box-shadow:4px 4px 0 #000;padding:18px;margin-top:18px;}
+.checkout-section-title{font-size:1.1em;font-weight:900;text-transform:uppercase;text-align:center;margin-bottom:14px;padding-bottom:10px;border-bottom:var(--border);}
+.form-group{margin-bottom:11px;}
+.form-group label{display:block;margin-bottom:4px;font-weight:900;text-transform:uppercase;font-size:.82em;}
+.form-group input[type=text],.form-group input[type=email],.form-group input[type=tel]{width:100%;padding:10px;border:var(--border);font-size:.95em;background:#fff;font-weight:700;transition:box-shadow .2s;-webkit-appearance:none;border-radius:0;}
+.form-group input:focus{outline:none;box-shadow:4px 4px 0 #000;}
+.address-row{display:flex;gap:8px;}
+.address-row .form-group{flex:1;min-width:0;}
+.address-row .form-group.small{flex:0 0 85px;}
+.terms-agreement{background:#f0f0f0;border:2px solid #000;padding:10px;font-size:.83em;text-align:center;margin:12px 0;font-weight:700;line-height:1.5;}
+
+/* Payment buttons */
+#pay-btn{
+  display:block;width:100%;background:#1E3A5F;color:#fff;
+  border:var(--border);padding:16px;font-size:1.1em;font-weight:900;cursor:pointer;
+  text-transform:uppercase;text-align:center;box-shadow:4px 4px 0 #000;
+  transition:all .2s;margin-top:12px;touch-action:manipulation;
+}
+#pay-btn:hover{background:#000;transform:translate(-2px,-2px);box-shadow:6px 6px 0 #000;}
+#pay-btn:disabled{background:#999;cursor:not-allowed;transform:none;}
+#no-pay-btn{
+  display:block;width:100%;background:#6c757d;color:#fff;
+  border:var(--border);padding:13px;font-size:.95em;font-weight:900;cursor:pointer;
+  text-transform:uppercase;margin-top:8px;touch-action:manipulation;
+}
+#no-pay-btn:hover{background:#000;}
+.bit-note{background:#e8f4fd;border:2px solid #1E3A5F;padding:10px;font-size:.82em;font-weight:700;margin-top:8px;text-align:center;line-height:1.5;}
+#confirm-payment-btn{display:none;width:100%;background:#28a745;color:#fff;border:var(--border);padding:14px;font-size:1em;font-weight:900;cursor:pointer;text-transform:uppercase;margin-top:8px;touch-action:manipulation;}
+
+/* ===== PRODUCTS GRID ===== */
+main#products-container{
+  max-width:1400px;margin:30px auto;padding:16px;
+  display:flex;flex-wrap:wrap;justify-content:center;gap:32px;
+}
+.product-card{
+  background:#fff;border:var(--border);box-shadow:var(--shadow);
+  display:flex;flex-direction:column;transition:all .2s;position:relative;
+  flex:0 1 auto;min-width:280px;max-width:340px;width:100%;
+}
+.product-card:hover{transform:translate(-4px,-4px);box-shadow:var(--shadow-hover);}
+.product-card img{width:100%;height:auto;max-height:340px;object-fit:contain;background:transparent;border-bottom:var(--border);display:block;}
+.sale-badge{position:absolute;top:12px;right:12px;background:var(--accent);color:#fff;padding:6px 12px;font-weight:900;font-size:.85em;border:3px solid #000;box-shadow:3px 3px 0 #000;z-index:10;text-transform:uppercase;}
+.event-exclusive-badge{position:absolute;top:12px;left:12px;background:#000;color:#fff;padding:6px 10px;font-weight:900;font-size:.75em;border:3px solid var(--accent);box-shadow:3px 3px 0 var(--accent);z-index:10;text-transform:uppercase;}
+.product-card h3{margin:14px 18px 7px;font-size:1.4em;color:#000;cursor:pointer;font-weight:900;text-transform:uppercase;line-height:1;}
+.product-card .price{font-weight:700;color:#444;margin:7px 18px;font-size:1.3em;}
+.product-card .price.on-sale{display:flex;align-items:center;gap:10px;}
+.product-card .price.on-sale .original-price{text-decoration:line-through;color:#999;font-size:.75em;}
+.product-card .price.on-sale .sale-price{color:var(--accent);font-weight:900;}
+.product-card button.add-btn{background:#000;color:#fff;border:none;border-top:var(--border);padding:14px;cursor:pointer;font-size:1.05em;width:100%;margin-top:auto;font-weight:900;text-transform:uppercase;transition:background .2s;touch-action:manipulation;}
+.product-card button.add-btn:hover{background:var(--accent);}
+
+/* ===== PRODUCT MODAL ===== */
+#product-modal{display:none;position:fixed;top:0;right:0;left:0;bottom:0;background:rgba(0,0,0,.5);z-index:2000;justify-content:center;align-items:center;overflow-y:auto;padding:16px;}
+#product-modal .modal-content{background:#fff;border:var(--border);box-shadow:var(--shadow);display:flex;flex-direction:row;max-width:680px;width:100%;overflow:hidden;position:relative;max-height:90vh;overflow-y:auto;margin:auto;}
+#product-modal .modal-image{flex:1.2;background:#f0f0f0;display:flex;align-items:center;justify-content:center;min-width:0;border-left:var(--border);padding:18px;}
+#product-modal .modal-image img{max-width:100%;max-height:300px;object-fit:contain;}
+#product-modal .modal-details{flex:2;padding:22px 16px;display:flex;flex-direction:column;min-width:0;}
+#product-modal .close-btn{position:absolute;top:10px;left:10px;background:#000;border:var(--border);color:#fff;font-size:1.4em;cursor:pointer;z-index:5;padding:4px 12px;font-weight:900;touch-action:manipulation;}
+#product-modal .close-btn:hover{background:var(--accent);}
+#product-modal .modal-details h2{margin:0 0 8px;font-size:1.6em;font-weight:900;text-transform:uppercase;line-height:1;}
+#product-modal .modal-details .price{font-weight:700;font-size:1.3em;margin-bottom:10px;color:#444;}
+#product-modal .modal-details .description{color:#000;font-size:.95em;margin-bottom:10px;white-space:pre-line;font-weight:500;}
+.option-group{margin:8px 0;}
+.option-group label{display:block;margin-bottom:4px;font-weight:900;text-transform:uppercase;font-size:.82em;}
+.option-group select,.option-group input[type=text]{width:100%;padding:10px;border:var(--border);font-size:.95em;background:#fff;font-weight:700;-webkit-appearance:none;border-radius:0;}
+.option-group select:focus,.option-group input[type=text]:focus{outline:none;box-shadow:4px 4px 0 #000;}
+#modal-add-to-cart{margin-top:14px;background:#000;color:#fff;border:var(--border);padding:12px 18px;cursor:pointer;font-size:1em;font-weight:900;text-transform:uppercase;width:100%;touch-action:manipulation;}
+#modal-add-to-cart:hover{background:var(--accent);}
+
+/* Size charts */
+.size-charts-carousel{margin-top:10px;}
+.carousel-track-container{overflow:hidden;border:var(--border);}
+.carousel-track{display:flex;transition:transform .3s ease;}
+.carousel-track img{min-width:100%;width:100%;flex-shrink:0;max-height:240px;object-fit:contain;background:#f0f0f0;cursor:zoom-in;}
+.carousel-controls{display:flex;justify-content:center;align-items:center;gap:8px;margin-top:6px;}
+.carousel-btn{background:#000;color:#fff;border:2px solid #000;width:28px;height:28px;cursor:pointer;font-size:1em;font-weight:900;display:flex;align-items:center;justify-content:center;}
+.carousel-btn:hover{background:var(--accent);}
+
+/* ===== SUCCESS OVERLAY ===== */
+#success-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.85);z-index:9999;justify-content:center;align-items:center;padding:20px;}
+#success-overlay.active{display:flex;}
+.success-box{background:#fff;border:var(--border);box-shadow:var(--shadow);padding:30px;max-width:460px;width:100%;text-align:center;}
+.success-box h2{font-size:2em;font-weight:900;margin:0 0 12px;text-transform:uppercase;}
+.success-box .success-icon{font-size:3em;margin-bottom:10px;}
+.success-box .order-id-display{background:#f0f0f0;border:2px solid #000;padding:10px;font-weight:900;font-size:.9em;margin:12px 0;direction:ltr;word-break:break-all;}
+.success-close-btn{background:var(--accent);color:#fff;border:var(--border);padding:14px 24px;cursor:pointer;font-weight:900;font-size:1em;text-transform:uppercase;margin-top:14px;width:100%;touch-action:manipulation;}
+
+/* ===== ZOOM ===== */
+#zoom-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:3000;justify-content:center;align-items:center;padding:20px;}
+#zoom-modal.active{display:flex;}
+#zoom-modal img{max-width:95vw;max-height:90vh;object-fit:contain;border:var(--border);}
+#zoom-modal .close-zoom{position:absolute;top:15px;left:15px;background:var(--accent);border:var(--border);color:#fff;width:44px;height:44px;font-size:1.5em;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:900;touch-action:manipulation;}
+
+/* Search */
+#event-search{max-width:400px;margin:16px auto;display:block;width:calc(100% - 32px);padding:12px;border:var(--border);font-size:1em;font-weight:700;background:#fff;box-shadow:4px 4px 0 #000;-webkit-appearance:none;border-radius:0;}
+#event-search:focus{outline:none;transform:translate(-2px,-2px);box-shadow:6px 6px 0 #000;}
+
+/* empty */
+#clear-cart-btn{background:none;border:2px solid #ccc;color:#666;font-size:.8em;cursor:pointer;padding:4px 8px;font-weight:700;text-transform:uppercase;touch-action:manipulation;}
+#clear-cart-btn:hover{border-color:#000;color:#000;}
+.empty-cart-message{text-align:center;padding:36px 16px;color:#555;font-weight:700;text-transform:uppercase;}
+
+/* Mobile */
+@media(max-width:700px){
+  :root{--cart-width:100vw;}
+  body.cart-open{margin-right:0;}
+  #product-modal .modal-content{flex-direction:column;max-height:95vh;margin:auto 0 0;}
+  #product-modal .modal-image{border-left:none;border-bottom:4px solid #000;max-height:200px;padding:14px;}
+  .address-row{flex-direction:column;gap:0;}
+  main#products-container{padding:10px 12px;gap:18px;margin:16px auto;}
+  .product-card{min-width:0;max-width:100%;width:100%;}
+  .product-card:hover{transform:none;}
+}
+</style>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+</head>
+<body>
+
+<div id="countdown-bar"></div>
+
+<header>
+  <img src="https://i.postimg.cc/YCXfMWLg/Whats-App-Image-2026-04-14-at-19-24-10.png" alt="YR Jerseys">
+  <h1>YR Jerseys <span id="event-name-header"></span></h1>
+</header>
+
+<button id="cart-toggle-button">
+  <span>🛒</span>
+  <span>עגלה</span>
+  <span class="cart-count" style="display:none">0</span>
+</button>
+
+<!-- CART PANEL -->
+<div id="cart-container">
+  <div class="cart-header">
+    <button class="cart-close-btn" onclick="closeCart()">&times;</button>
+    <h2>🛒 עגלת הקניות</h2>
+  </div>
+  <div class="cart-content">
+    <div class="cart-section">
+      <div class="cart-section-title">מוצרים בעגלה</div>
+      <ul id="cart-items"></ul>
+      <div style="text-align:left;margin-top:6px;"><button id="clear-cart-btn" onclick="clearCart()">🗑 נקה עגלה</button></div>
+    </div>
+    <div class="shipping-info" id="shipping-info"></div>
+    <div class="cart-section">
+      <div class="cart-section-title">קוד הנחה</div>
+      <div class="coupon-section">
+        <input type="text" id="coupon-input" placeholder="הזן קוד קופון">
+        <button id="apply-coupon-btn">החל קופון</button>
+        <div id="coupon-message"></div>
+      </div>
+    </div>
+    <div class="cart-totals" id="cart-totals"></div>
+    <!-- CHECKOUT -->
+    <div class="checkout-section">
+      <div class="checkout-section-title">📋 פרטים ותשלום</div>
+      <form id="checkout-form" onsubmit="return false;">
+        <div class="form-group"><label>שם מלא *</label><input type="text" id="c-name" required autocomplete="name"></div>
+        <div class="form-group"><label>אימייל *</label><input type="email" id="c-email" required autocomplete="email"></div>
+        <div class="form-group"><label>טלפון *</label><input type="tel" id="c-phone" required autocomplete="tel"></div>
+        <div class="cart-section-title" style="margin-top:14px;">כתובת למשלוח</div>
+        <div class="address-row">
+          <div class="form-group"><label>רחוב *</label><input type="text" id="c-street" required autocomplete="address-line1"></div>
+          <div class="form-group small"><label>מס' *</label><input type="text" id="c-house" required></div>
+        </div>
+        <div class="address-row">
+          <div class="form-group"><label>עיר *</label><input type="text" id="c-city" required autocomplete="address-level2"></div>
+          <div class="form-group small"><label>מיקוד *</label><input type="text" id="c-zip" required autocomplete="postal-code"></div>
+        </div>
+        <div class="form-group"><label>מדינה *</label><input type="text" id="c-country" value="ישראל" required autocomplete="country"></div>
+        <div class="terms-agreement">⏱️ זמן משלוח מוערך: 3 שבועות<br>📋 בביצוע ההזמנה אני מאשר/ת את <a href="terms.html" target="_blank" style="color:var(--accent);font-weight:900;">התקנון</a></div>
+        <div id="payment-buttons-container"></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- EVENT LOADING/NOT FOUND -->
+<div id="event-loading">⏳ טוען אירוע...</div>
+<div id="event-not-found" style="display:none">
+  <div style="font-size:3em;margin-bottom:16px;">😕</div>
+  <h2 style="font-weight:900;text-transform:uppercase;">האירוע לא נמצא</h2>
+  <p style="font-weight:700;">ייתכן שהאירוע הסתיים או שהלינק שגוי.</p>
+  <a href="/" style="display:inline-block;margin-top:16px;background:#000;color:#fff;padding:12px 24px;font-weight:900;text-decoration:none;border:var(--border);box-shadow:4px 4px 0 #000;">← לחנות הראשית</a>
+</div>
+
+<!-- EVENT CONTENT (hidden until loaded) -->
+<div id="event-content" style="display:none">
+  <div id="event-hero"></div>
+  <input type="text" id="event-search" placeholder="🔍 חפש מוצר...">
+  <main id="products-container"></main>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div id="product-modal">
+  <div class="modal-content">
+    <button class="close-btn" onclick="closeModal()">&times;</button>
+    <div class="modal-image"><img id="modal-img" src="" alt=""></div>
+    <div class="modal-details">
+      <h2 id="modal-title"></h2>
+      <div class="price" id="modal-price"></div>
+      <div class="description" id="modal-desc"></div>
+      <div id="modal-options"></div>
+      <button id="modal-add-to-cart">הוסף לעגלה</button>
+    </div>
+  </div>
+</div>
+
+<!-- ZOOM -->
+<div id="zoom-modal"><button class="close-zoom" onclick="closeZoom()">&times;</button><img id="zoom-img" src="" alt=""></div>
+
+<!-- SUCCESS -->
+<div id="success-overlay">
+  <div class="success-box">
+    <div class="success-icon">✅</div>
+    <h2>תודה על הרכישה!</h2>
+    <p id="success-name"></p>
+    <p>הזמנתך התקבלה ונשמרה במערכת.</p>
+    <p>מספר הזמנה:</p>
+    <div class="order-id-display" id="success-order-id"></div>
+    <p style="font-size:.88em;color:#555;">⏱️ זמן משלוח מוערך: 3 שבועות</p>
+    <button class="success-close-btn" onclick="document.getElementById('success-overlay').classList.remove('active')">סגור</button>
+  </div>
+</div>
+
+<script>
+emailjs.init('f-U3pdugkQiavzAvU');
+firebase.initializeApp({apiKey:"AIzaSyDLHENaXTeorjL87sExB1EJrH7mrEnNYOA",authDomain:"timetable-titus.firebaseapp.com",projectId:"timetable-titus",storageBucket:"timetable-titus.firebasestorage.app",messagingSenderId:"199146911555",appId:"1:199146911555:web:5d9436d716dfc6de7361f6"});
+const db = firebase.firestore();
+
+// ===== STATE =====
+let eventData = null;
+let eventId = null;
+let eventProducts = []; // merged: store products + event-exclusive
+let cart = [];
+let appliedCoupon = null;
+let couponDiscount = 0;
+let subtotal = 0;
+let shippingCost = 0;
+let total = 0;
+let currentModalProductId = null;
+let currentProductOptions = {};
+let currentProductPrice = 0;
+let isCouponProduct = false;
+let couponLockedOptions = null;
+let pendingOrderId = null;
+let cartOpen = false;
+let countdownInterval = null;
+
+const $ = id => document.getElementById(id);
+
+// ===== LOAD EVENT =====
+async function loadEvent() {
+  // Get event ID from URL: /event/[id] or ?event=[id] or #[id]
+  const path = location.pathname;
+  const parts = path.split('/').filter(Boolean);
+  eventId = parts[parts.length - 1];
+  if (!eventId || eventId === 'event' || eventId === 'event.html') {
+    const params = new URLSearchParams(location.search);
+    eventId = params.get('event') || location.hash.replace('#','');
+  }
+
+  if (!eventId) { showNotFound(); return; }
+
+  try {
+    const doc = await db.collection('yr_events').doc(eventId).get();
+    if (!doc.exists) { showNotFound(); return; }
+    eventData = { id: doc.id, ...doc.data() };
+
+    // Check if event is active
+    if (!eventData.active) { showNotFound(); return; }
+    // Check if expired
+    if (eventData.endDate) {
+      const end = new Date(eventData.endDate);
+      end.setHours(23,59,59,999);
+      if (new Date() > end) { showNotFound(); return; }
+    }
+
+    await loadEventProducts();
+    renderEventPage();
+    startCountdown();
+    loadCartFromStorage();
+    updateCartDisplay();
+  } catch(e) {
+    console.error(e);
+    showNotFound();
+  }
+}
+
+function showNotFound() {
+  $('event-loading').style.display = 'none';
+  $('event-not-found').style.display = 'block';
+}
+
+async function loadEventProducts() {
+  const prods = [];
+  // Load selected store products
+  if (eventData.productIds && eventData.productIds.length) {
+    const snap = await db.collection('yr_jerseys').get();
+    snap.docs.forEach(d => {
+      if (eventData.productIds.includes(d.id)) {
+        prods.push({ id: d.id, ...d.data(), isEventExclusive: false });
+      }
+    });
+  }
+  // Load event-exclusive products
+  const excSnap = await db.collection('yr_events').doc(eventId).collection('products').get();
+  excSnap.docs.forEach(d => {
+    prods.push({ id: 'exc_'+d.id, _excId: d.id, ...d.data(), isEventExclusive: true });
+  });
+  eventProducts = prods;
+}
+
+// ===== RENDER PAGE =====
+function renderEventPage() {
+  $('event-loading').style.display = 'none';
+  $('event-content').style.display = 'block';
+  document.title = `${eventData.name} - YR Jerseys`;
+  $('event-name-header').textContent = '| ' + eventData.name;
+
+  // Hero
+  const hero = $('event-hero');
+  let bannerHtml = eventData.bannerUrl ? `<img src="${eventData.bannerUrl}" alt="${eventData.name}" class="event-banner-img">` : '';
+  let metaHtml = '';
+  if (eventData.endDate) metaHtml += `<div class="event-meta-item">📅 מסתיים: ${new Date(eventData.endDate).toLocaleDateString('he-IL')}</div>`;
+  if (eventData.location) metaHtml += `<div class="event-meta-item">📍 ${eventData.location}</div>`;
+  if (eventData.extraMeta) metaHtml += `<div class="event-meta-item">${eventData.extraMeta}</div>`;
+  hero.innerHTML = `${bannerHtml}<h2>${eventData.name}</h2>${eventData.description?`<div class="event-desc">${eventData.description}</div>`:''}<div class="event-meta">${metaHtml}</div>`;
+
+  renderProducts(eventProducts);
+  buildPaymentButtons();
+}
+
+function renderProducts(list) {
+  const container = $('products-container');
+  container.innerHTML = '';
+  if (!list.length) {
+    container.innerHTML = '<p style="text-align:center;width:100%;padding:40px;font-weight:900;text-transform:uppercase;">לא נמצאו מוצרים.</p>';
+    return;
+  }
+  list.forEach(product => {
+    const card = document.createElement('div');
+    card.className = 'product-card';
+    const onSale = isOnSale(product);
+    const ep = effectivePrice(product);
+    let priceHTML = `<p class="price">${ep.toFixed(2)} ₪</p>`;
+    let saleBadge = '';
+    if (onSale) {
+      const pct = Math.round(((product.price - product.salePrice)/product.price)*100);
+      saleBadge = `<div class="sale-badge">-${pct}%</div>`;
+      priceHTML = `<p class="price on-sale"><span class="original-price">${product.price.toFixed(2)} ₪</span><span class="sale-price">${product.salePrice.toFixed(2)} ₪</span></p>`;
+    }
+    const excBadge = product.isEventExclusive ? '<div class="event-exclusive-badge">⭐ בלעדי לאירוע</div>' : '';
+    card.innerHTML = `${saleBadge}${excBadge}<img src="${product.image}" alt="${product.name}" loading="lazy"><h3>${product.name}</h3>${priceHTML}<button class="add-btn" onclick="openProductModal('${product.id}')">הוסף לעגלה</button>`;
+    card.querySelector('img').addEventListener('click', () => openProductModal(product.id));
+    card.querySelector('h3').addEventListener('click', () => openProductModal(product.id));
+    container.appendChild(card);
+  });
+}
+
+// ===== SEARCH =====
+$('event-search').addEventListener('input', e => {
+  const q = e.target.value.toLowerCase();
+  const filtered = q ? eventProducts.filter(p => p.name.toLowerCase().includes(q)) : eventProducts;
+  renderProducts(filtered);
+});
+
+// ===== PAYMENT BUTTONS =====
+function buildPaymentButtons() {
+  const container = $('payment-buttons-container');
+  if (eventData.paymentLink) {
+    container.innerHTML = `
+      <button id="pay-btn" onclick="handlePayment()">💳 שלם עכשיו</button>
+      <button id="no-pay-btn" onclick="handleNoPayment()">📋 שלח הזמנה ללא תשלום</button>
+      <div class="bit-note">📱 לחיצה תפתח את עמוד התשלום.<br>לאחר תשלום — חזור ולחץ "אישור תשלום".</div>
+      <button id="confirm-payment-btn" onclick="confirmPayment()">✅ אישור תשלום — ביצעתי</button>`;
+  } else {
+    container.innerHTML = `<button id="no-pay-btn" onclick="handleNoPayment()" style="margin-top:12px;">📋 שלח הזמנה</button>`;
+  }
+}
+
+// ===== COUNTDOWN =====
+function startCountdown() {
+  const bar = $('countdown-bar');
+  if (!eventData.endDate) { bar.style.display = 'none'; return; }
+  const end = new Date(eventData.endDate);
+  end.setHours(23,59,59,999);
+  function update() {
+    const now = new Date();
+    const diff = end - now;
+    if (diff <= 0) { bar.innerHTML = '⏰ האירוע הסתיים'; clearInterval(countdownInterval); return; }
+    const days = Math.floor(diff/86400000);
+    const hours = Math.floor((diff%86400000)/3600000);
+    const mins = Math.floor((diff%3600000)/60000);
+    const secs = Math.floor((diff%60000)/1000);
+    const urgent = diff < 86400000;
+    bar.innerHTML = `⏰ ${eventData.name} — ${urgent?'<span class="cd-urgent">':''}נגמר בעוד: ${days>0?days+'ימים ':''}${String(hours).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}${urgent?'</span>':''}`;
+  }
+  update();
+  countdownInterval = setInterval(update, 1000);
+}
+
+// ===== PRICE HELPERS =====
+function isOnSale(p) {
+  if (!p.salePrice || p.salePrice <= 0) return false;
+  if (p.saleEndDate) return new Date(p.saleEndDate) >= new Date();
+  return true;
+}
+function effectivePrice(p) {
+  if (p.salePrice && p.salePrice > 0) {
+    if (p.saleEndDate) { if (new Date(p.saleEndDate) >= new Date()) return p.salePrice; }
+    else return p.salePrice;
+  }
+  return p.price;
+}
+
+// ===== PRODUCT MODAL =====
+function openProductModal(productId, isCouponFree = false) {
+  const product = eventProducts.find(p => p.id === productId);
+  if (!product) return;
+  currentModalProductId = productId;
+  currentProductOptions = {};
+  isCouponProduct = isCouponFree;
+
+  $('modal-img').src = product.image;
+  $('modal-title').textContent = product.name;
+  $('modal-desc').textContent = product.description || '';
+  currentProductPrice = isCouponFree ? 0 : effectivePrice(product);
+
+  const onSale = isOnSale(product);
+  if (isCouponFree) {
+    $('modal-price').innerHTML = '<span style="color:#28a745;font-weight:900;">מתנה - 0.00 ₪</span>';
+  } else if (onSale) {
+    $('modal-price').innerHTML = `<span class="price on-sale"><span class="original-price">${product.price.toFixed(2)} ₪</span><span class="sale-price">${product.salePrice.toFixed(2)} ₪</span></span>`;
+  } else {
+    $('modal-price').textContent = `${currentProductPrice.toFixed(2)} ₪`;
+  }
+
+  // Size charts
+  const existingSC = document.getElementById('sc-carousel');
+  if (existingSC) existingSC.remove();
+  if (product.sizeCharts && product.sizeCharts.length > 0) {
+    buildSizeCarousel(product.sizeCharts);
+  }
+
+  // Options
+  const optContainer = $('modal-options');
+  optContainer.innerHTML = '';
+  if (product.customFields && product.customFields.length > 0) {
+    product.customFields.forEach((field, idx) => {
+      const group = document.createElement('div');
+      group.className = 'option-group';
+      const isLocked = isCouponFree && couponLockedOptions && couponLockedOptions[field.name];
+      const label = document.createElement('label');
+      label.textContent = field.name + (field.required ? ' *' : '') + ':';
+      if (field.extraPrice && field.extraPrice > 0 && !isCouponFree) {
+        const pt = document.createElement('span');
+        pt.style.cssText = 'color:#28a745;font-weight:900;font-size:.9em;';
+        pt.textContent = ` (+${field.extraPrice.toFixed(2)}₪)`;
+        label.appendChild(pt);
+      }
+      group.appendChild(label);
+      if (field.type === 'select') {
+        const sel = document.createElement('select');
+        sel.id = `opt-${idx}`;
+        sel.innerHTML = `<option value="">בחר ${field.name}</option>`;
+        (field.options||[]).forEach(opt => {
+          const o = document.createElement('option');
+          o.value = opt.value;
+          const ep2 = (!isCouponFree && opt.extraPrice) ? opt.extraPrice : 0;
+          o.textContent = opt.value + (ep2 > 0 ? ` (+${ep2.toFixed(2)}₪)` : '');
+          o.dataset.image = opt.image || '';
+          o.dataset.extraPrice = ep2;
+          if (isLocked && opt.value === couponLockedOptions[field.name]) o.selected = true;
+          sel.appendChild(o);
+        });
+        if (isLocked) { sel.disabled = true; currentProductOptions[field.name] = couponLockedOptions[field.name]; }
+        sel.addEventListener('change', e => {
+          currentProductOptions[field.name] = e.target.value;
+          const so = (field.options||[]).find(o => o.value === e.target.value);
+          if (so && so.image) $('modal-img').src = so.image;
+          else $('modal-img').src = product.image;
+          if (!isCouponFree) updateModalPrice();
+        });
+        group.appendChild(sel);
+      } else {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = `opt-${idx}`;
+        input.placeholder = 'הזן ' + field.name;
+        input.addEventListener('input', e => { currentProductOptions[field.name] = e.target.value; if (!isCouponFree) updateModalPrice(); });
+        group.appendChild(input);
+      }
+      optContainer.appendChild(group);
+    });
+  }
+
+  $('product-modal').style.display = 'flex';
+}
+
+function updateModalPrice() {
+  const product = eventProducts.find(p => p.id === currentModalProductId);
+  if (!product) return;
+  let t = effectivePrice(product);
+  if (product.customFields) {
+    product.customFields.forEach((field, i) => {
+      const el = document.getElementById(`opt-${i}`);
+      if (!el) return;
+      const fp = parseFloat(field.extraPrice) || 0;
+      if (field.type === 'select' && el.value) {
+        t += fp + (parseFloat(el.options[el.selectedIndex].dataset.extraPrice) || 0);
+      } else if (field.type === 'text' && el.value) {
+        t += fp;
+      }
+    });
+  }
+  currentProductPrice = t;
+  const onSale = isOnSale(product);
+  if (onSale) {
+    const extra = t - effectivePrice(product);
+    $('modal-price').innerHTML = `<span class="price on-sale"><span class="original-price">${(product.price+extra).toFixed(2)} ₪</span><span class="sale-price">${t.toFixed(2)} ₪</span></span>`;
+  } else {
+    $('modal-price').textContent = `${t.toFixed(2)} ₪`;
+  }
+}
+
+function buildSizeCarousel(charts) {
+  const section = document.createElement('div');
+  section.id = 'sc-carousel';
+  section.className = 'size-charts-carousel';
+  section.innerHTML = '<div style="font-weight:900;text-transform:uppercase;font-size:.85em;margin-bottom:6px;">טבלת מידות</div>';
+  const tc = document.createElement('div');
+  tc.className = 'carousel-track-container';
+  const track = document.createElement('div');
+  track.className = 'carousel-track';
+  charts.forEach((c, i) => {
+    const img = document.createElement('img');
+    img.src = c; img.alt = `מידות ${i+1}`;
+    img.addEventListener('click', () => { $('zoom-img').src = c; $('zoom-modal').classList.add('active'); });
+    track.appendChild(img);
+  });
+  tc.appendChild(track); section.appendChild(tc);
+  if (charts.length > 1) {
+    let cur = 0;
+    const ctrl = document.createElement('div');
+    ctrl.className = 'carousel-controls';
+    const prev = document.createElement('button'); prev.className = 'carousel-btn'; prev.textContent = '‹'; prev.type = 'button'; prev.disabled = true;
+    const counter = document.createElement('span'); counter.textContent = `1 / ${charts.length}`;
+    const next = document.createElement('button'); next.className = 'carousel-btn'; next.textContent = '›'; next.type = 'button';
+    function go(i) { cur = i; const w = tc.getBoundingClientRect().width; track.style.transform = `translateX(${cur*w}px)`; counter.textContent = `${cur+1} / ${charts.length}`; prev.disabled = cur===0; next.disabled = cur===charts.length-1; }
+    prev.addEventListener('click', () => { if (cur > 0) go(cur-1); });
+    next.addEventListener('click', () => { if (cur < charts.length-1) go(cur+1); });
+    ctrl.append(prev, counter, next); section.appendChild(ctrl);
+  }
+  $('modal-add-to-cart').before(section);
+}
+
+$('modal-add-to-cart').addEventListener('click', () => {
+  const product = eventProducts.find(p => p.id === currentModalProductId);
+  if (!product) return;
+  if (product.customFields) {
+    for (const field of product.customFields) {
+      if (field.required && !currentProductOptions[field.name]) {
+        alert('אנא מלא את השדה: ' + field.name);
+        return;
+      }
+    }
+  }
+  addToCart(currentModalProductId, {...currentProductOptions}, $('modal-img').src, currentProductPrice, isCouponProduct);
+  if (isCouponProduct) {
+    $('coupon-message').innerHTML = '<span class="coupon-applied">✓ קופון הוחל בהצלחה!</span>';
+    isCouponProduct = false; couponLockedOptions = null;
+  }
+  closeModal();
+});
+
+function closeModal() {
+  $('product-modal').style.display = 'none';
+  currentProductOptions = {}; isCouponProduct = false; couponLockedOptions = null;
+}
+document.querySelector('.close-btn').addEventListener('click', closeModal);
+$('product-modal').addEventListener('mousedown', e => { if (e.target === $('product-modal')) closeModal(); });
+function closeZoom() { $('zoom-modal').classList.remove('active'); }
+$('zoom-modal').addEventListener('click', e => { if (e.target === $('zoom-modal')) closeZoom(); });
+
+// ===== CART =====
+function openCart() { cartOpen = true; $('cart-container').classList.add('open'); document.body.classList.add('cart-open'); updateCartButton(); }
+function closeCart() { cartOpen = false; $('cart-container').classList.remove('open'); document.body.classList.remove('cart-open'); updateCartButton(); }
+$('cart-toggle-button').addEventListener('click', () => { if (cartOpen) closeCart(); else openCart(); });
+
+function addToCart(productId, selectedOptions, displayImage, price, isFreebie=false) {
+  const product = eventProducts.find(p => p.id === productId);
+  const existIdx = cart.findIndex(item => {
+    if (item.id !== productId || item.isFreebie !== isFreebie) return false;
+    return JSON.stringify(item.selectedOptions) === JSON.stringify(selectedOptions);
+  });
+  if (existIdx !== -1) cart[existIdx].quantity++;
+  else cart.push({...product, quantity:1, price, selectedOptions, displayImage, isFreebie});
+  updateCartDisplay(); openCart();
+}
+
+function clearCart() {
+  if (!confirm('לנקות את העגלה?')) return;
+  cart = []; appliedCoupon = null; couponDiscount = 0;
+  $('coupon-input').value = ''; $('coupon-message').innerHTML = '';
+  localStorage.removeItem('yr_event_cart_'+eventId); localStorage.removeItem('yr_event_coupon_'+eventId);
+  updateCartDisplay();
+}
+
+function updateCartDisplay() {
+  const list = $('cart-items');
+  list.innerHTML = '';
+  subtotal = 0;
+  if (!cart.length) {
+    list.innerHTML = `<div class="empty-cart-message"><div style="font-size:3em;margin-bottom:10px;">🛒</div><p>העגלה ריקה</p></div>`;
+    $('shipping-info').innerHTML = '';
+  } else {
+    cart.forEach((item, idx) => {
+      const li = document.createElement('li');
+      let optTxt = '';
+      if (item.selectedOptions) Object.keys(item.selectedOptions).forEach(k => { if (item.selectedOptions[k]) optTxt += `${k}: ${item.selectedOptions[k]} `; });
+      const freebieTag = item.isFreebie ? '<span style="background:#28a745;color:#fff;padding:2px 6px;font-size:.75em;font-weight:900;border:2px solid #000;margin-left:4px;">מתנה</span>' : '';
+      li.innerHTML = `
+        <div class="cart-item-details">
+          <img src="${item.displayImage||item.image}" alt="${item.name}">
+          <div class="cart-item-info">
+            <span>${freebieTag}${item.name}</span>
+            ${optTxt ? `<span style="font-size:.8em;color:#555;">${optTxt.trim()}</span>` : ''}
+            <span style="color:#28a745;">${item.price.toFixed(2)} ₪</span>
+          </div>
+        </div>
+        <div class="cart-item-quantity">
+          <button onclick="changeQty(${idx},-1)">-</button>
+          <span>${item.quantity}</span>
+          <button onclick="changeQty(${idx},1)">+</button>
+        </div>
+        <button class="remove-from-cart" onclick="removeItem(${idx})">🗑</button>`;
+      list.appendChild(li);
+      subtotal += item.price * item.quantity;
+    });
+    // Shipping
+    const shipCfg = eventData.shipping || {method:'fixed',value:30,freeThreshold:0};
+    if (shipCfg.freeThreshold > 0 && subtotal >= shipCfg.freeThreshold) {
+      shippingCost = 0;
+      $('shipping-info').innerHTML = '<strong style="color:#28a745;">✓ משלוח חינם!</strong>';
+    } else {
+      if (shipCfg.method === 'percentage') shippingCost = (subtotal * shipCfg.value) / 100;
+      else if (shipCfg.method === 'per_item') shippingCost = shipCfg.value * cart.reduce((s,i)=>s+i.quantity,0);
+      else shippingCost = parseFloat(shipCfg.value) || 0;
+      if (shipCfg.freeThreshold > 0) $('shipping-info').innerHTML = `הוסף עוד ${(shipCfg.freeThreshold-subtotal).toFixed(2)}₪ לקבלת משלוח חינם!`;
+    }
+  }
+
+  // Coupon
+  applyCoupon();
+  total = Math.max(0, subtotal + shippingCost - couponDiscount);
+
+  let html = `<div class="total-row"><span>סה"כ מוצרים:</span><span>${subtotal.toFixed(2)} ₪</span></div>`;
+  html += `<div class="total-row"><span>דמי משלוח:</span><span>${shippingCost.toFixed(2)} ₪</span></div>`;
+  if (couponDiscount > 0) html += `<div class="total-row" style="color:#28a745;"><span>הנחת קופון (${appliedCoupon.Code}):</span><span>-${couponDiscount.toFixed(2)} ₪</span></div>`;
+  html += `<div class="total-row grand-total"><span>סה"כ לתשלום:</span><span>${total.toFixed(2)} ₪</span></div>`;
+  $('cart-totals').innerHTML = html;
+
+  updateCartButton();
+  saveCartToStorage();
+}
+
+function removeItem(idx) { cart.splice(idx,1); updateCartDisplay(); }
+function changeQty(idx, d) { if (cart[idx]) { cart[idx].quantity += d; if (cart[idx].quantity < 1) cart.splice(idx,1); updateCartDisplay(); } }
+
+function updateCartButton() {
+  const btn = $('cart-toggle-button');
+  const count = cart.reduce((s,i)=>s+i.quantity, 0);
+  const countEl = btn.querySelector('.cart-count');
+  if (count > 0) { countEl.textContent = count; countEl.style.display = ''; }
+  else countEl.style.display = 'none';
+}
+
+// ===== COUPON (event-specific) =====
+function applyCoupon() {
+  if (!appliedCoupon) { couponDiscount = 0; return; }
+  if (appliedCoupon.Type === 'free_shipping') { couponDiscount = shippingCost; shippingCost = 0; }
+  else if (appliedCoupon.Type === 'fixed_discount') couponDiscount = Math.min(appliedCoupon.Value, subtotal);
+  else if (appliedCoupon.Type === 'percentage_discount') couponDiscount = (subtotal * appliedCoupon.Value) / 100;
+  else couponDiscount = 0;
+}
+
+$('apply-coupon-btn').addEventListener('click', () => {
+  const code = $('coupon-input').value.trim();
+  if (!code) { $('coupon-message').innerHTML = '<span style="color:red;font-weight:700;">הזן קוד קופון</span>'; return; }
+  const coupons = (eventData.coupons || []);
+  const coupon = coupons.find(c => c.Code === code);
+  if (!coupon) { $('coupon-message').innerHTML = '<span style="color:red;font-weight:700;">קוד לא קיים</span>'; return; }
+  if (coupon.ExpiryDate) {
+    const exp = new Date(coupon.ExpiryDate); const today = new Date(); today.setHours(0,0,0,0);
+    if (exp < today) { $('coupon-message').innerHTML = '<span style="color:red;font-weight:700;">תוקף הקופון עבר</span>'; return; }
+  }
+  // Free product coupon
+  if (coupon.Type === 'free_product' && coupon.ProductId) {
+    const freeProd = eventProducts.find(p => p.id === coupon.ProductId);
+    if (freeProd && !cart.find(i => i.id === coupon.ProductId && i.isFreebie)) {
+      const needsInput = freeProd.customFields && freeProd.customFields.some(f => f.required || f.type === 'text');
+      if (needsInput) { couponLockedOptions = coupon.SelectedOptions || {}; isCouponProduct = true; appliedCoupon = coupon; openProductModal(coupon.ProductId, true); $('coupon-message').innerHTML = '<span style="color:#3498db;font-weight:700;">מלא פרטי המוצר המתנה</span>'; return; }
+      addToCart(coupon.ProductId, coupon.SelectedOptions || {}, freeProd.image, 0, true);
+    }
+  }
+  appliedCoupon = coupon;
+  updateCartDisplay();
+  $('coupon-message').innerHTML = '<span class="coupon-applied">✓ קופון הוחל בהצלחה!</span>';
+  localStorage.setItem('yr_event_coupon_'+eventId, JSON.stringify(coupon));
+});
+
+// ===== STORAGE =====
+function saveCartToStorage() {
+  localStorage.setItem('yr_event_cart_'+eventId, JSON.stringify(cart));
+}
+function loadCartFromStorage() {
+  const saved = localStorage.getItem('yr_event_cart_'+eventId);
+  if (saved) { try { cart = JSON.parse(saved); } catch(e) { cart = []; } }
+  const savedCoupon = localStorage.getItem('yr_event_coupon_'+eventId);
+  if (savedCoupon) {
+    try {
+      appliedCoupon = JSON.parse(savedCoupon);
+      $('coupon-input').value = appliedCoupon.Code;
+      $('coupon-message').innerHTML = '<span class="coupon-applied">✓ קופון הוחל!</span>';
+    } catch(e) { appliedCoupon = null; }
+  }
+  // Pending payment
+  const pid = localStorage.getItem('yr_event_pending_'+eventId);
+  if (pid) {
+    pendingOrderId = pid;
+    const confirmBtn = $('confirm-payment-btn');
+    if (confirmBtn) { confirmBtn.style.display = 'block'; }
+    openCart();
+  }
+}
+
+// ===== FORM VALIDATION =====
+function validateForm() {
+  if (!cart.length) { alert('העגלה ריקה'); return false; }
+  const name = $('c-name').value.trim();
+  const email = $('c-email').value.trim();
+  const phone = $('c-phone').value.trim();
+  const street = $('c-street').value.trim();
+  const house = $('c-house').value.trim();
+  const city = $('c-city').value.trim();
+  const zip = $('c-zip').value.trim();
+  if (!name) { alert('הזן שם מלא'); return false; }
+  if (!email || !email.includes('@')) { alert('הזן אימייל תקין'); return false; }
+  if (!phone) { alert('הזן טלפון'); return false; }
+  if (!street || !house || !city || !zip) { alert('הזן כתובת מלאה'); return false; }
+  return true;
+}
+
+function getAddress() {
+  return `${$('c-street').value.trim()} ${$('c-house').value.trim()}, ${$('c-city').value.trim()}, ${$('c-country').value.trim()} ${$('c-zip').value.trim()}`;
+}
+
+function buildOrderData(name, email, phone, address, status) {
+  const detailedItems = cart.map(item => ({
+    id: item.id, productName: item.name,
+    quantity: item.quantity, unitPrice: item.price,
+    totalPrice: item.price * item.quantity,
+    isFreebie: item.isFreebie || false,
+    image: item.displayImage || item.image || '',
+    selectedOptions: item.selectedOptions || {}
+  }));
+  return {
+    eventId, eventName: eventData.name,
+    customerName: name, customerEmail: email, customerPhone: phone, customerAddress: address,
+    items: detailedItems,
+    subtotal: parseFloat(subtotal.toFixed(2)),
+    shippingCost: parseFloat(shippingCost.toFixed(2)),
+    appliedCoupon: appliedCoupon ? appliedCoupon.Code : null,
+    couponType: appliedCoupon ? appliedCoupon.Type : null,
+    couponValue: appliedCoupon ? (appliedCoupon.Value||0) : null,
+    couponDiscount: parseFloat(couponDiscount.toFixed(2)),
+    totalAmount: parseFloat(total.toFixed(2)),
+    orderDate: firebase.firestore.FieldValue.serverTimestamp(),
+    status, completed: false, adminStatus: '', paymentType: 'event'
+  };
+}
+
+// ===== PAYMENT WITH LINK =====
+async function handlePayment() {
+  if (!validateForm()) return;
+  const name = $('c-name').value.trim(), email = $('c-email').value.trim(),
+        phone = $('c-phone').value.trim(), address = getAddress();
+  try {
+    const shortId = Math.floor(10000 + Math.random()*90000).toString();
+    await db.collection('yr_event_orders').doc(shortId).set({...buildOrderData(name,email,phone,address,'bit_pending'), orderId: shortId});
+    pendingOrderId = shortId;
+    localStorage.setItem('yr_event_pending_'+eventId, shortId);
+    const confirmBtn = $('confirm-payment-btn');
+    if (confirmBtn) confirmBtn.style.display = 'block';
+    const payBtn = $('pay-btn');
+    if (payBtn) payBtn.textContent = '📱 פתח שוב';
+    const url = eventData.paymentLink + `?amount=${total.toFixed(2)}&note=${encodeURIComponent('YR Jerseys '+eventData.name+' - '+name)}`;
+    window.open(url, '_blank');
+  } catch(e) { console.error(e); alert('שגיאה בשמירת ההזמנה'); }
+}
+
+async function confirmPayment() {
+  if (!pendingOrderId) {
+    const pid = localStorage.getItem('yr_event_pending_'+eventId);
+    if (pid) pendingOrderId = pid; else { alert('לא נמצאה הזמנה ממתינה'); return; }
+  }
+  if (!confirm('האם ביצעת את התשלום?')) return;
+  try {
+    await db.collection('yr_event_orders').doc(pendingOrderId).update({
+      status: 'bit_pending', paymentConfirmedByUser: true,
+      userConfirmedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    await sendInvoiceEmail(pendingOrderId);
+    showSuccess(pendingOrderId);
+    localStorage.removeItem('yr_event_pending_'+eventId);
+    pendingOrderId = null;
+    resetAfterOrder();
+  } catch(e) { console.error(e); alert('שגיאה באישור. מספר הזמנה: ' + pendingOrderId); }
+}
+
+// ===== NO PAYMENT ORDER =====
+async function handleNoPayment() {
+  if (!validateForm()) return;
+  if (!confirm('לשלוח הזמנה ללא תשלום?')) return;
+  const name = $('c-name').value.trim(), email = $('c-email').value.trim(),
+        phone = $('c-phone').value.trim(), address = getAddress();
+  try {
+    const shortId = Math.floor(10000 + Math.random()*90000).toString();
+    await db.collection('yr_event_orders').doc(shortId).set({...buildOrderData(name,email,phone,address,'unpaid'), orderId: shortId, paymentType: 'none'});
+    showSuccess(shortId);
+    resetAfterOrder();
+  } catch(e) { console.error(e); alert('שגיאה בשמירת ההזמנה'); }
+}
+
+function showSuccess(orderId) {
+  const name = $('c-name').value.trim();
+  $('success-name').textContent = `תודה ${name}! 🎉`;
+  $('success-order-id').textContent = orderId;
+  $('success-overlay').classList.add('active');
+}
+
+function resetAfterOrder() {
+  cart = []; appliedCoupon = null; couponDiscount = 0;
+  localStorage.removeItem('yr_event_cart_'+eventId); localStorage.removeItem('yr_event_coupon_'+eventId);
+  updateCartDisplay(); closeCart();
+  document.getElementById('checkout-form').reset();
+  const payBtn = $('pay-btn'); if (payBtn) payBtn.textContent = '💳 שלם עכשיו';
+  const confirmBtn = $('confirm-payment-btn'); if (confirmBtn) confirmBtn.style.display = 'none';
+}
+
+// ===== EMAIL =====
+async function sendInvoiceEmail(orderId) {
+  try {
+    const doc = await db.collection('yr_event_orders').doc(orderId).get();
+    if (!doc.exists) return;
+    const o = doc.data();
+    const itemsText = (o.items||[]).map(i => `${i.quantity}x ${i.productName}${i.isFreebie?' (מתנה)':''} - ${i.isFreebie?'0.00':((i.unitPrice||0)*(i.quantity||1)).toFixed(2)}₪`).join('\n');
+    await emailjs.send('service_pypll0n','yrjerseys',{
+      email: o.customerEmail, order_id: orderId,
+      customer_name: o.customerName, customer_phone: o.customerPhone||'',
+      customer_address: o.customerAddress||'',
+      items_list: itemsText, options_list: 'ראה פירוט',
+      subtotal: (o.subtotal||0).toFixed(2),
+      shipping_cost: (o.shippingCost||0).toFixed(2),
+      coupon_code: o.appliedCoupon||'', coupon_discount: o.couponDiscount>0?o.couponDiscount.toFixed(2):'',
+      points_used: '', points_discount: '',
+      total_amount: (o.totalAmount||0).toFixed(2),
+      invoice_url: `${location.origin}/event-invoice.html#${orderId}`
+    });
+  } catch(e) { console.error('Email error:', e); }
+}
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', loadEvent);
+window.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeModal(); closeZoom(); }
+});
+</script>
+</body>
+</html>
