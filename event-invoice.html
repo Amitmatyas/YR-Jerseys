@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>חשבונית אירוע - YR Jerseys</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&display=swap');
+
+:root {
+  --primary-color: #1a1a1a;
+  --accent: #dc3545;
+  --bg-color: #f4f7f6;
+  --border-color: #e1e1e1;
+  --text-main: #2d3436;
+  --text-muted: #636e72;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Heebo', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 20px;
+  direction: rtl;
+}
+
+.container {
+  background: white;
+  border-radius: 16px;
+  padding: 50px 45px;
+  max-width: 720px;
+  width: 100%;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+}
+
+/* Event banner strip */
+.event-strip {
+  background: var(--primary-color);
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 8px;
+  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+.event-strip .ev-badge {
+  background: var(--accent);
+  color: #fff;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  white-space: nowrap;
+}
+
+.invoice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 40px;
+  padding-bottom: 30px;
+  border-bottom: 2px solid #eee;
+}
+
+.invoice-meta h2 {
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: var(--primary-color);
+  margin-bottom: 6px;
+  letter-spacing: -0.5px;
+}
+.invoice-meta .invoice-num { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 4px; }
+.invoice-meta .invoice-date { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 4px; }
+
+.logo img { width: 120px; height: auto; }
+
+.section-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 36px;
+}
+
+.info-block {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 18px 20px;
+  border-right: 4px solid var(--primary-color);
+}
+
+.info-block p { font-size: 0.92rem; color: var(--text-main); line-height: 1.7; }
+.info-block strong { display: block; font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
+
+.items-section { margin-bottom: 30px; }
+
+table { width: 100%; border-collapse: collapse; font-size: 0.93rem; }
+thead tr { background: var(--primary-color); color: white; }
+thead th { padding: 12px 15px; font-weight: 600; text-align: right; }
+thead th:first-child { border-radius: 0 8px 8px 0; }
+thead th:last-child  { border-radius: 8px 0 0 8px; text-align: left; }
+tbody tr { border-bottom: 1px solid #f0f0f0; }
+tbody tr:last-child { border-bottom: none; }
+tbody td { padding: 13px 15px; vertical-align: top; }
+tbody td:last-child { text-align: left; font-weight: 600; }
+
+.item-name { font-weight: 600; color: var(--text-main); }
+.item-options { font-size: 0.82rem; color: var(--text-muted); margin-top: 3px; line-height: 1.5; }
+
+.freebie-tag {
+  display: inline-block;
+  background: #eafff2;
+  color: #27ae60;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 6px;
+  margin-left: 6px;
+}
+
+.totals-section { margin-top: 10px; display: flex; justify-content: flex-end; }
+.totals-box { min-width: 280px; }
+.totals-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 0.93rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+.totals-row:last-child { border-bottom: none; }
+.totals-row.total-final {
+  font-size: 1.15rem;
+  font-weight: 800;
+  padding-top: 14px;
+  margin-top: 4px;
+  border-top: 2px solid var(--primary-color);
+}
+.coupon-row { color: #27ae60; }
+
+/* Status */
+.status-section {
+  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+.status-paid    { background: #d4edda; color: #155724; }
+.status-pending { background: #fff3cd; color: #856404; }
+.status-shipped { background: #cce5ff; color: #004085; }
+.payment-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #f0f0f0;
+  color: #444;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.invoice-footer {
+  margin-top: 40px;
+  padding-top: 25px;
+  border-top: 2px solid #eee;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  line-height: 1.8;
+}
+.invoice-footer strong { color: var(--text-main); }
+
+.actions {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+.btn {
+  padding: 11px 22px;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.2s;
+}
+.btn:hover { opacity: 0.85; }
+.btn-dark { background: var(--primary-color); color: white; }
+.btn-copy { background: #f0f0f0; color: var(--primary-color); }
+
+.message {
+  padding: 18px;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+.error   { background: #ffeaea; color: #c0392b; }
+.loading { background: #f0f5ff; color: #2980b9; }
+
+@media print {
+  body { background: white; padding: 0; }
+  .container { box-shadow: none; border-radius: 0; padding: 30px; }
+  .actions { display: none !important; }
+}
+
+@media (max-width: 540px) {
+  .container { padding: 25px 20px; }
+  .invoice-header { flex-direction: column-reverse; gap: 20px; }
+  .info-grid { grid-template-columns: 1fr; gap: 14px; }
+  .actions { flex-direction: column; }
+  .btn { width: 100%; text-align: center; }
+  .totals-box { min-width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div id="state-box"></div>
+
+  <div class="actions" id="actions-bar" style="display:none;">
+    <button class="btn btn-dark" onclick="window.print()">🖨️ הורד / הדפס PDF</button>
+    <button class="btn btn-copy" id="copy-link-btn" onclick="copyLink()">🔗 העתק קישור</button>
+  </div>
+
+  <div id="invoice-content" style="display:none;">
+
+    <!-- Event badge strip -->
+    <div class="event-strip">
+      <span class="ev-badge">🎪 אירוע</span>
+      <span id="inv-event-name">טוען...</span>
+    </div>
+
+    <div class="invoice-header">
+      <div class="invoice-meta">
+        <h2>חשבונית</h2>
+        <div class="invoice-num">מספר הזמנה: #<span id="inv-num"></span></div>
+        <div class="invoice-date">תאריך הזמנה: <span id="inv-date"></span></div>
+        <div class="invoice-date" id="inv-paid-date-row" style="display:none;">תאריך תשלום: <span id="inv-paid-date"></span></div>
+      </div>
+      <div class="logo">
+        <img src="https://i.postimg.cc/YCXfMWLg/Whats-App-Image-2026-04-14-at-19-24-10.png" alt="YR Jerseys">
+      </div>
+    </div>
+
+    <!-- Status -->
+    <div class="status-section" id="inv-status-section"></div>
+
+    <div class="info-grid">
+      <div class="info-block">
+        <div class="section-title">פרטי לקוח</div>
+        <strong id="inv-name"></strong>
+        <p id="inv-contact"></p>
+      </div>
+      <div class="info-block">
+        <div class="section-title">כתובת למשלוח</div>
+        <p id="inv-address"></p>
+      </div>
+    </div>
+
+    <div class="items-section">
+      <div class="section-title" style="margin-bottom:12px;">פירוט הזמנה</div>
+      <table>
+        <thead>
+          <tr>
+            <th>מוצר</th>
+            <th style="text-align:center;width:70px;">כמות</th>
+            <th style="text-align:left;width:110px;">מחיר</th>
+          </tr>
+        </thead>
+        <tbody id="inv-items"></tbody>
+      </table>
+    </div>
+
+    <div class="totals-section">
+      <div class="totals-box">
+        <div class="totals-row">
+          <span>סכום מוצרים</span>
+          <span id="inv-subtotal"></span>
+        </div>
+        <div class="totals-row">
+          <span>משלוח</span>
+          <span id="inv-shipping"></span>
+        </div>
+        <div class="totals-row coupon-row" id="inv-coupon-row" style="display:none;">
+          <span>קופון (<span id="inv-coupon-code"></span>)</span>
+          <span id="inv-coupon-val"></span>
+        </div>
+        <div class="totals-row total-final">
+          <span>סה"כ לתשלום</span>
+          <span id="inv-total"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="invoice-footer">
+      <strong>YR Jerseys</strong> — תודה על הרכישה!<br>
+      לשאלות ופניות צור קשר איתנו<br>
+      <span id="inv-footer-id" style="font-size:0.78rem;color:#aaa;"></span>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDLHENaXTeorjL87sExB1EJrH7mrEnNYOA",
+    authDomain: "timetable-titus.firebaseapp.com",
+    projectId: "timetable-titus",
+    storageBucket: "timetable-titus.firebasestorage.app",
+    messagingSenderId: "199146911555",
+    appId: "1:199146911555:web:5d9436d716dfc6de7361f6"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  function fmt(n) { return '₪' + (parseFloat(n) || 0).toFixed(2); }
+
+  function showState(msg, type) {
+    document.getElementById('state-box').innerHTML = `<div class="message ${type}">${msg}</div>`;
+  }
+
+  function fmtDate(ts) {
+    if (!ts) return '—';
+    try {
+      return ts.toDate().toLocaleString('he-IL', {
+        year: 'numeric', month: 'long', day: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      });
+    } catch(e) { return '—'; }
+  }
+
+  function buildStatusSection(o) {
+    const section = document.getElementById('inv-status-section');
+    let html = '';
+    const s = o.status || '';
+    if (o.completed) {
+      html += '<span class="status-badge status-shipped">📦 נשלח / הושלם</span>';
+    } else if (s === 'paid' || s === 'paid_bit') {
+      html += '<span class="status-badge status-paid">✅ תשלום אושר</span>';
+    } else if (s === 'bit_pending') {
+      html += '<span class="status-badge status-pending">🟡 ממתין לאישור תשלום</span>';
+    } else {
+      html += '<span class="status-badge status-pending">⏳ בטיפול</span>';
+    }
+    if (o.paymentMethodLabel) {
+      html += `<span class="payment-badge">💳 ${o.paymentMethodLabel}</span>`;
+    }
+    section.innerHTML = html;
+  }
+
+  async function init() {
+    const hash = window.location.hash.substring(1);
+    if (!hash) { showState('מזהה הזמנה חסר', 'error'); return; }
+
+    showState('טוען חשבונית...', 'loading');
+
+    try {
+      const doc = await db.collection('yr_event_orders').doc(hash).get();
+      if (!doc.exists) { showState('הזמנה לא נמצאה', 'error'); return; }
+
+      const o = doc.data();
+
+      // Event name
+      document.getElementById('inv-event-name').textContent = o.eventName || 'אירוע';
+      document.title = `חשבונית אירוע ${o.eventName||''} - YR Jerseys`;
+
+      // Order number & dates
+      document.getElementById('inv-num').textContent = hash;
+      document.getElementById('inv-date').textContent = fmtDate(o.orderDate);
+
+      if (o.paidAt) {
+        document.getElementById('inv-paid-date-row').style.display = '';
+        document.getElementById('inv-paid-date').textContent = fmtDate(o.paidAt);
+      }
+
+      document.getElementById('inv-footer-id').textContent = 'מזהה הזמנה: ' + hash;
+
+      buildStatusSection(o);
+
+      // Customer
+      document.getElementById('inv-name').textContent = o.customerName || '—';
+      document.getElementById('inv-contact').innerHTML =
+        [o.customerPhone, o.customerEmail].filter(Boolean).join('<br>');
+      document.getElementById('inv-address').textContent = o.customerAddress || '—';
+
+      // Items
+      const tbody = document.getElementById('inv-items');
+      (o.items || []).forEach(item => {
+        const unitPrice = typeof item.unitPrice === 'number' ? item.unitPrice : 0;
+        const qty = item.quantity || 1;
+        const lineTotal = item.isFreebie ? 0 : (typeof item.totalPrice === 'number' ? item.totalPrice : unitPrice * qty);
+
+        let optionsHTML = '';
+        if (item.selectedOptions) {
+          const opts = Object.entries(item.selectedOptions)
+            .filter(([, v]) => v)
+            .map(([k, v]) => `${k}: ${v}`)
+            .join(' | ');
+          if (opts) optionsHTML = `<div class="item-options">${opts}</div>`;
+        }
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>
+            <div class="item-name">
+              ${item.isFreebie ? '<span class="freebie-tag">מתנה</span>' : ''}
+              ${item.productName || '—'}
+            </div>
+            ${optionsHTML}
+          </td>
+          <td style="text-align:center;">${qty}</td>
+          <td>${item.isFreebie ? '<span style="color:#27ae60;">חינם</span>' : fmt(lineTotal)}</td>`;
+        tbody.appendChild(tr);
+      });
+
+      // Totals
+      document.getElementById('inv-subtotal').textContent = fmt(o.subtotal || 0);
+      const shipping = o.shippingCost || 0;
+      document.getElementById('inv-shipping').textContent = shipping === 0 ? 'חינם' : fmt(shipping);
+
+      if (o.appliedCoupon && o.couponDiscount > 0) {
+        document.getElementById('inv-coupon-row').style.display = 'flex';
+        document.getElementById('inv-coupon-code').textContent = o.appliedCoupon;
+        document.getElementById('inv-coupon-val').textContent = '−' + fmt(o.couponDiscount);
+      }
+
+      document.getElementById('inv-total').textContent = fmt(o.totalAmount || 0);
+
+      // Show
+      document.getElementById('state-box').innerHTML = '';
+      document.getElementById('invoice-content').style.display = 'block';
+      document.getElementById('actions-bar').style.display = 'flex';
+
+    } catch(e) {
+      console.error(e);
+      showState('שגיאה בטעינת החשבונית', 'error');
+    }
+  }
+
+  function copyLink() {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      const btn = document.getElementById('copy-link-btn');
+      const orig = btn.textContent;
+      btn.textContent = '✓ הועתק!';
+      btn.style.background = '#eafff2';
+      btn.style.color = '#27ae60';
+      setTimeout(() => { btn.textContent = orig; btn.style.background = ''; btn.style.color = ''; }, 2000);
+    });
+  }
+
+  window.onload = init;
+</script>
+</body>
+</html>
