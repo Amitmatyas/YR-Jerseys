@@ -705,21 +705,60 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f0f0;color:#333;direction:r
     <table class="items-table"><thead><tr><th>תמונה</th><th>מוצר</th><th>אפשרויות</th><th>כמות</th><th>מחיר יחידה</th><th>סה"כ</th></tr></thead><tbody id="order-items-tbody"></tbody></table>
 
     <!-- EDIT ORDER PANEL -->
+<!-- EDIT ORDER PANEL -->
     <div id="om-edit-panel" style="display:none;margin-bottom:14px;background:#f8f9fa;border-radius:9px;padding:16px;border:2px solid #e0e0e0;">
-      <h4 style="margin:0 0 12px;font-size:1em;">✏️ עריכת פרטי הזמנה</h4>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-        <div class="form-group"><label>שם לקוח</label><input type="text" id="om-edit-name"></div>
-        <div class="form-group"><label>טלפון</label><input type="tel" id="om-edit-phone"></div>
-        <div class="form-group"><label>אימייל</label><input type="email" id="om-edit-email"></div>
-        <div class="form-group"><label>כתובת משלוח</label><input type="text" id="om-edit-address"></div>
-        <div class="form-group"><label>דמי משלוח (₪)</label><input type="number" id="om-edit-shipping" step="0.01" min="0"></div>
-        <div class="form-group"><label>הנחת קופון (₪)</label><input type="number" id="om-edit-coupon-discount" step="0.01" min="0"></div>
-        <div class="form-group"><label>קוד קופון</label><input type="text" id="om-edit-coupon-code"></div>
-        <div class="form-group"><label>סה"כ לתשלום (₪)</label><input type="number" id="om-edit-total" step="0.01" min="0"></div>
+      <h4 style="margin:0 0 14px;font-size:1em;">✏️ עריכת פרטי הזמנה</h4>
+
+      <!-- פרטי לקוח -->
+      <div style="background:#fff;border-radius:7px;padding:12px;margin-bottom:12px;border:1px solid #e0e0e0;">
+        <div style="font-weight:700;font-size:.85em;color:#888;text-transform:uppercase;margin-bottom:10px;">פרטי לקוח ומשלוח</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div class="form-group"><label>שם לקוח</label><input type="text" id="om-edit-name"></div>
+          <div class="form-group"><label>טלפון</label><input type="tel" id="om-edit-phone"></div>
+          <div class="form-group"><label>אימייל</label><input type="email" id="om-edit-email"></div>
+          <div class="form-group"><label>כתובת משלוח</label><input type="text" id="om-edit-address"></div>
+        </div>
       </div>
-      <div style="display:flex;gap:8px;margin-top:10px;">
-        <button class="btn btn-success" id="om-save-edit-btn" style="flex:1;padding:10px;">💾 שמור עריכה ושלח חשבונית</button>
-        <button class="btn btn-secondary" id="om-cancel-edit-btn" style="padding:10px 14px;">ביטול</button>
+
+      <!-- פריטים בהזמנה -->
+      <div style="background:#fff;border-radius:7px;padding:12px;margin-bottom:12px;border:1px solid #e0e0e0;">
+        <div style="font-weight:700;font-size:.85em;color:#888;text-transform:uppercase;margin-bottom:10px;">פריטים בהזמנה</div>
+        <div id="om-edit-items-list"></div>
+        <button type="button" class="btn btn-success" id="om-add-item-btn" style="margin-top:10px;padding:7px 14px;font-size:.85em;">+ הוסף מוצר</button>
+        <div id="om-add-item-panel" style="display:none;margin-top:10px;padding:12px;background:#f8f9fa;border-radius:7px;border:1px dashed #ccc;">
+          <div style="font-weight:700;font-size:.85em;margin-bottom:8px;">הוסף מוצר להזמנה</div>
+          <div class="form-group"><label>שם מוצר</label>
+            <select id="om-new-item-product" style="width:100%;padding:9px;border:2px solid #e0e0e0;border-radius:7px;">
+              <option value="">בחר מוצר מהחנות...</option>
+            </select>
+          </div>
+          <div id="om-new-item-options" style="margin-bottom:8px;"></div>
+          <div style="display:flex;gap:8px;">
+            <div class="form-group" style="flex:1"><label>כמות</label><input type="number" id="om-new-item-qty" min="1" value="1" style="width:100%;padding:9px;border:2px solid #e0e0e0;border-radius:7px;"></div>
+            <div class="form-group" style="flex:1"><label>מחיר יחידה (₪)</label><input type="number" id="om-new-item-price" step="0.01" min="0" style="width:100%;padding:9px;border:2px solid #e0e0e0;border-radius:7px;"></div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button type="button" class="btn btn-dark" id="om-confirm-add-item-btn" style="flex:1;padding:8px;">✅ הוסף</button>
+            <button type="button" class="btn btn-secondary" id="om-cancel-add-item-btn" style="padding:8px 12px;">ביטול</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- תמחור -->
+      <div style="background:#fff;border-radius:7px;padding:12px;margin-bottom:12px;border:1px solid #e0e0e0;">
+        <div style="font-weight:700;font-size:.85em;color:#888;text-transform:uppercase;margin-bottom:10px;">תמחור</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div class="form-group"><label>דמי משלוח (₪)</label><input type="number" id="om-edit-shipping" step="0.01" min="0"></div>
+          <div class="form-group"><label>הנחת קופון (₪)</label><input type="number" id="om-edit-coupon-discount" step="0.01" min="0"></div>
+          <div class="form-group"><label>קוד קופון</label><input type="text" id="om-edit-coupon-code"></div>
+          <div class="form-group"><label>סה"כ לתשלום (₪) <small style="color:#888;font-weight:400;">(מחושב אוטומטית)</small></label><input type="number" id="om-edit-total" step="0.01" min="0"></div>
+        </div>
+        <button type="button" class="btn btn-secondary" id="om-recalc-btn" style="margin-top:4px;padding:7px 14px;font-size:.84em;">🔄 חשב מחדש סה"כ</button>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-top:4px;">
+        <button class="btn btn-success" id="om-save-edit-btn" style="flex:1;padding:11px;">💾 שמור עריכה ושלח חשבונית</button>
+        <button class="btn btn-secondary" id="om-cancel-edit-btn" style="padding:11px 14px;">ביטול</button>
       </div>
     </div>
 
@@ -793,21 +832,57 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f0f0;color:#333;direction:r
     <table class="items-table"><thead><tr><th>תמונה</th><th>מוצר</th><th>אפשרויות</th><th>כמות</th><th>מחיר</th><th>סה"כ</th></tr></thead><tbody id="ev-order-items-tbody"></tbody></table>
 
     <!-- EDIT EVENT ORDER PANEL -->
+<!-- EDIT EVENT ORDER PANEL -->
     <div id="ev-om-edit-panel" style="display:none;margin-bottom:14px;background:#f8f9fa;border-radius:9px;padding:16px;border:2px solid #e0e0e0;">
-      <h4 style="margin:0 0 12px;font-size:1em;">✏️ עריכת פרטי הזמנה</h4>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-        <div class="form-group"><label>שם לקוח</label><input type="text" id="ev-om-edit-name"></div>
-        <div class="form-group"><label>טלפון</label><input type="tel" id="ev-om-edit-phone"></div>
-        <div class="form-group"><label>אימייל</label><input type="email" id="ev-om-edit-email"></div>
-        <div class="form-group"><label>כתובת משלוח</label><input type="text" id="ev-om-edit-address"></div>
-        <div class="form-group"><label>דמי משלוח (₪)</label><input type="number" id="ev-om-edit-shipping" step="0.01" min="0"></div>
-        <div class="form-group"><label>הנחת קופון (₪)</label><input type="number" id="ev-om-edit-coupon-discount" step="0.01" min="0"></div>
-        <div class="form-group"><label>קוד קופון</label><input type="text" id="ev-om-edit-coupon-code"></div>
-        <div class="form-group"><label>סה"כ לתשלום (₪)</label><input type="number" id="ev-om-edit-total" step="0.01" min="0"></div>
+      <h4 style="margin:0 0 14px;font-size:1em;">✏️ עריכת פרטי הזמנה</h4>
+
+      <div style="background:#fff;border-radius:7px;padding:12px;margin-bottom:12px;border:1px solid #e0e0e0;">
+        <div style="font-weight:700;font-size:.85em;color:#888;text-transform:uppercase;margin-bottom:10px;">פרטי לקוח ומשלוח</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div class="form-group"><label>שם לקוח</label><input type="text" id="ev-om-edit-name"></div>
+          <div class="form-group"><label>טלפון</label><input type="tel" id="ev-om-edit-phone"></div>
+          <div class="form-group"><label>אימייל</label><input type="email" id="ev-om-edit-email"></div>
+          <div class="form-group"><label>כתובת משלוח</label><input type="text" id="ev-om-edit-address"></div>
+        </div>
       </div>
-      <div style="display:flex;gap:8px;margin-top:10px;">
-        <button class="btn btn-success" id="ev-om-save-edit-btn" style="flex:1;padding:10px;">💾 שמור עריכה ושלח חשבונית</button>
-        <button class="btn btn-secondary" id="ev-om-cancel-edit-btn" style="padding:10px 14px;">ביטול</button>
+
+      <div style="background:#fff;border-radius:7px;padding:12px;margin-bottom:12px;border:1px solid #e0e0e0;">
+        <div style="font-weight:700;font-size:.85em;color:#888;text-transform:uppercase;margin-bottom:10px;">פריטים בהזמנה</div>
+        <div id="ev-om-edit-items-list"></div>
+        <button type="button" class="btn btn-success" id="ev-om-add-item-btn" style="margin-top:10px;padding:7px 14px;font-size:.85em;">+ הוסף מוצר</button>
+        <div id="ev-om-add-item-panel" style="display:none;margin-top:10px;padding:12px;background:#f8f9fa;border-radius:7px;border:1px dashed #ccc;">
+          <div style="font-weight:700;font-size:.85em;margin-bottom:8px;">הוסף מוצר להזמנה</div>
+          <div class="form-group"><label>שם מוצר</label>
+            <select id="ev-om-new-item-product" style="width:100%;padding:9px;border:2px solid #e0e0e0;border-radius:7px;">
+              <option value="">בחר מוצר...</option>
+            </select>
+          </div>
+          <div id="ev-om-new-item-options" style="margin-bottom:8px;"></div>
+          <div style="display:flex;gap:8px;">
+            <div class="form-group" style="flex:1"><label>כמות</label><input type="number" id="ev-om-new-item-qty" min="1" value="1" style="width:100%;padding:9px;border:2px solid #e0e0e0;border-radius:7px;"></div>
+            <div class="form-group" style="flex:1"><label>מחיר יחידה (₪)</label><input type="number" id="ev-om-new-item-price" step="0.01" min="0" style="width:100%;padding:9px;border:2px solid #e0e0e0;border-radius:7px;"></div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button type="button" class="btn btn-dark" id="ev-om-confirm-add-item-btn" style="flex:1;padding:8px;">✅ הוסף</button>
+            <button type="button" class="btn btn-secondary" id="ev-om-cancel-add-item-btn" style="padding:8px 12px;">ביטול</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:#fff;border-radius:7px;padding:12px;margin-bottom:12px;border:1px solid #e0e0e0;">
+        <div style="font-weight:700;font-size:.85em;color:#888;text-transform:uppercase;margin-bottom:10px;">תמחור</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div class="form-group"><label>דמי משלוח (₪)</label><input type="number" id="ev-om-edit-shipping" step="0.01" min="0"></div>
+          <div class="form-group"><label>הנחת קופון (₪)</label><input type="number" id="ev-om-edit-coupon-discount" step="0.01" min="0"></div>
+          <div class="form-group"><label>קוד קופון</label><input type="text" id="ev-om-edit-coupon-code"></div>
+          <div class="form-group"><label>סה"כ לתשלום (₪)</label><input type="number" id="ev-om-edit-total" step="0.01" min="0"></div>
+        </div>
+        <button type="button" class="btn btn-secondary" id="ev-om-recalc-btn" style="margin-top:4px;padding:7px 14px;font-size:.84em;">🔄 חשב מחדש סה"כ</button>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-top:4px;">
+        <button class="btn btn-success" id="ev-om-save-edit-btn" style="flex:1;padding:11px;">💾 שמור עריכה ושלח חשבונית</button>
+        <button class="btn btn-secondary" id="ev-om-cancel-edit-btn" style="padding:11px 14px;">ביטול</button>
       </div>
     </div>
 
@@ -1031,10 +1106,266 @@ $('om-completed-btn').addEventListener('click',async()=>{if(!currentOrderId||!co
 $('om-save-notes-btn').addEventListener('click',async()=>{if(!currentOrderId)return;try{await db.collection('yr_orders').doc(currentOrderId).update({adminStatus:$('order-modal-notes').value});alert('נשמר!');}catch(e){alert('שגיאה');}});
 $('om-invoice-btn').addEventListener('click',async()=>{if(!currentOrderId)return;const url=`${window.location.origin}/invoice.html#${currentOrderId}`;const ok=await clip(url);if(ok){const b=$('om-invoice-btn');const o=b.innerHTML;b.innerHTML='✓ הועתק';setTimeout(()=>{b.innerHTML=o;},2000);}});
 $('om-resend-invoice-btn').addEventListener('click',async()=>{if(!currentOrderId)return;try{await adminSendInvoiceEmail(currentOrderId);const b=$('om-resend-invoice-btn');const o=b.innerHTML;b.innerHTML='✓ נשלח!';b.style.background='#27ae60';setTimeout(()=>{b.innerHTML=o;b.style.background='';},2000);}catch(e){alert('שגיאה בשליחה');}});
-$('om-edit-btn').addEventListener('click',()=>{if(!_currentOrderObj)return;const o=_currentOrderObj;$('om-edit-name').value=o.customerName||'';$('om-edit-phone').value=o.customerPhone||'';$('om-edit-email').value=o.customerEmail||'';$('om-edit-address').value=o.customerAddress||'';$('om-edit-shipping').value=o.shippingCost||0;$('om-edit-coupon-discount').value=o.couponDiscount||0;$('om-edit-coupon-code').value=o.appliedCoupon||'';$('om-edit-total').value=o.totalAmount||0;$('om-edit-panel').style.display='block';$('om-edit-panel').scrollIntoView({behavior:'smooth',block:'nearest'});});
-$('om-cancel-edit-btn').addEventListener('click',()=>{$('om-edit-panel').style.display='none';});
-$('om-save-edit-btn').addEventListener('click',async()=>{if(!currentOrderId)return;const upd={customerName:$('om-edit-name').value.trim(),customerPhone:$('om-edit-phone').value.trim(),customerEmail:$('om-edit-email').value.trim(),customerAddress:$('om-edit-address').value.trim(),shippingCost:parseFloat($('om-edit-shipping').value)||0,couponDiscount:parseFloat($('om-edit-coupon-discount').value)||0,appliedCoupon:$('om-edit-coupon-code').value.trim()||null,totalAmount:parseFloat($('om-edit-total').value)||0};try{await db.collection('yr_orders').doc(currentOrderId).update(upd);await adminSendInvoiceEmail(currentOrderId);alert('הזמנה עודכנה וחשבונית נשלחה!');$('om-edit-panel').style.display='none';closeModal('order-modal');fetchOrders();}catch(e){alert('שגיאה');console.error(e);}});
-$('om-delete-btn').addEventListener('click',async()=>{if(!currentOrderId||!confirm('למחוק הזמנה זו לצמיתות?'))return;try{await db.collection('yr_orders').doc(currentOrderId).delete();alert('נמחק!');closeModal('order-modal');fetchOrders();}catch(e){alert('שגיאה');}});
+let _omEditItems = [];
+
+function omRecalcTotal() {
+  const subtotal = _omEditItems.reduce((s, i) => s + (i.isFreebie ? 0 : (i.unitPrice||0) * (i.quantity||1)), 0);
+  const ship = parseFloat($('om-edit-shipping').value) || 0;
+  const disc = parseFloat($('om-edit-coupon-discount').value) || 0;
+  $('om-edit-total').value = Math.max(0, subtotal + ship - disc).toFixed(2);
+}
+
+function omRenderEditItems() {
+  const list = $('om-edit-items-list');
+  list.innerHTML = '';
+  if (!_omEditItems.length) {
+    list.innerHTML = '<p style="color:#aaa;font-size:.88em;text-align:center;padding:10px;">אין פריטים</p>';
+    return;
+  }
+  _omEditItems.forEach((item, idx) => {
+    const optsHtml = item.customFields && item.customFields.length
+      ? item.customFields.map(f => {
+          const currentVal = (item.selectedOptions || {})[f.name] || '';
+          if (f.type === 'select') {
+            return `<div style="margin-bottom:5px;"><label style="font-size:.8em;font-weight:600;color:#555;">${f.name}:</label>
+              <select data-idx="${idx}" data-field="${f.name}" class="om-item-opt-sel" style="width:100%;padding:6px;border:2px solid #e0e0e0;border-radius:5px;font-size:.85em;margin-top:2px;">
+                <option value="">ללא</option>
+                ${(f.options||[]).map(o=>`<option value="${o.value}" ${currentVal===o.value?'selected':''}>${o.value}${o.extraPrice?` (+${o.extraPrice}₪)`:''}</option>`).join('')}
+              </select></div>`;
+          } else {
+            return `<div style="margin-bottom:5px;"><label style="font-size:.8em;font-weight:600;color:#555;">${f.name}:</label>
+              <input type="text" data-idx="${idx}" data-field="${f.name}" class="om-item-opt-txt" value="${currentVal}" style="width:100%;padding:6px;border:2px solid #e0e0e0;border-radius:5px;font-size:.85em;margin-top:2px;"></div>`;
+          }
+        }).join('')
+      : '';
+
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:8px;align-items:flex-start;padding:10px;background:#fafafa;border-radius:7px;margin-bottom:8px;border:1px solid #e8e8e8;flex-wrap:wrap;';
+    row.innerHTML = `
+      <img src="${item.image||item.displayImage||''}" onerror="this.style.display='none'" style="width:46px;height:46px;object-fit:cover;border-radius:5px;border:1px solid #ddd;flex-shrink:0;">
+      <div style="flex:1;min-width:160px;">
+        <div style="font-weight:700;font-size:.9em;margin-bottom:6px;">${item.productName||item.name||'מוצר'}${item.isFreebie?'<span style="background:#d4edda;color:#155724;padding:1px 6px;border-radius:3px;font-size:.75em;font-weight:700;margin-right:5px;">מתנה</span>':''}</div>
+        ${optsHtml}
+        <div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;">
+          <div><label style="font-size:.78em;color:#888;display:block;">כמות</label>
+            <input type="number" data-idx="${idx}" class="om-item-qty" value="${item.quantity||1}" min="1" style="width:64px;padding:5px;border:2px solid #e0e0e0;border-radius:5px;font-size:.88em;"></div>
+          <div><label style="font-size:.78em;color:#888;display:block;">מחיר יחידה (₪)</label>
+            <input type="number" data-idx="${idx}" class="om-item-price" value="${item.unitPrice||item.price||0}" step="0.01" min="0" style="width:90px;padding:5px;border:2px solid #e0e0e0;border-radius:5px;font-size:.88em;"></div>
+          <div style="align-self:flex-end;padding-bottom:2px;font-size:.84em;color:#dc3545;font-weight:700;">
+            = ${item.isFreebie?'מתנה':`${((item.unitPrice||0)*(item.quantity||1)).toFixed(2)} ₪`}
+          </div>
+        </div>
+      </div>
+      <button data-idx="${idx}" class="om-item-del btn btn-danger" style="padding:5px 9px;font-size:.8em;flex-shrink:0;">🗑</button>`;
+    list.appendChild(row);
+  });
+
+  // bind option selects
+  list.querySelectorAll('.om-item-opt-sel').forEach(sel => {
+    sel.addEventListener('change', e => {
+      const idx = +e.target.dataset.idx, field = e.target.dataset.field;
+      if (!_omEditItems[idx].selectedOptions) _omEditItems[idx].selectedOptions = {};
+      _omEditItems[idx].selectedOptions[field] = e.target.value;
+      // recalc unit price based on extra prices
+      const prod = products.find(p => p.name === (_omEditItems[idx].productName || _omEditItems[idx].name));
+      if (prod && prod.customFields) {
+        let base = prod.salePrice && prod.salePrice < prod.price ? prod.salePrice : prod.price;
+        prod.customFields.forEach(f => {
+          if (f.type === 'select') {
+            const chosen = _omEditItems[idx].selectedOptions[f.name];
+            const opt = (f.options||[]).find(o => o.value === chosen);
+            base += (opt?.extraPrice || 0) + (f.extraPrice || 0);
+          }
+        });
+        _omEditItems[idx].unitPrice = base;
+        omRenderEditItems();
+      }
+      omRecalcTotal();
+    });
+  });
+  // bind text opts
+  list.querySelectorAll('.om-item-opt-txt').forEach(inp => {
+    inp.addEventListener('input', e => {
+      const idx = +e.target.dataset.idx, field = e.target.dataset.field;
+      if (!_omEditItems[idx].selectedOptions) _omEditItems[idx].selectedOptions = {};
+      _omEditItems[idx].selectedOptions[field] = e.target.value;
+    });
+  });
+  // bind qty
+  list.querySelectorAll('.om-item-qty').forEach(inp => {
+    inp.addEventListener('input', e => {
+      _omEditItems[+e.target.dataset.idx].quantity = parseInt(e.target.value) || 1;
+      omRecalcTotal();
+      // update inline total
+      const row = e.target.closest('div[style]');
+      const priceEl = row.querySelector('[style*="dc3545"]');
+      const item = _omEditItems[+e.target.dataset.idx];
+      if (priceEl && !item.isFreebie) priceEl.textContent = `= ${((item.unitPrice||0)*(item.quantity||1)).toFixed(2)} ₪`;
+    });
+  });
+  // bind unit price
+  list.querySelectorAll('.om-item-price').forEach(inp => {
+    inp.addEventListener('input', e => {
+      _omEditItems[+e.target.dataset.idx].unitPrice = parseFloat(e.target.value) || 0;
+      omRecalcTotal();
+    });
+  });
+  // bind delete
+  list.querySelectorAll('.om-item-del').forEach(btn => {
+    btn.addEventListener('click', e => {
+      _omEditItems.splice(+e.target.dataset.idx, 1);
+      omRenderEditItems();
+      omRecalcTotal();
+    });
+  });
+}
+
+function omPopulateNewItemProduct() {
+  const sel = $('om-new-item-product');
+  sel.innerHTML = '<option value="">בחר מוצר מהחנות...</option>';
+  products.forEach(p => {
+    const o = document.createElement('option');
+    o.value = p.id; o.textContent = p.name;
+    sel.appendChild(o);
+  });
+}
+
+$('om-add-item-btn').addEventListener('click', () => {
+  omPopulateNewItemProduct();
+  $('om-add-item-panel').style.display = 'block';
+  $('om-add-item-btn').style.display = 'none';
+});
+$('om-cancel-add-item-btn').addEventListener('click', () => {
+  $('om-add-item-panel').style.display = 'none';
+  $('om-add-item-btn').style.display = '';
+});
+
+$('om-new-item-product').addEventListener('change', function() {
+  const p = products.find(x => x.id === this.value);
+  const optsDiv = $('om-new-item-options');
+  optsDiv.innerHTML = '';
+  if (!p) { $('om-new-item-price').value = ''; return; }
+  const ep = p.salePrice && p.salePrice < p.price ? p.salePrice : p.price;
+  $('om-new-item-price').value = ep.toFixed(2);
+  if (p.customFields && p.customFields.length) {
+    p.customFields.forEach(f => {
+      const div = document.createElement('div');
+      div.style.marginBottom = '6px';
+      if (f.type === 'select') {
+        div.innerHTML = `<label style="font-size:.85em;font-weight:600;display:block;margin-bottom:3px;">${f.name}${f.required?' *':''}:</label>
+          <select data-field="${f.name}" class="om-new-opt" style="width:100%;padding:8px;border:2px solid #e0e0e0;border-radius:6px;">
+            <option value="">בחר...</option>
+            ${(f.options||[]).map(o=>`<option value="${o.value}" data-extra="${o.extraPrice||0}">${o.value}${o.extraPrice?` (+${o.extraPrice}₪)`:''}</option>`).join('')}
+          </select>`;
+      } else {
+        div.innerHTML = `<label style="font-size:.85em;font-weight:600;display:block;margin-bottom:3px;">${f.name}${f.required?' *':''}:</label>
+          <input type="text" data-field="${f.name}" class="om-new-opt" placeholder="${f.name}" style="width:100%;padding:8px;border:2px solid #e0e0e0;border-radius:6px;">`;
+      }
+      // update price on option change
+      div.querySelectorAll('select.om-new-opt').forEach(sel => {
+        sel.addEventListener('change', () => {
+          const p2 = products.find(x => x.id === $('om-new-item-product').value);
+          if (!p2) return;
+          let base = p2.salePrice && p2.salePrice < p2.price ? p2.salePrice : p2.price;
+          optsDiv.querySelectorAll('select.om-new-opt').forEach(s => {
+            const extra = parseFloat(s.selectedOptions[0]?.dataset.extra || 0);
+            base += extra;
+          });
+          $('om-new-item-price').value = base.toFixed(2);
+        });
+      });
+      optsDiv.appendChild(div);
+    });
+  }
+});
+
+$('om-confirm-add-item-btn').addEventListener('click', () => {
+  const p = products.find(x => x.id === $('om-new-item-product').value);
+  if (!p) { alert('בחר מוצר'); return; }
+  const qty = parseInt($('om-new-item-qty').value) || 1;
+  const unitPrice = parseFloat($('om-new-item-price').value) || 0;
+  const selectedOptions = {};
+  $('om-new-item-options').querySelectorAll('.om-new-opt').forEach(el => {
+    if (el.value) selectedOptions[el.dataset.field] = el.value;
+  });
+  _omEditItems.push({
+    productName: p.name,
+    name: p.name,
+    image: p.image,
+    quantity: qty,
+    unitPrice,
+    totalPrice: unitPrice * qty,
+    selectedOptions: Object.keys(selectedOptions).length ? selectedOptions : null,
+    customFields: p.customFields || null,
+    isFreebie: false
+  });
+  omRenderEditItems();
+  omRecalcTotal();
+  $('om-add-item-panel').style.display = 'none';
+  $('om-add-item-btn').style.display = '';
+  $('om-new-item-product').value = '';
+  $('om-new-item-options').innerHTML = '';
+  $('om-new-item-qty').value = '1';
+  $('om-new-item-price').value = '';
+});
+
+$('om-recalc-btn').addEventListener('click', omRecalcTotal);
+
+$('om-edit-btn').addEventListener('click', () => {
+  if (!_currentOrderObj) return;
+  const o = _currentOrderObj;
+  $('om-edit-name').value = o.customerName || '';
+  $('om-edit-phone').value = o.customerPhone || '';
+  $('om-edit-email').value = o.customerEmail || '';
+  $('om-edit-address').value = o.customerAddress || '';
+  $('om-edit-shipping').value = o.shippingCost || 0;
+  $('om-edit-coupon-discount').value = o.couponDiscount || 0;
+  $('om-edit-coupon-code').value = o.appliedCoupon || '';
+  $('om-edit-total').value = o.totalAmount || 0;
+  // deep copy items and attach customFields from products
+  _omEditItems = (o.items || []).map(item => {
+    const prod = products.find(p => p.name === (item.productName || item.name));
+    return { ...item, unitPrice: item.unitPrice || item.price || 0, customFields: prod?.customFields || item.customFields || null };
+  });
+  omRenderEditItems();
+  $('om-add-item-panel').style.display = 'none';
+  $('om-add-item-btn').style.display = '';
+  $('om-edit-panel').style.display = 'block';
+  $('om-edit-panel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+});
+$('om-cancel-edit-btn').addEventListener('click', () => { $('om-edit-panel').style.display = 'none'; });
+$('om-save-edit-btn').addEventListener('click', async () => {
+  if (!currentOrderId) return;
+  const items = _omEditItems.map(item => ({
+    ...item,
+    quantity: item.quantity || 1,
+    unitPrice: item.unitPrice || 0,
+    totalPrice: item.isFreebie ? 0 : (item.unitPrice || 0) * (item.quantity || 1),
+    customFields: undefined // don't store UI helper field
+  }));
+  const subtotal = items.reduce((s, i) => s + (i.isFreebie ? 0 : i.totalPrice), 0);
+  const upd = {
+    customerName: $('om-edit-name').value.trim(),
+    customerPhone: $('om-edit-phone').value.trim(),
+    customerEmail: $('om-edit-email').value.trim(),
+    customerAddress: $('om-edit-address').value.trim(),
+    shippingCost: parseFloat($('om-edit-shipping').value) || 0,
+    couponDiscount: parseFloat($('om-edit-coupon-discount').value) || 0,
+    appliedCoupon: $('om-edit-coupon-code').value.trim() || null,
+    totalAmount: parseFloat($('om-edit-total').value) || 0,
+    subtotal,
+    items
+  };
+  try {
+    await db.collection('yr_orders').doc(currentOrderId).update(upd);
+    await adminSendInvoiceEmail(currentOrderId);
+    alert('הזמנה עודכנה וחשבונית נשלחה!');
+    $('om-edit-panel').style.display = 'none';
+    closeModal('order-modal');
+    fetchOrders();
+  } catch(e) { alert('שגיאה'); console.error(e); }
+});
+  $('om-delete-btn').addEventListener('click',async()=>{if(!currentOrderId||!confirm('למחוק הזמנה זו לצמיתות?'))return;try{await db.collection('yr_orders').doc(currentOrderId).delete();alert('נמחק!');closeModal('order-modal');fetchOrders();}catch(e){alert('שגיאה');}});
   
 // LEADS
 $('search-lead-btn').addEventListener('click',()=>fetchLeads($('lead-search').value.trim().toLowerCase()));
@@ -1945,23 +2276,219 @@ document.getElementById('ev-om-resend-invoice-btn').addEventListener('click', as
     setTimeout(()=>{b.innerHTML=o;b.style.background='';},2000);
   } catch(e) { alert('שגיאה בשליחה'); }
 });
+let _evOmEditItems = [];
+
+function evOmRecalcTotal() {
+  const subtotal = _evOmEditItems.reduce((s, i) => s + (i.isFreebie ? 0 : (i.unitPrice||0) * (i.quantity||1)), 0);
+  const ship = parseFloat(document.getElementById('ev-om-edit-shipping').value) || 0;
+  const disc = parseFloat(document.getElementById('ev-om-edit-coupon-discount').value) || 0;
+  document.getElementById('ev-om-edit-total').value = Math.max(0, subtotal + ship - disc).toFixed(2);
+}
+
+function evOmGetEventProducts() {
+  // returns store products assigned to event + exclusive products already loaded
+  const storeProds = (currentEventData?.productIds || []).map(id => products.find(p => p.id === id)).filter(Boolean);
+  return storeProds;
+}
+
+function evOmRenderEditItems() {
+  const list = document.getElementById('ev-om-edit-items-list');
+  list.innerHTML = '';
+  if (!_evOmEditItems.length) {
+    list.innerHTML = '<p style="color:#aaa;font-size:.88em;text-align:center;padding:10px;">אין פריטים</p>';
+    return;
+  }
+  _evOmEditItems.forEach((item, idx) => {
+    const optsHtml = item.customFields && item.customFields.length
+      ? item.customFields.map(f => {
+          const currentVal = (item.selectedOptions || {})[f.name] || '';
+          if (f.type === 'select') {
+            return `<div style="margin-bottom:5px;"><label style="font-size:.8em;font-weight:600;color:#555;">${f.name}:</label>
+              <select data-idx="${idx}" data-field="${f.name}" class="ev-om-item-opt-sel" style="width:100%;padding:6px;border:2px solid #e0e0e0;border-radius:5px;font-size:.85em;margin-top:2px;">
+                <option value="">ללא</option>
+                ${(f.options||[]).map(o=>`<option value="${o.value}" ${currentVal===o.value?'selected':''}>${o.value}${o.extraPrice?` (+${o.extraPrice}₪)`:''}</option>`).join('')}
+              </select></div>`;
+          } else {
+            return `<div style="margin-bottom:5px;"><label style="font-size:.8em;font-weight:600;color:#555;">${f.name}:</label>
+              <input type="text" data-idx="${idx}" data-field="${f.name}" class="ev-om-item-opt-txt" value="${currentVal}" style="width:100%;padding:6px;border:2px solid #e0e0e0;border-radius:5px;font-size:.85em;margin-top:2px;"></div>`;
+          }
+        }).join('')
+      : '';
+
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:8px;align-items:flex-start;padding:10px;background:#fafafa;border-radius:7px;margin-bottom:8px;border:1px solid #e8e8e8;flex-wrap:wrap;';
+    row.innerHTML = `
+      <img src="${item.image||''}" onerror="this.style.display='none'" style="width:46px;height:46px;object-fit:cover;border-radius:5px;border:1px solid #ddd;flex-shrink:0;">
+      <div style="flex:1;min-width:160px;">
+        <div style="font-weight:700;font-size:.9em;margin-bottom:6px;">${item.productName||item.name||'מוצר'}${item.isFreebie?'<span style="background:#d4edda;color:#155724;padding:1px 6px;border-radius:3px;font-size:.75em;font-weight:700;margin-right:5px;">מתנה</span>':''}</div>
+        ${optsHtml}
+        <div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;">
+          <div><label style="font-size:.78em;color:#888;display:block;">כמות</label>
+            <input type="number" data-idx="${idx}" class="ev-om-item-qty" value="${item.quantity||1}" min="1" style="width:64px;padding:5px;border:2px solid #e0e0e0;border-radius:5px;font-size:.88em;"></div>
+          <div><label style="font-size:.78em;color:#888;display:block;">מחיר יחידה (₪)</label>
+            <input type="number" data-idx="${idx}" class="ev-om-item-price" value="${item.unitPrice||0}" step="0.01" min="0" style="width:90px;padding:5px;border:2px solid #e0e0e0;border-radius:5px;font-size:.88em;"></div>
+          <div style="align-self:flex-end;padding-bottom:2px;font-size:.84em;color:#dc3545;font-weight:700;">
+            = ${item.isFreebie?'מתנה':`${((item.unitPrice||0)*(item.quantity||1)).toFixed(2)} ₪`}
+          </div>
+        </div>
+      </div>
+      <button data-idx="${idx}" class="ev-om-item-del btn btn-danger" style="padding:5px 9px;font-size:.8em;flex-shrink:0;">🗑</button>`;
+    list.appendChild(row);
+  });
+
+  list.querySelectorAll('.ev-om-item-opt-sel').forEach(sel => {
+    sel.addEventListener('change', e => {
+      const idx = +e.target.dataset.idx, field = e.target.dataset.field;
+      if (!_evOmEditItems[idx].selectedOptions) _evOmEditItems[idx].selectedOptions = {};
+      _evOmEditItems[idx].selectedOptions[field] = e.target.value;
+      evOmRecalcTotal();
+    });
+  });
+  list.querySelectorAll('.ev-om-item-opt-txt').forEach(inp => {
+    inp.addEventListener('input', e => {
+      const idx = +e.target.dataset.idx, field = e.target.dataset.field;
+      if (!_evOmEditItems[idx].selectedOptions) _evOmEditItems[idx].selectedOptions = {};
+      _evOmEditItems[idx].selectedOptions[field] = e.target.value;
+    });
+  });
+  list.querySelectorAll('.ev-om-item-qty').forEach(inp => {
+    inp.addEventListener('input', e => {
+      _evOmEditItems[+e.target.dataset.idx].quantity = parseInt(e.target.value) || 1;
+      evOmRecalcTotal();
+    });
+  });
+  list.querySelectorAll('.ev-om-item-price').forEach(inp => {
+    inp.addEventListener('input', e => {
+      _evOmEditItems[+e.target.dataset.idx].unitPrice = parseFloat(e.target.value) || 0;
+      evOmRecalcTotal();
+    });
+  });
+  list.querySelectorAll('.ev-om-item-del').forEach(btn => {
+    btn.addEventListener('click', e => {
+      _evOmEditItems.splice(+e.target.dataset.idx, 1);
+      evOmRenderEditItems();
+      evOmRecalcTotal();
+    });
+  });
+}
+
+async function evOmPopulateNewItemProduct() {
+  const sel = document.getElementById('ev-om-new-item-product');
+  sel.innerHTML = '<option value="">בחר מוצר...</option>';
+  // store products in event
+  const storeProds = (currentEventData?.productIds || []).map(id => products.find(p => p.id === id)).filter(Boolean);
+  if (storeProds.length) {
+    const grp = document.createElement('optgroup'); grp.label = 'מוצרי חנות';
+    storeProds.forEach(p => { const o = document.createElement('option'); o.value = 'store_'+p.id; o.textContent = p.name; grp.appendChild(o); });
+    sel.appendChild(grp);
+  }
+  // exclusive products
+  try {
+    const snap = await db.collection('yr_events').doc(currentEventId).collection('products').get();
+    if (!snap.empty) {
+      const grp2 = document.createElement('optgroup'); grp2.label = '⭐ מוצרים בלעדיים';
+      snap.docs.forEach(doc => { const p = doc.data(); const o = document.createElement('option'); o.value = 'exc_'+doc.id; o.textContent = p.name; o.dataset.price = p.salePrice && p.salePrice < p.price ? p.salePrice : p.price; o.dataset.image = p.image; o.dataset.cfs = JSON.stringify(p.customFields||[]); grp2.appendChild(o); });
+      sel.appendChild(grp2);
+    }
+  } catch(e) {}
+}
+
+document.getElementById('ev-om-add-item-btn').addEventListener('click', async () => {
+  await evOmPopulateNewItemProduct();
+  document.getElementById('ev-om-add-item-panel').style.display = 'block';
+  document.getElementById('ev-om-add-item-btn').style.display = 'none';
+});
+document.getElementById('ev-om-cancel-add-item-btn').addEventListener('click', () => {
+  document.getElementById('ev-om-add-item-panel').style.display = 'none';
+  document.getElementById('ev-om-add-item-btn').style.display = '';
+});
+
+document.getElementById('ev-om-new-item-product').addEventListener('change', function() {
+  const val = this.value;
+  const optsDiv = document.getElementById('ev-om-new-item-options');
+  optsDiv.innerHTML = '';
+  if (!val) { document.getElementById('ev-om-new-item-price').value = ''; return; }
+  let p = null, cfs = [];
+  if (val.startsWith('store_')) {
+    p = products.find(x => x.id === val.replace('store_',''));
+    if (p) { const ep = p.salePrice && p.salePrice < p.price ? p.salePrice : p.price; document.getElementById('ev-om-new-item-price').value = ep.toFixed(2); cfs = p.customFields || []; }
+  } else {
+    const opt = this.selectedOptions[0];
+    document.getElementById('ev-om-new-item-price').value = parseFloat(opt?.dataset.price||0).toFixed(2);
+    try { cfs = JSON.parse(opt?.dataset.cfs || '[]'); } catch(e) {}
+  }
+  cfs.forEach(f => {
+    const div = document.createElement('div'); div.style.marginBottom = '6px';
+    if (f.type === 'select') {
+      div.innerHTML = `<label style="font-size:.85em;font-weight:600;display:block;margin-bottom:3px;">${f.name}${f.required?' *':''}:</label>
+        <select data-field="${f.name}" class="ev-om-new-opt" style="width:100%;padding:8px;border:2px solid #e0e0e0;border-radius:6px;">
+          <option value="">בחר...</option>
+          ${(f.options||[]).map(o=>`<option value="${o.value}" data-extra="${o.extraPrice||0}">${o.value}${o.extraPrice?` (+${o.extraPrice}₪)`:''}</option>`).join('')}
+        </select>`;
+    } else {
+      div.innerHTML = `<label style="font-size:.85em;font-weight:600;display:block;margin-bottom:3px;">${f.name}${f.required?' *':''}:</label>
+        <input type="text" data-field="${f.name}" class="ev-om-new-opt" style="width:100%;padding:8px;border:2px solid #e0e0e0;border-radius:6px;">`;
+    }
+    optsDiv.appendChild(div);
+  });
+});
+
+document.getElementById('ev-om-confirm-add-item-btn').addEventListener('click', () => {
+  const val = document.getElementById('ev-om-new-item-product').value;
+  if (!val) { alert('בחר מוצר'); return; }
+  const qty = parseInt(document.getElementById('ev-om-new-item-qty').value) || 1;
+  const unitPrice = parseFloat(document.getElementById('ev-om-new-item-price').value) || 0;
+  const selectedOptions = {};
+  document.getElementById('ev-om-new-item-options').querySelectorAll('.ev-om-new-opt').forEach(el => { if (el.value) selectedOptions[el.dataset.field] = el.value; });
+  let name = '', image = '', cfs = [];
+  if (val.startsWith('store_')) {
+    const p = products.find(x => x.id === val.replace('store_',''));
+    if (p) { name = p.name; image = p.image; cfs = p.customFields || []; }
+  } else {
+    const opt = document.getElementById('ev-om-new-item-product').selectedOptions[0];
+    name = opt?.textContent?.replace('⭐ ','') || '';
+    image = opt?.dataset.image || '';
+    try { cfs = JSON.parse(opt?.dataset.cfs || '[]'); } catch(e) {}
+  }
+  _evOmEditItems.push({ productName: name, name, image, quantity: qty, unitPrice, totalPrice: unitPrice*qty, selectedOptions: Object.keys(selectedOptions).length ? selectedOptions : null, customFields: cfs.length ? cfs : null, isFreebie: false });
+  evOmRenderEditItems();
+  evOmRecalcTotal();
+  document.getElementById('ev-om-add-item-panel').style.display = 'none';
+  document.getElementById('ev-om-add-item-btn').style.display = '';
+  document.getElementById('ev-om-new-item-product').value = '';
+  document.getElementById('ev-om-new-item-options').innerHTML = '';
+  document.getElementById('ev-om-new-item-qty').value = '1';
+  document.getElementById('ev-om-new-item-price').value = '';
+});
+
+document.getElementById('ev-om-recalc-btn').addEventListener('click', evOmRecalcTotal);
+
 document.getElementById('ev-om-edit-btn').addEventListener('click', () => {
   if (!_currentEvOrderObj) return;
   const o = _currentEvOrderObj;
-  document.getElementById('ev-om-edit-name').value = o.customerName||'';
-  document.getElementById('ev-om-edit-phone').value = o.customerPhone||'';
-  document.getElementById('ev-om-edit-email').value = o.customerEmail||'';
-  document.getElementById('ev-om-edit-address').value = o.customerAddress||'';
-  document.getElementById('ev-om-edit-shipping').value = o.shippingCost||0;
-  document.getElementById('ev-om-edit-coupon-discount').value = o.couponDiscount||0;
-  document.getElementById('ev-om-edit-coupon-code').value = o.appliedCoupon||'';
-  document.getElementById('ev-om-edit-total').value = o.totalAmount||0;
-  document.getElementById('ev-om-edit-panel').style.display='block';
-  document.getElementById('ev-om-edit-panel').scrollIntoView({behavior:'smooth',block:'nearest'});
+  document.getElementById('ev-om-edit-name').value = o.customerName || '';
+  document.getElementById('ev-om-edit-phone').value = o.customerPhone || '';
+  document.getElementById('ev-om-edit-email').value = o.customerEmail || '';
+  document.getElementById('ev-om-edit-address').value = o.customerAddress || '';
+  document.getElementById('ev-om-edit-shipping').value = o.shippingCost || 0;
+  document.getElementById('ev-om-edit-coupon-discount').value = o.couponDiscount || 0;
+  document.getElementById('ev-om-edit-coupon-code').value = o.appliedCoupon || '';
+  document.getElementById('ev-om-edit-total').value = o.totalAmount || 0;
+  _evOmEditItems = (o.items || []).map(item => {
+    const prod = products.find(p => p.name === (item.productName || item.name));
+    return { ...item, unitPrice: item.unitPrice || item.price || 0, customFields: prod?.customFields || item.customFields || null };
+  });
+  evOmRenderEditItems();
+  document.getElementById('ev-om-add-item-panel').style.display = 'none';
+  document.getElementById('ev-om-add-item-btn').style.display = '';
+  document.getElementById('ev-om-edit-panel').style.display = 'block';
+  document.getElementById('ev-om-edit-panel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 });
-document.getElementById('ev-om-cancel-edit-btn').addEventListener('click', () => { document.getElementById('ev-om-edit-panel').style.display='none'; });
+document.getElementById('ev-om-cancel-edit-btn').addEventListener('click', () => { document.getElementById('ev-om-edit-panel').style.display = 'none'; });
 document.getElementById('ev-om-save-edit-btn').addEventListener('click', async () => {
   if (!currentEvOrderId) return;
+  const items = _evOmEditItems.map(item => ({ ...item, quantity: item.quantity||1, unitPrice: item.unitPrice||0, totalPrice: item.isFreebie?0:(item.unitPrice||0)*(item.quantity||1), customFields: undefined }));
+  const subtotal = items.reduce((s, i) => s + (i.isFreebie ? 0 : i.totalPrice), 0);
   const upd = {
     customerName: document.getElementById('ev-om-edit-name').value.trim(),
     customerPhone: document.getElementById('ev-om-edit-phone').value.trim(),
@@ -1970,13 +2497,14 @@ document.getElementById('ev-om-save-edit-btn').addEventListener('click', async (
     shippingCost: parseFloat(document.getElementById('ev-om-edit-shipping').value)||0,
     couponDiscount: parseFloat(document.getElementById('ev-om-edit-coupon-discount').value)||0,
     appliedCoupon: document.getElementById('ev-om-edit-coupon-code').value.trim()||null,
-    totalAmount: parseFloat(document.getElementById('ev-om-edit-total').value)||0
+    totalAmount: parseFloat(document.getElementById('ev-om-edit-total').value)||0,
+    subtotal, items
   };
   try {
     await db.collection('yr_event_orders').doc(currentEvOrderId).update(upd);
     await adminSendEvInvoiceEmail(currentEvOrderId);
     alert('הזמנה עודכנה וחשבונית נשלחה!');
-    document.getElementById('ev-om-edit-panel').style.display='none';
+    document.getElementById('ev-om-edit-panel').style.display = 'none';
     closeModal('event-order-modal');
     loadEvOrders();
   } catch(e) { alert('שגיאה'); console.error(e); }
