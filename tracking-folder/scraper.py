@@ -9,19 +9,22 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 def run_scraper():
-    tracking_number = "כאן_שים_מספר_מעקב" # שים פה את המספר שלך
+    tracking_number = "כאן_שים_מספר_מעקב" 
     
     options = Options()
     options.add_argument('--headless')
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
+    # שורה קריטית: גורמת לשרתים של AfterShip לחשוב שזה דפדפן רגיל
+    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36")
     
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     
     try:
+        print(f"Starting search for: {tracking_number}")
         driver.get(f"https://www.aftership.com/track/{tracking_number}")
         
-        # מחכה לטעינת הסטטוס
+        # מחכה עד 20 שניות שהסטטוס יופיע
         wait = WebDriverWait(driver, 20)
         wait.until(EC.presence_of_element_located((By.CLASS_NAME, "status-tag")))
         
@@ -36,14 +39,17 @@ def run_scraper():
             "last_update": time.strftime("%d/%m/%Y %H:%M")
         }
 
-        # שמירה לקובץ JSON ספציפי שלא יפריע ל-index
+        # שמירה בתיקייה הנוכחית
         with open('tracking_data.json', 'w', encoding='utf-8') as f:
             json.dump(output, f, ensure_ascii=False, indent=4)
             
-        print("Success: tracking_data.json updated!")
+        print("!!! SUCCESS: tracking_data.json created !!!")
 
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"!!! ERROR: {e}")
+        # יצירת קובץ שגיאה קטן כדי שה-Action לא יקרוס
+        with open('tracking_data.json', 'w', encoding='utf-8') as f:
+            json.dump({"status": "Error", "message": str(e)}, f)
     finally:
         driver.quit()
 
