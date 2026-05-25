@@ -1,0 +1,43 @@
+name: Manual Update Tracking
+
+on:
+  workflow_dispatch: # מאפשר לך להפעיל ידנית מכפתור ה-Actions ב-GitHub
+  schedule:
+    - cron: '0 * * * *' # אופציונלי: ירוץ אוטומטית כל שעה עגולה
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install Chrome and Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+          pip install selenium webdriver-manager
+
+      - name: Run Scraper
+        run: |
+          # נכנס לתיקייה ומריץ את הסקריפט
+          cd tracking-folder
+          python scraper.py
+
+      - name: Commit and Push results
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          # מוודא שמוסיפים את הקובץ מהתיקייה הנכונה
+          git add tracking-folder/tracking_data.json
+          
+          # מבצע קומיט רק אם יש שינויים (כדי למנוע שגיאות כשהסטטוס לא השתנה)
+          git commit -m "Update tracking data [skip ci]" || echo "No changes to commit"
+          git push
