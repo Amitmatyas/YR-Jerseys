@@ -1,9 +1,13 @@
 name: Manual Update Tracking
 
 on:
-  workflow_dispatch: # מאפשר לך להפעיל ידנית מכפתור ה-Actions ב-GitHub
+  workflow_dispatch: # הפעלה ידנית מהלשונית Actions
   schedule:
-    - cron: '0 * * * *' # אופציונלי: ירוץ אוטומטית כל שעה עגולה
+    - cron: '0 * * * *' # הרצה אוטומטית בכל שעה עגולה
+
+# נותן הרשאות כתיבה ל-Action כדי שיוכל לעדכן את ה-JSON
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -11,7 +15,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -27,6 +31,7 @@ jobs:
       - name: Run Scraper
         run: |
           # נכנס לתיקייה ומריץ את הסקריפט
+          # וודא ששם התיקייה כאן תואם לשם התיקייה שיצרת ב-GitHub
           cd tracking-folder
           python scraper.py
 
@@ -35,9 +40,13 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           
-          # מוודא שמוסיפים את הקובץ מהתיקייה הנכונה
+          # בודק אם נוצר או עודכן קובץ הנתונים
           git add tracking-folder/tracking_data.json
           
-          # מבצע קומיט רק אם יש שינויים (כדי למנוע שגיאות כשהסטטוס לא השתנה)
-          git commit -m "Update tracking data [skip ci]" || echo "No changes to commit"
-          git push
+          # מבצע קומיט רק אם יש שינוי אמיתי בתוכן
+          if git diff --staged --quiet; then
+            echo "No changes in tracking data, nothing to commit."
+          else
+            git commit -m "Update tracking data [skip ci]"
+            git push
+          fi
