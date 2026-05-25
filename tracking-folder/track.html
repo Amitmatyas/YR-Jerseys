@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>מעקב משלוח - עיצוב אישי</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; padding: 20px; }
+        .tracking-card { background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 100%; max-width: 600px; padding: 25px; }
+        .header { border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 20px; }
+        .status-now { font-size: 24px; color: #1a73e8; font-weight: bold; }
+        .checkpoint-list { list-style: none; padding: 0; }
+        .checkpoint-item { padding: 15px; border-right: 3px solid #1a73e8; margin-bottom: 10px; background: #f8f9fa; position: relative; }
+        .update-time { font-size: 12px; color: #777; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="tracking-card">
+    <div class="header">
+        <h1 id="order-id">טוען נתונים...</h1>
+        <div id="status" class="status-now">אנא המתן...</div>
+    </div>
+    
+    <ul id="history" class="checkpoint-list">
+        </ul>
+    
+    <div id="last-update" class="update-time"></div>
+</div>
+
+<script>
+    async function loadTracking() {
+        try {
+            // טוען את קובץ הנתונים שהסקריפט מייצר
+            const response = await fetch('tracking_data.json'); 
+            const data = await response.json();
+            
+            document.getElementById('order-id').innerText = "הזמנה #" + data.tracking_number;
+            document.getElementById('status').innerText = data.status;
+            document.getElementById('last-update').innerText = "עדכון אחרון מהמערכת: " + data.last_update;
+            
+            const historyHtml = data.history.map(item => `
+                <li class="checkpoint-item">
+                    ${item}
+                </li>
+            `).join('');
+            
+            document.getElementById('history').innerHTML = historyHtml;
+        } catch (error) {
+            document.getElementById('order-id').innerText = "הנתונים עדיין לא מוכנים";
+            document.getElementById('status').innerText = "יש להריץ את ה-Action ב-GitHub פעם ראשונה";
+        }
+    }
+
+    loadTracking();
+</script>
+</body>
+</html>
