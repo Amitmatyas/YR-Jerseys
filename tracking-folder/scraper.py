@@ -1,73 +1,55 @@
 import json
 import time
+import requests
 import os
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
-def run_scraper():
-    # מספר המעקב של HFD (שנה למספר האמיתי שלך)
-    tracking_number = "88297724" 
-    courier_slug = "hfd" # חברת HFD
+def get_tracking_api():
+    # שליפת המפתח והמספר מהגדרות המערכת
+    api_key = os.getenv('AFTERSHIP_KEY')
+    tracking_number = "88297724" # שים פה את המספר שלך
+    slug = "hfd"
+
+    url = "https://api.aftership.com/tracking/v202601/trackings"
+    headers = {
+        "as-api-key": api_key,
+        "Content-Type": "application/json"
+    }
     
-    options = Options()
-    options.add_argument('--headless')
-    options.add_argument('--no-sandbox')
-    options.add_argument('--disable-dev-shm-usage')
-    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36")
-    
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-    
+    payload = {
+        "tracking": {
+            "tracking_number": tracking_number,
+            "slug": slug
+        }
+    }
+
     try:
-        # פנייה ישירה לדף המעקב של HFD
-        url = f"https://www.aftership.com/track/{courier_slug}/{tracking_number}"
-        print(f"ניגש לכתובת: {url}")
-        driver.get(url)
+        # שליחת הבקשה ל-AfterShip
+        response = requests.post(url, headers=headers, json=payload)
+        res_data = response.json()
         
-        # המתנה לטעינת הסטטוס (עד 20 שניות)
-        wait = WebDriverWait(driver, 20)
+        # גם אם זה כבר קיים (4003) או נוצר (201), אנחנו רוצים את הנתונים
+        tracking_info = res_data.get("data", {}).get("tracking", {})
         
-        # מחפש את הסטטוס המרכזי
-        status_element = wait.until(EC.presence_of_element_located((By.CLASS_NAME, "status-tag")))
-        status = status_element.text
-        
-        # שליפת היסטוריית המשלוח
-        checkpoints = driver.find_elements(By.CLASS_NAME, "checkpoint-item")
-        history = [cp.text.replace('\n', ' ') for cp in checkpoints]
-        
-        if not history:
-            history = ["אין עדכונים זמינים כרגע"]
+        # אם אין נתונים ב-POST, נבצע GET קטן כדי למשוך אותם
+        if not tracking_info:
+            get_url = f"{url}/{slug}/{tracking_number}"
+            tracking_info = requests.get(get_url, headers=headers).json().get("data", {}).get("tracking", {})
 
+        history = [f"[{cp.get('checkpoint_time')}] {cp.get('message')}" for cp in tracking_info.get("checkpoints", [])]
+        
         output = {
             "tracking_number": tracking_number,
-            "courier": "HFD",
-            "status": status,
-            "history": history,
+            "status": tracking_info.get("tag", "בתהליך"),
+            "history": history if history else ["ממתין לעדכון ראשון מ-HFD"],
             "last_update": time.strftime("%d/%m/%Y %H:%M")
         }
 
-        # שמירה לקובץ
         with open('tracking_data.json', 'w', encoding='utf-8') as f:
             json.dump(output, f, ensure_ascii=False, indent=4)
-            
-        print(f"!!! SUCCESS: Data for {tracking_number} saved !!!")
+        print("Success: API data saved to JSON")
 
     except Exception as e:
-        print(f"!!! ERROR: {e}")
-        # יצירת קובץ שגיאה בסיסי כדי שהאתר לא יציג "טוען..." לנצח
-        with open('tracking_data.json', 'w', encoding='utf-8') as f:
-            json.dump({
-                "tracking_number": tracking_number,
-                "status": "בבדיקה / לא נמצא",
-                "history": ["לא הצלחנו למשוך נתונים מ-AfterShip. וודא שמספר המעקב תקין."],
-                "last_update": time.strftime("%d/%m/%Y %H:%M")
-            }, f, ensure_ascii=False)
-    finally:
-        driver.quit()
+        print(f"API Error: {e}")
 
 if __name__ == "__main__":
-    run_scraper()
+    get_tracking_api()
