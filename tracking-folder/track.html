@@ -2,60 +2,65 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>מעקב משלוח - עיצוב אישי</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מעקב הזמנה - HFD</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; padding: 20px; }
-        .tracking-card { background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 100%; max-width: 600px; padding: 25px; }
-        .header { border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 20px; }
-        .status-now { font-size: 24px; color: #1a73e8; font-weight: bold; }
-        .checkpoint-list { list-style: none; padding: 0; }
-        .checkpoint-item { padding: 15px; border-right: 3px solid #1a73e8; margin-bottom: 10px; background: #f8f9fa; position: relative; }
-        .update-time { font-size: 12px; color: #777; margin-top: 20px; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; padding: 20px; margin: 0; }
+        .card { background: white; border-radius: 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.1); width: 100%; max-width: 500px; overflow: hidden; }
+        .header { background: #1a73e8; color: white; padding: 25px; text-align: center; }
+        .header h1 { margin: 0; font-size: 22px; }
+        .status-box { padding: 20px; text-align: center; border-bottom: 1px solid #eee; }
+        .status-text { font-size: 28px; font-weight: bold; color: #1a73e8; margin-top: 10px; }
+        .history { padding: 20px; }
+        .history-title { font-weight: bold; margin-bottom: 15px; color: #555; border-bottom: 2px solid #1a73e8; display: inline-block; }
+        .history-list { list-style: none; padding: 0; margin: 0; }
+        .history-item { padding: 12px; border-right: 3px solid #1a73e8; background: #f9f9f9; margin-bottom: 8px; font-size: 14px; line-height: 1.4; }
+        .footer { padding: 15px; font-size: 11px; color: #999; text-align: center; }
     </style>
 </head>
 <body>
 
-<div class="tracking-card">
+<div class="card">
     <div class="header">
-        <h1 id="order-id">טוען נתונים...</h1>
-        <div id="status" class="status-now">אנא המתן...</div>
+        <h1 id="order-title">טוען נתונים...</h1>
+        <small>חברת שליחויות: HFD</small>
     </div>
     
-    <ul id="history" class="checkpoint-list">
-        </ul>
-    
-    <div id="last-update" class="update-time"></div>
+    <div class="status-box">
+        <div>סטטוס נוכחי:</div>
+        <div id="status" class="status-text">ממתין...</div>
+    </div>
+
+    <div class="history">
+        <div class="history-title">היסטוריית משלוח</div>
+        <ul id="history-list" class="history-list">
+            </ul>
+    </div>
+
+    <div id="update-time" class="footer"></div>
 </div>
 
 <script>
-    async function loadTracking() {
-    try {
-        // הוספת סימן שאלה וזמן כדי למנוע מהדפדפן לטעון גרסה ישנה (Cache)
-        const response = await fetch('tracking_data.json?v=' + new Date().getTime());
-        
-        if (!response.ok) {
-            throw new Error("הקובץ לא נמצא בשרת");
+    async function loadTrackingData() {
+        try {
+            // הוספת Timestamp למניעת Cache
+            const response = await fetch('tracking_data.json?t=' + Date.now());
+            if (!response.ok) throw new Error();
+            const data = await response.json();
+
+            document.getElementById('order-title').innerText = "הזמנה #" + data.tracking_number;
+            document.getElementById('status').innerText = data.status;
+            document.getElementById('update-time').innerText = "עדכון אחרון: " + data.last_update;
+
+            const list = document.getElementById('history-list');
+            list.innerHTML = data.history.map(item => `<li class="history-item">${item}</li>`).join('');
+        } catch (e) {
+            document.getElementById('order-title').innerText = "הנתונים עדיין לא מוכנים";
+            document.getElementById('status').innerText = "בטעינה...";
         }
-
-        const data = await response.json();
-        
-        document.getElementById('order-id').innerText = "הזמנה #" + data.tracking_number;
-        document.getElementById('status').innerText = data.status;
-        document.getElementById('last-update').innerText = "עדכון אחרון: " + data.last_update;
-        
-        const historyHtml = data.history.map(item => `
-            <li class="checkpoint-item">${item}</li>
-        `).join('');
-        
-        document.getElementById('history').innerHTML = historyHtml;
-    } catch (error) {
-        console.error("Error loading JSON:", error);
-        document.getElementById('order-id').innerText = "שגיאה בטעינת הנתונים";
-        document.getElementById('status').innerText = "ודא שה-Action הסתיים בהצלחה";
     }
-}
-loadTracking();
-
+    loadTrackingData();
 </script>
+
 </body>
 </html>
