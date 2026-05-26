@@ -1,1 +1,8 @@
-{"status": "Error", "message": "Message: \nStacktrace:\n#0 0x55eede41416a <unknown>\n#1 0x55eedde116b9 <unknown>\n#2 0x55eedde65c0d <unknown>\n#3 0x55eedde65e51 <unknown>\n#4 0x55eeddeb0b24 <unknown>\n#5 0x55eeddeadcbf <unknown>\n#6 0x55eedde59222 <unknown>\n#7 0x55eedde5a011 <unknown>\n#8 0x55eede3d9a0b <unknown>\n#9 0x55eede3dc92d <unknown>\n#10 0x55eede3c6948 <unknown>\n#11 0x55eede3dd4c0 <unknown>\n#12 0x55eede3ad560 <unknown>\n#13 0x55eede400dd8 <unknown>\n#14 0x55eede400f75 <unknown>\n#15 0x55eede412bce <unknown>\n#16 0x7f8c0809caa4 <unknown>\n#17 0x7f8c08129c6c <unknown>\n"}
+{
+    "tracking_number": "88297724",
+    "status": "בתהליך",
+    "history": [
+        "ממתין לעדכון ראשון מ-HFD"
+    ],
+    "last_update": "26/05/2026 18:22"
+}
