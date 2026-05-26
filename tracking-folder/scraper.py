@@ -9,7 +9,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 def run_scraper():
-    tracking_number = "כאן_שים_מספר_מעקב" 
+    tracking_number = "88297724" 
     
     options = Options()
     options.add_argument('--headless')
