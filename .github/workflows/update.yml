@@ -1,9 +1,9 @@
-name: HFD Tracking Update
+name: HFD API Update
 
 on:
-  workflow_dispatch: # הרצה ידנית
+  workflow_dispatch:
   schedule:
-    - cron: '0 * * * *' # כל שעה עגולה
+    - cron: '0 * * * *'
 
 permissions:
   contents: write
@@ -20,29 +20,20 @@ jobs:
         with:
           python-version: '3.9'
 
-      - name: Install Chrome and Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y google-chrome-stable
-          pip install selenium webdriver-manager
+      - name: Install Requests
+        run: pip install requests
 
-      - name: Run Scraper
+      - name: Run API Scraper
+        env:
+          AFTERSHIP_KEY: ${{ secrets.AFTERSHIP_KEY }} # כאן הקסם קורה
         run: |
-          # נכנס לתיקייה שבה נמצא הסקריפט
           cd tracking-folder
           python scraper.py
 
-      - name: Commit and Push results
+      - name: Commit and Push
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          
-          # מוסיף את קובץ הנתונים שנוצר בתוך התיקייה
           git add tracking-folder/tracking_data.json
-          
-          if git diff --staged --quiet; then
-            echo "No changes to commit."
-          else
-            git commit -m "Update HFD tracking [skip ci]"
-            git push
-          fi
+          git commit -m "Update via API [skip ci]" || echo "No changes"
+          git push
