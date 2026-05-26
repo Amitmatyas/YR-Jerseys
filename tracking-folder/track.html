@@ -29,29 +29,33 @@
 
 <script>
     async function loadTracking() {
-        try {
-            // טוען את קובץ הנתונים שהסקריפט מייצר
-            const response = await fetch('tracking_data.json'); 
-            const data = await response.json();
-            
-            document.getElementById('order-id').innerText = "הזמנה #" + data.tracking_number;
-            document.getElementById('status').innerText = data.status;
-            document.getElementById('last-update').innerText = "עדכון אחרון מהמערכת: " + data.last_update;
-            
-            const historyHtml = data.history.map(item => `
-                <li class="checkpoint-item">
-                    ${item}
-                </li>
-            `).join('');
-            
-            document.getElementById('history').innerHTML = historyHtml;
-        } catch (error) {
-            document.getElementById('order-id').innerText = "הנתונים עדיין לא מוכנים";
-            document.getElementById('status').innerText = "יש להריץ את ה-Action ב-GitHub פעם ראשונה";
+    try {
+        // הוספת סימן שאלה וזמן כדי למנוע מהדפדפן לטעון גרסה ישנה (Cache)
+        const response = await fetch('tracking_data.json?v=' + new Date().getTime());
+        
+        if (!response.ok) {
+            throw new Error("הקובץ לא נמצא בשרת");
         }
-    }
 
-    loadTracking();
+        const data = await response.json();
+        
+        document.getElementById('order-id').innerText = "הזמנה #" + data.tracking_number;
+        document.getElementById('status').innerText = data.status;
+        document.getElementById('last-update').innerText = "עדכון אחרון: " + data.last_update;
+        
+        const historyHtml = data.history.map(item => `
+            <li class="checkpoint-item">${item}</li>
+        `).join('');
+        
+        document.getElementById('history').innerHTML = historyHtml;
+    } catch (error) {
+        console.error("Error loading JSON:", error);
+        document.getElementById('order-id').innerText = "שגיאה בטעינת הנתונים";
+        document.getElementById('status').innerText = "ודא שה-Action הסתיים בהצלחה";
+    }
+}
+loadTracking();
+
 </script>
 </body>
 </html>
