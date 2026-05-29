@@ -1504,8 +1504,7 @@ localStorage.setItem('yr_pending_order_id', pendingOrderId);
                 document.getElementById('bit-payment-btn').textContent = '📱 פתח ביט שוב';
 
                 // Open Bit
-                const bitUrl = BIT_PAYMENT_LINK + `?amount=${total.toFixed(2)}&note=${encodeURIComponent('YR Jerseys - ' + name)}`;
-                window.open(bitUrl, '_blank');
+                window.open(BIT_PAYMENT_LINK, '_blank');
             } catch(e) {
                 console.error('Error saving pending order:', e);
                 alert('שגיאה בשמירת ההזמנה. נסה שוב.');
