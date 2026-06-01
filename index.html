@@ -1125,54 +1125,65 @@ function startAnnouncementsBar() {
 }
 
 function loadSettingsAndAnnouncements() {
-    db.collection('yr_settings').doc('main').onSnapshot(doc => {
-        if (doc.exists) {
-            const data = doc.data();
-            settings = data;
-            categories = data.Categories || [];
-            subCategories = data.SubCategories || {};
-            activeDeals = data.Deals || [];
-            updateCategoryFilter();
+    try {
+        db.collection('yr_settings').doc('main').onSnapshot(doc => {
+            applySettingsDoc(doc);
+        }, err => {
+            console.warn('onSnapshot failed, falling back to get():', err);
+            db.collection('yr_settings').doc('main').get().then(applySettingsDoc).catch(console.error);
+        });
+    } catch(e) {
+        console.warn('onSnapshot threw, falling back:', e);
+        db.collection('yr_settings').doc('main').get().then(applySettingsDoc).catch(console.error);
+    }
+}
 
-            announcements = data.Announcements || [];
-            if (data.Shipping && data.Shipping.FreeThreshold > 0)
-                announcements.push(`משלוח חינם על קניות מעל ${data.Shipping.FreeThreshold}₪!`);
-            startAnnouncementsBar();
-
-            if (currentClubMember && data.MemberAnnouncements)
-                addMemberAnnouncements(data.MemberAnnouncements);
-        } else {
-            settings = { Shipping: { Method: 'fixed', Value: 30, FreeThreshold: 0 }, Coupons: [], Categories: [], MemberAnnouncements: [] };
-            activeDeals = [];
-        }
-    }, err => {
-        console.error('Settings error:', err);
+function applySettingsDoc(doc) {
+    if (doc.exists) {
+        const data = doc.data();
+        settings = data;
+        categories = data.Categories || [];
+        subCategories = data.SubCategories || {};
+        activeDeals = data.Deals || [];
+        updateCategoryFilter();
+        announcements = data.Announcements || [];
+        if (data.Shipping && data.Shipping.FreeThreshold > 0)
+            announcements.push(`משלוח חינם על קניות מעל ${data.Shipping.FreeThreshold}₪!`);
+        startAnnouncementsBar();
+        if (currentClubMember && data.MemberAnnouncements)
+            addMemberAnnouncements(data.MemberAnnouncements);
+    } else {
         settings = { Shipping: { Method: 'fixed', Value: 30, FreeThreshold: 0 }, Coupons: [], Categories: [], MemberAnnouncements: [] };
         activeDeals = [];
-    });
+    }
 }
 
         // ===== PRODUCTS =====
-async function fetchProducts() {
-    productsContainer.innerHTML = `<div style="text-align:center;padding:80px 20px;width:100%;">
-        <div style="font-size:3em;font-weight:900;margin-bottom:15px;">⏳</div>
-        <p style="font-size:1.1em;font-weight:900;text-transform:uppercase;">טוען מוצרים...</p>
-    </div>`;
+function fetchProducts() {
+    productsContainer.innerHTML = `<div style="text-align:center;padding:80px 20px;width:100%;"><div style="font-size:3em;font-weight:900;margin-bottom:15px;">⏳</div><p style="font-size:1.1em;font-weight:900;text-transform:uppercase;">טוען מוצרים...</p></div>`;
 
-    db.collection('yr_jerseys').onSnapshot(snap => {
+    const applyProducts = snap => {
         products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
         applyFilters();
         handleDeepLink();
-    }, err => {
-        console.error('Products error:', err);
-        if (!products.length) {
+    };
+
+    const onError = err => {
+        console.warn('onSnapshot failed, falling back to get():', err);
+        db.collection('yr_jerseys').get().then(applyProducts).catch(e => {
             productsContainer.innerHTML = `<div style="text-align:center;padding:60px;width:100%;">
                 <div style="font-size:3em;margin-bottom:15px;font-weight:900;">⚠️</div>
                 <p style="color:var(--accent-color);font-weight:900;">שגיאה בטעינת המוצרים</p>
                 <button onclick="location.reload()" style="background:#000;color:white;border:4px solid #000;padding:12px 24px;cursor:pointer;font-size:1em;font-weight:900;text-transform:uppercase;margin-top:15px;">רענן דף</button>
             </div>`;
-        }
-    });
+        });
+    };
+
+    try {
+        db.collection('yr_jerseys').onSnapshot(applyProducts, onError);
+    } catch(e) {
+        onError(e);
+    }
 }
 
         function getEffectivePrice(product) {
