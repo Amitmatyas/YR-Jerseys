@@ -988,7 +988,6 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        db.enablePersistence({ synchronizeTabs: true }).catch(err => console.log('Persistence:', err.code));
 
         // DOM refs
         const productsContainer = document.getElementById('products-container');
@@ -2548,28 +2547,24 @@ function openProductByName(encodedName) {
 
         // ===== INIT =====
 document.addEventListener('DOMContentLoaded', async () => {
-            productsContainer.innerHTML = `<div style="text-align:center;padding:80px 20px;width:100%;"><div style="font-size:3em;font-weight:900;margin-bottom:15px;">⏳</div><p style="font-size:1.1em;font-weight:900;text-transform:uppercase;">טוען מוצרים...</p></div>`;
-try {
-                await loadSettings();
-                loadCartFromStorage();
-                const pendingId = localStorage.getItem('yr_pending_order_id');
-                if (pendingId) {
-                    pendingOrderId = pendingId;
-                    document.getElementById('confirm-payment-btn').style.display = 'block';
-                    document.getElementById('bit-payment-btn').textContent = '📱 פתח ביט שוב';
-                    openCart();
-                }
-loadSettingsAndAnnouncements();
-fetchProducts();
-await Promise.all([loadClubMember(), loadNews()]);
-    if (currentClubMember && settings && settings.MemberAnnouncements) {
-                    addMemberAnnouncements(settings.MemberAnnouncements);
-                }
-                validateCoupon();
-                validateDealsInCart();
-                updateCartDisplay();
-            } catch(e) { console.error('Init error:', e); }
-        });
+    productsContainer.innerHTML = `<div style="text-align:center;padding:80px 20px;width:100%;"><div style="font-size:3em;font-weight:900;margin-bottom:15px;">⏳</div><p style="font-size:1.1em;font-weight:900;text-transform:uppercase;">טוען מוצרים...</p></div>`;
+    try {
+        loadCartFromStorage();
+        const pendingId = localStorage.getItem('yr_pending_order_id');
+        if (pendingId) {
+            pendingOrderId = pendingId;
+            document.getElementById('confirm-payment-btn').style.display = 'block';
+            document.getElementById('bit-payment-btn').textContent = '📱 פתח ביט שוב';
+            openCart();
+        }
+        loadSettingsAndAnnouncements();
+        fetchProducts();
+        await Promise.all([loadClubMember(), loadNews()]);
+        validateCoupon();
+        validateDealsInCart();
+        updateCartDisplay();
+    } catch(e) { console.error('Init error:', e); }
+});
     </script>
 </body>
 </html>
