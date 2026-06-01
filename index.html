@@ -1104,19 +1104,6 @@ let currentSubCategoryFilter = null;
         // ===== ANNOUNCEMENTS =====
 let announcementsInterval = null;
 
-async function loadAnnouncements() {
-    try {
-        const doc = await db.collection('yr_settings').doc('main').get();
-        const bar = document.getElementById('announcement-bar');
-        if (doc.exists) {
-            const data = doc.data();
-            announcements = data.Announcements || [];
-            if (data.Shipping && data.Shipping.FreeThreshold > 0) announcements.push(`משלוח חינם על קניות מעל ${data.Shipping.FreeThreshold}₪!`);
-            startAnnouncementsBar();
-        }
-    } catch(e) { console.error('Announcements:', e); }
-}
-
 function addMemberAnnouncements(memberAnnouncements) {
     if (!memberAnnouncements || !memberAnnouncements.length) return;
     memberAnnouncements.forEach(m => {
@@ -1138,25 +1125,56 @@ function startAnnouncementsBar() {
     }, 5000);
 }
 
-        // ===== SETTINGS =====
-async function loadSettings() {
-    try {
-        const doc = await db.collection('yr_settings').doc('main').get();
-        if (doc.exists) { settings = doc.data(); categories = settings.Categories || []; subCategories = settings.SubCategories || {}; activeDeals = settings.Deals || []; updateCategoryFilter(); }
-        else { settings = { Shipping: { Method: 'fixed', Value: 30, FreeThreshold: 0 }, Coupons: [], Categories: [], MemberAnnouncements: [] }; activeDeals = []; }
-    } catch(e) { settings = { Shipping: { Method: 'fixed', Value: 30, FreeThreshold: 0 }, Coupons: [], Categories: [], MemberAnnouncements: [] }; activeDeals = []; }
+function loadSettingsAndAnnouncements() {
+    db.collection('yr_settings').doc('main').onSnapshot(doc => {
+        if (doc.exists) {
+            const data = doc.data();
+            settings = data;
+            categories = data.Categories || [];
+            subCategories = data.SubCategories || {};
+            activeDeals = data.Deals || [];
+            updateCategoryFilter();
+
+            announcements = data.Announcements || [];
+            if (data.Shipping && data.Shipping.FreeThreshold > 0)
+                announcements.push(`משלוח חינם על קניות מעל ${data.Shipping.FreeThreshold}₪!`);
+            startAnnouncementsBar();
+
+            if (currentClubMember && data.MemberAnnouncements)
+                addMemberAnnouncements(data.MemberAnnouncements);
+        } else {
+            settings = { Shipping: { Method: 'fixed', Value: 30, FreeThreshold: 0 }, Coupons: [], Categories: [], MemberAnnouncements: [] };
+            activeDeals = [];
+        }
+    }, err => {
+        console.error('Settings error:', err);
+        settings = { Shipping: { Method: 'fixed', Value: 30, FreeThreshold: 0 }, Coupons: [], Categories: [], MemberAnnouncements: [] };
+        activeDeals = [];
+    });
 }
 
         // ===== PRODUCTS =====
-        async function fetchProducts() {
-            try {
-                const snap = await withTimeout(db.collection('yr_jerseys').get());
-                products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                applyFilters(); handleDeepLink();
-            } catch(e) {
-                productsContainer.innerHTML = `<div style="text-align:center;padding:60px;width:100%;"><div style="font-size:3em;margin-bottom:15px;font-weight:900;">⚠️</div><p style="color:var(--accent-color);font-weight:900;">שגיאה בטעינת המוצרים</p><button onclick="location.reload()" style="background:#000;color:white;border:4px solid #000;padding:12px 24px;cursor:pointer;font-size:1em;font-weight:900;text-transform:uppercase;margin-top:15px;">רענן דף</button></div>`;
-            }
+async function fetchProducts() {
+    productsContainer.innerHTML = `<div style="text-align:center;padding:80px 20px;width:100%;">
+        <div style="font-size:3em;font-weight:900;margin-bottom:15px;">⏳</div>
+        <p style="font-size:1.1em;font-weight:900;text-transform:uppercase;">טוען מוצרים...</p>
+    </div>`;
+
+    db.collection('yr_jerseys').onSnapshot(snap => {
+        products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        applyFilters();
+        handleDeepLink();
+    }, err => {
+        console.error('Products error:', err);
+        if (!products.length) {
+            productsContainer.innerHTML = `<div style="text-align:center;padding:60px;width:100%;">
+                <div style="font-size:3em;margin-bottom:15px;font-weight:900;">⚠️</div>
+                <p style="color:var(--accent-color);font-weight:900;">שגיאה בטעינת המוצרים</p>
+                <button onclick="location.reload()" style="background:#000;color:white;border:4px solid #000;padding:12px 24px;cursor:pointer;font-size:1em;font-weight:900;text-transform:uppercase;margin-top:15px;">רענן דף</button>
+            </div>`;
         }
+    });
+}
 
         function getEffectivePrice(product) {
             if (product.salePrice && product.salePrice > 0) {
@@ -1480,36 +1498,44 @@ applyCouponBtn.addEventListener('click', async () => {
             return true;
         }
 
-        async function handleBitPayment() {
-            if (cart.length === 0) { alert('העגלה ריקה'); return; }
-            if (!validateCheckoutForm()) return;
+async function handleBitPayment() {
+    if (cart.length === 0) { alert('העגלה ריקה'); return; }
+    if (!validateCheckoutForm()) return;
 
-            const name = document.getElementById('name').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const phone = document.getElementById('phone').value.trim();
-            const address = getFullAddress();
+    // פתח את ביט מיד — לפני כל await, כדי שהדפדפן לא יחסום
+    const bitWindow = window.open(BIT_PAYMENT_LINK, '_blank');
 
-            // Save pending order to Firestore
-            try {
-                const pointsEarned = Math.floor(total * 0.01);
-                const orderData = buildOrderData(name, email, phone, address, pointsEarned, 'bit_pending');
-const shortId = Math.floor(10000 + Math.random() * 90000).toString();
-const orderData2 = { ...orderData, orderId: shortId };
-await db.collection('yr_orders').doc(shortId).set(orderData2);
-pendingOrderId = shortId;
-localStorage.setItem('yr_pending_order_id', pendingOrderId);
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const address = getFullAddress();
 
-                // Show confirm button
-                document.getElementById('confirm-payment-btn').style.display = 'block';
-                document.getElementById('bit-payment-btn').textContent = '📱 פתח ביט שוב';
+    try {
+        const pointsEarned = Math.floor(total * 0.01);
+        const orderData = buildOrderData(name, email, phone, address, pointsEarned, 'bit_pending');
+        const shortId = Math.floor(10000 + Math.random() * 90000).toString();
+        const orderData2 = { ...orderData, orderId: shortId };
+        await db.collection('yr_orders').doc(shortId).set(orderData2);
+        pendingOrderId = shortId;
+        localStorage.setItem('yr_pending_order_id', pendingOrderId);
 
-                // Open Bit
-                window.open(BIT_PAYMENT_LINK, '_blank');
-            } catch(e) {
-                console.error('Error saving pending order:', e);
-                alert('שגיאה בשמירת ההזמנה. נסה שוב.');
-            }
+        document.getElementById('confirm-payment-btn').style.display = 'block';
+        document.getElementById('bit-payment-btn').textContent = '📱 פתח ביט שוב';
+
+        // אם ה-popup נחסם (bitWindow יהיה null), כפתור גיבוי ישיר
+        if (!bitWindow || bitWindow.closed) {
+            const fallback = document.createElement('a');
+            fallback.href = BIT_PAYMENT_LINK;
+            fallback.target = '_blank';
+            fallback.rel = 'noopener';
+            fallback.click();
         }
+
+    } catch(e) {
+        console.error('Error saving pending order:', e);
+        alert('שגיאה בשמירת ההזמנה. נסה שוב.');
+    }
+}
 
         async function confirmBitPayment() {
             if (!pendingOrderId) {
@@ -2533,8 +2559,10 @@ try {
                     document.getElementById('bit-payment-btn').textContent = '📱 פתח ביט שוב';
                     openCart();
                 }
-                await Promise.all([loadAnnouncements(), fetchProducts(), loadClubMember(), loadNews()]);
-                if (currentClubMember && settings && settings.MemberAnnouncements) {
+loadSettingsAndAnnouncements();
+fetchProducts();
+await Promise.all([loadClubMember(), loadNews()]);
+    if (currentClubMember && settings && settings.MemberAnnouncements) {
                     addMemberAnnouncements(settings.MemberAnnouncements);
                 }
                 validateCoupon();
