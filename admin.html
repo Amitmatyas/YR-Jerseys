@@ -16,8 +16,6 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f0f0;color:#333;direction:r
 #login-button{background:#dc3545;color:#fff;border:none;padding:13px;border-radius:7px;cursor:pointer;font-size:1.05em;font-weight:700;width:100%;transition:background .2s}
 #login-button:hover{background:#b02a37}
 #login-error{color:#dc3545;margin-top:10px;font-weight:600;font-size:.92em;display:none}
-#admin-mgmt-link{display:block;margin-top:14px;color:rgba(255,255,255,.55);text-decoration:none;font-size:.82em;transition:color .2s}
-#admin-mgmt-link:hover{color:#fff;text-decoration:underline}
 .admin-layout{display:none;flex-direction:row;min-height:100vh}
 .admin-layout.active{display:flex}
 .sidebar{width:240px;background:#fff;min-height:100vh;position:fixed;right:0;top:0;z-index:100;overflow-y:auto;box-shadow:-2px 0 8px rgba(0,0,0,.07);display:flex;flex-direction:column}
@@ -240,7 +238,6 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f0f0;color:#333;direction:r
       <button id="login-button">התחבר</button>
       <p id="login-error"></p>
     </div>
-    <a href="/password" id="admin-mgmt-link">ניהול משתמשים</a>
   </div>
 </div>
 
@@ -945,9 +942,14 @@ function addCFUI(fd=null,container){const fc=document.createElement('div');fc.cl
 function extractCFs(container){const out=[];container.querySelectorAll('.cf-container').forEach(fc=>{const name=fc.querySelector('.cf-name').value.trim(),type=fc.querySelector('.cf-type').value,required=fc.querySelector('.cf-required').checked,extraPrice=parseFloat(fc.querySelector('.cf-extra').value)||0;if(!name)return;const f={name,type,required,extraPrice};if(type==='select'){f.options=[];fc.querySelectorAll('.opt-item').forEach(oi=>{const v=oi.querySelector('.opt-val').value.trim();if(v)f.options.push({value:v,extraPrice:parseFloat(oi.querySelector('.opt-price').value)||0,image:oi.querySelector('.opt-img-url').value||null});});}out.push(f);});return out;}
 
 // LOGIN
+const ADMIN_USERS={
+  'Yair':{password:'12344',hebrewName:'יאיר לוי'},
+  'Ron':{password:'54321',hebrewName:'רון קדוש'},
+  'Amit':{password:'Amit2012',hebrewName:'עמית מטיאס'},
+};
 async function doLogin(username, displayName){$('login-overlay').style.display='none';$('admin-layout').classList.add('active');$('sw-name').textContent=`היי ${displayName||username}`;$('sw-sub').textContent='ברוך הבא לפאנל הניהול של YR JERSEYS';$('login-error').style.display='none';try{await initSettings();await Promise.all([loadAllProducts(),loadCategories()]);await Promise.all([fetchOrders(),fetchLeads(),fetchCustomers(),loadShipping(),loadCoupons(),loadAnnouncements(),loadMemberAnnouncements()]);setupUpload('pimg-file','pimg-preview','pimg-status','pimg-url','pimg-zone');await loadDeals();updateNewsProductSelect();}catch(e){console.error(e);alert('שגיאה: '+e.message);}}
-window.addEventListener('DOMContentLoaded',async()=>{const logged=localStorage.getItem('vip_admin_logged'),user=localStorage.getItem('vip_admin_user');if(logged==='true'&&user){try{const d=await db.collection('users').doc(user).get();if(d.exists)doLogin(user,d.data().hebrewName);else{localStorage.removeItem('vip_admin_logged');localStorage.removeItem('vip_admin_user');}}catch(e){console.error(e);}}});
-$('login-button').addEventListener('click',async()=>{const u=$('login-username').value.trim(),p=$('login-password').value;if(!u||!p)return;try{const d=await db.collection('users').doc(u).get();if(!d.exists)throw new Error('user-not-found');if(d.data().password!==p)throw new Error('wrong-password');if(confirm('להישאר מחובר?')){localStorage.setItem('vip_admin_logged','true');localStorage.setItem('vip_admin_user',u);}doLogin(u,d.data().hebrewName);}catch(e){const msg=e.message==='user-not-found'?'משתמש לא קיים':e.message==='wrong-password'?'סיסמה שגויה':'שגיאה בהתחברות';$('login-error').textContent=msg;$('login-error').style.display='block';}});
+window.addEventListener('DOMContentLoaded',async()=>{const logged=localStorage.getItem('vip_admin_logged'),user=localStorage.getItem('vip_admin_user');if(logged==='true'&&user){const acc=ADMIN_USERS[user];if(acc)doLogin(user,acc.hebrewName);else{localStorage.removeItem('vip_admin_logged');localStorage.removeItem('vip_admin_user');}}});
+$('login-button').addEventListener('click',()=>{const u=$('login-username').value.trim(),p=$('login-password').value;if(!u||!p)return;try{const acc=ADMIN_USERS[u];if(!acc)throw new Error('user-not-found');if(acc.password!==p)throw new Error('wrong-password');if(confirm('להישאר מחובר?')){localStorage.setItem('vip_admin_logged','true');localStorage.setItem('vip_admin_user',u);}doLogin(u,acc.hebrewName);}catch(e){const msg=e.message==='user-not-found'?'משתמש לא קיים':e.message==='wrong-password'?'סיסמה שגויה':'שגיאה בהתחברות';$('login-error').textContent=msg;$('login-error').style.display='block';}});
 ['login-username','login-password'].forEach(id=>$(id).addEventListener('keypress',e=>{if(e.key==='Enter')$('login-button').click();}));
 $('logout-button').addEventListener('click',()=>{if(confirm('להתנתק?')){localStorage.removeItem('vip_admin_logged');localStorage.removeItem('vip_admin_user');location.reload();}});
 
