@@ -16,6 +16,8 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f0f0;color:#333;direction:r
 #login-button{background:#dc3545;color:#fff;border:none;padding:13px;border-radius:7px;cursor:pointer;font-size:1.05em;font-weight:700;width:100%;transition:background .2s}
 #login-button:hover{background:#b02a37}
 #login-error{color:#dc3545;margin-top:10px;font-weight:600;font-size:.92em;display:none}
+#admin-mgmt-link{display:block;margin-top:14px;color:rgba(255,255,255,.55);text-decoration:none;font-size:.82em;transition:color .2s}
+#admin-mgmt-link:hover{color:#fff;text-decoration:underline}
 .admin-layout{display:none;flex-direction:row;min-height:100vh}
 .admin-layout.active{display:flex}
 .sidebar{width:240px;background:#fff;min-height:100vh;position:fixed;right:0;top:0;z-index:100;overflow-y:auto;box-shadow:-2px 0 8px rgba(0,0,0,.07);display:flex;flex-direction:column}
@@ -220,8 +222,8 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f0f0;color:#333;direction:r
 .ev-exc-card .price{color:#dc3545;font-weight:900;font-size:.88em;margin-bottom:6px;}
 .ev-exc-card .del-btn{background:#dc3545;color:#fff;border:none;cursor:pointer;padding:4px 10px;font-size:.78em;border-radius:4px;font-weight:700;}
 </style>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.12.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <script>emailjs.init('f-U3pdugkQiavzAvU');</script>
 </head>
@@ -238,6 +240,7 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f0f0;color:#333;direction:r
       <button id="login-button">התחבר</button>
       <p id="login-error"></p>
     </div>
+    <a href="/password" id="admin-mgmt-link">ניהול משתמשים</a>
   </div>
 </div>
 
@@ -257,11 +260,12 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f0f0;color:#333;direction:r
       <div class="menu-item" data-section="customers">⭐ מועדון לקוחות</div>
       <div class="menu-item" data-section="bulk-edit">✏️ עריכה מרובה</div>
       <div class="menu-item" data-section="news">📰 חדשות</div>
+      <div class="menu-item" data-section="reviews">⭐ ביקורות</div>
 <div class="menu-item" data-section="events">🎪 אירועים</div>
       <div class="menu-item" data-section="settings">⚙️ הגדרות</div>
     </div>
     <div class="sidebar-footer">
-      <a href="https://amitmatyas-sitemanage.netlify.app/#YR Jerseys" target="_blank" class="btn" style="width:100%;display:block;text-align:center;text-decoration:none;margin-bottom:8px;">גרסאות</a>
+      <button id="versions-button" class="btn" style="width:100%;background:#2980b9;color:#fff;margin-bottom:8px">גרסאות</button>
       <button id="logout-button" class="btn btn-danger" style="width:100%">התנתקות</button>
     </div>
   </div>
@@ -367,6 +371,58 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f0f0;color:#333;direction:r
         <button class="btn btn-secondary" id="clear-customer-btn">נקה</button>
       </div>
       <div id="customers-list"><p>טוען לקוחות...</p></div>
+
+      <div class="settings-box" style="margin-top:24px;">
+        <h3>🎟️ קופוני מועדון חודשיים</h3>
+        <p style="color:#888;font-size:.85em;margin-bottom:12px">תזמן הטבות לחברי המועדון מראש לפי חודש ושנה (עד 100 שנה קדימה). ההטבה תוצג לחברים ותהיה ניתנת למימוש רק בחודש ובשנה שנבחרו.</p>
+        <div style="display:flex;gap:10px">
+          <div class="form-group" style="flex:1"><label>חודש</label><select id="mc-month">
+            <option value="1">ינואר</option><option value="2">פברואר</option><option value="3">מרץ</option><option value="4">אפריל</option><option value="5">מאי</option><option value="6">יוני</option><option value="7">יולי</option><option value="8">אוגוסט</option><option value="9">ספטמבר</option><option value="10">אוקטובר</option><option value="11">נובמבר</option><option value="12">דצמבר</option>
+          </select></div>
+          <div class="form-group" style="flex:1"><label>שנה</label><select id="mc-year"></select></div>
+        </div>
+        <div class="form-group"><label>קוד קופון</label><input type="text" id="mc-code" placeholder="VIPJAN"></div>
+        <div class="form-group"><label>סוג הטבה</label>
+          <select id="mc-kind" onchange="onMcKindChange()">
+            <option value="general">הנחה כללית על ההזמנה</option>
+            <option value="shipping">הנחה על המשלוח</option>
+            <option value="bogo">קנה X קבל Y</option>
+          </select>
+        </div>
+        <div id="mc-amount-fields">
+          <div style="display:flex;gap:10px">
+            <div class="form-group" style="flex:1"><label>סוג ערך</label><select id="mc-amount-type"><option value="percentage">אחוז (%)</option><option value="fixed">סכום קבוע (₪)</option></select></div>
+            <div class="form-group" style="flex:1"><label>ערך</label><input type="number" id="mc-value" step="0.01" min="0"></div>
+          </div>
+          <div class="form-group"><label>סכום מינימום להזמנה (אופציונלי)</label><input type="number" id="mc-min-amount" step="0.01" min="0" placeholder="ריק = ללא מגבלה"></div>
+        </div>
+        <div id="mc-bogo-fields" style="display:none">
+          <div style="display:flex;gap:10px">
+            <div class="form-group" style="flex:1"><label>כמות לרכישה (X)</label><input type="number" id="mc-buy-qty" min="1" value="2"></div>
+            <div class="form-group" style="flex:1"><label>כמות במתנה (Y)</label><input type="number" id="mc-get-qty" min="1" value="1"></div>
+          </div>
+          <div class="form-group"><label>מוצרים שצריך לקנות</label>
+            <div style="display:flex;gap:12px;margin-bottom:8px;flex-wrap:wrap">
+              <label><input type="radio" name="mc-buy-mode" value="all" checked> כל המוצרים</label>
+              <label><input type="radio" name="mc-buy-mode" value="category"> לפי קטגוריה</label>
+              <label><input type="radio" name="mc-buy-mode" value="specific"> מוצרים ספציפיים</label>
+            </div>
+            <div id="mc-buy-cat-picker" style="display:none" class="cat-checks"></div>
+            <div id="mc-buy-prod-picker" style="display:none;max-height:180px;overflow-y:auto;border:2px solid #eee;border-radius:7px;padding:8px;background:#fafafa"></div>
+          </div>
+          <div class="form-group"><label>מוצרים שניתן לקבל במתנה</label>
+            <div style="display:flex;gap:12px;margin-bottom:8px;flex-wrap:wrap">
+              <label><input type="radio" name="mc-get-mode" value="all" checked> כל המוצרים</label>
+              <label><input type="radio" name="mc-get-mode" value="category"> לפי קטגוריה</label>
+              <label><input type="radio" name="mc-get-mode" value="specific"> מוצרים ספציפיים</label>
+            </div>
+            <div id="mc-get-cat-picker" style="display:none" class="cat-checks"></div>
+            <div id="mc-get-prod-picker" style="display:none;max-height:180px;overflow-y:auto;border:2px solid #eee;border-radius:7px;padding:8px;background:#fafafa"></div>
+          </div>
+        </div>
+        <button class="btn btn-success" id="add-mc-btn">+ הוסף קופון חודשי</button>
+        <div id="mc-list" style="margin-top:14px"></div>
+      </div>
     </div>
 
     <!-- BULK EDIT -->
@@ -428,6 +484,28 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f0f0;color:#333;direction:r
         <button class="btn btn-success" id="add-news-btn">+ הוסף לחדשות</button>
       </div>
       <div id="news-list-admin"></div>
+    </div>
+
+<!-- REVIEWS -->
+    <div class="content-section" id="reviews-section">
+      <div class="content-header"><h2>ניהול ביקורות</h2></div>
+      <div class="settings-box" style="margin-bottom:20px;">
+        <h3>הוסף ביקורת</h3>
+        <div class="form-group"><label>שם הלקוח *</label><input type="text" id="rev-name" placeholder="שם הלקוח"></div>
+        <div class="form-group"><label>דירוג *</label><select id="rev-rating">
+          <option value="5">★★★★★ (5)</option><option value="4">★★★★☆ (4)</option><option value="3">★★★☆☆ (3)</option><option value="2">★★☆☆☆ (2)</option><option value="1">★☆☆☆☆ (1)</option>
+        </select></div>
+        <div class="form-group"><label>תוכן הביקורת *</label><textarea id="rev-text" rows="3" placeholder="תוכן הביקורת..."></textarea></div>
+        <div class="form-group"><label>מוצר מקושר (אופציונלי)</label><select id="rev-product"><option value="">ללא קישור</option></select></div>
+        <div class="form-group">
+          <label>תמונות מלוות (עד 4, מקס 500KB לתמונה)</label>
+          <input type="file" id="rev-img-input" accept="image/*" multiple>
+          <div id="rev-img-preview" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px"></div>
+          <div id="rev-img-status" style="margin-top:5px;font-weight:600;font-size:.86em"></div>
+        </div>
+        <button class="btn btn-success" id="add-review-btn">+ הוסף ביקורת</button>
+      </div>
+      <div id="reviews-list"><p style="color:#888">טוען ביקורות...</p></div>
     </div>
 
     <!-- SETTINGS -->
@@ -580,7 +658,7 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f0f0;color:#333;direction:r
           <div class="form-group">
             <label>לינק ביט / כרטיס אשראי / PayPal</label>
             <input type="text" id="ev-payment-link" placeholder="https://... (ריק = ללא כפתור תשלום)">
-            <small>אם ריק — יופיע רק כפתור "שלח הזמנה ללא תשלום"</small>
+            <small>אם ריק — כפתור התשלום יוצג מושבת עד שיוגדר לינק</small>
           </div>
         </div>
 
@@ -913,6 +991,8 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f0f0;color:#333;direction:r
 <script>
 firebase.initializeApp({apiKey:"AIzaSyDLHENaXTeorjL87sExB1EJrH7mrEnNYOA",authDomain:"timetable-titus.firebaseapp.com",projectId:"timetable-titus",storageBucket:"timetable-titus.firebasestorage.app",messagingSenderId:"199146911555",appId:"1:199146911555:web:5d9436d716dfc6de7361f6"});
 const db=firebase.firestore();
+db.settings({experimentalAutoDetectLongPolling:true,merge:true});
+db.enablePersistence({synchronizeTabs:true}).catch(err=>{if(err.code!=='failed-precondition'&&err.code!=='unimplemented')console.error('שגיאת חיבור למסד נתונים (persistence):',err);});
 const IMGBB='949918f473144748f8dea05705ac165a';
 let products=[],categories=[],subCategories={},announcements=[],selectedCouponOptions={};
 let currentOrderId=null,currentLeadId=null,currentEditProductId=null;
@@ -943,19 +1023,15 @@ function addCFUI(fd=null,container){const fc=document.createElement('div');fc.cl
 function extractCFs(container){const out=[];container.querySelectorAll('.cf-container').forEach(fc=>{const name=fc.querySelector('.cf-name').value.trim(),type=fc.querySelector('.cf-type').value,required=fc.querySelector('.cf-required').checked,extraPrice=parseFloat(fc.querySelector('.cf-extra').value)||0;if(!name)return;const f={name,type,required,extraPrice};if(type==='select'){f.options=[];fc.querySelectorAll('.opt-item').forEach(oi=>{const v=oi.querySelector('.opt-val').value.trim();if(v)f.options.push({value:v,extraPrice:parseFloat(oi.querySelector('.opt-price').value)||0,image:oi.querySelector('.opt-img-url').value||null});});}out.push(f);});return out;}
 
 // LOGIN
-const ADMIN_USERS={
-  'Yair':{password:'12344',hebrewName:'יאיר לוי'},
-  'Ron':{password:'54321',hebrewName:'רון קדוש'},
-  'Amit':{password:'Amit2012',hebrewName:'עמית מטיאס'},
-};
-async function doLogin(username, displayName){$('login-overlay').style.display='none';$('admin-layout').classList.add('active');$('sw-name').textContent=`היי ${displayName||username}`;$('sw-sub').textContent='ברוך הבא לפאנל הניהול של YR JERSEYS';$('login-error').style.display='none';try{await initSettings();await Promise.all([loadAllProducts(),loadCategories()]);await Promise.all([fetchOrders(),fetchLeads(),fetchCustomers(),loadShipping(),loadCoupons(),loadAnnouncements(),loadMemberAnnouncements()]);setupUpload('pimg-file','pimg-preview','pimg-status','pimg-url','pimg-zone');await loadDeals();updateNewsProductSelect();}catch(e){console.error(e);alert('שגיאה: '+e.message);}}
-window.addEventListener('DOMContentLoaded',async()=>{const logged=localStorage.getItem('vip_admin_logged'),user=localStorage.getItem('vip_admin_user');if(logged==='true'&&user){const acc=ADMIN_USERS[user];if(acc)doLogin(user,acc.hebrewName);else{localStorage.removeItem('vip_admin_logged');localStorage.removeItem('vip_admin_user');}}});
-$('login-button').addEventListener('click',()=>{const u=$('login-username').value.trim(),p=$('login-password').value;if(!u||!p)return;try{const acc=ADMIN_USERS[u];if(!acc)throw new Error('user-not-found');if(acc.password!==p)throw new Error('wrong-password');if(confirm('להישאר מחובר?')){localStorage.setItem('vip_admin_logged','true');localStorage.setItem('vip_admin_user',u);}doLogin(u,acc.hebrewName);}catch(e){const msg=e.message==='user-not-found'?'משתמש לא קיים':e.message==='wrong-password'?'סיסמה שגויה':'שגיאה בהתחברות';$('login-error').textContent=msg;$('login-error').style.display='block';}});
+async function doLogin(username, displayName){$('login-overlay').style.display='none';$('admin-layout').classList.add('active');$('sw-name').textContent=`היי ${displayName||username}`;$('sw-sub').textContent='ברוך הבא לפאנל הניהול של YR JERSEYS';$('login-error').style.display='none';try{await initSettings();await Promise.all([loadAllProducts(),loadCategories()]);await Promise.all([fetchOrders(),fetchLeads(),fetchCustomers(),loadShipping(),loadCoupons(),loadAnnouncements(),loadMemberAnnouncements(),loadMonthlyCoupons()]);setupUpload('pimg-file','pimg-preview','pimg-status','pimg-url','pimg-zone');await loadDeals();updateNewsProductSelect();populateMcYearSelect();renderMcPicker('buy');renderMcPicker('get');updateReviewProductSelect();await loadReviews();}catch(e){console.error(e);alert('שגיאה: '+e.message);}}
+window.addEventListener('DOMContentLoaded',async()=>{const logged=localStorage.getItem('vip_admin_logged'),user=localStorage.getItem('vip_admin_user');if(logged==='true'&&user){try{const d=await db.collection('users').doc(user).get();if(d.exists)doLogin(user,d.data().hebrewName);else{localStorage.removeItem('vip_admin_logged');localStorage.removeItem('vip_admin_user');}}catch(e){console.error(e);}}});
+$('login-button').addEventListener('click',async()=>{const u=$('login-username').value.trim(),p=$('login-password').value;if(!u||!p)return;try{const d=await db.collection('users').doc(u).get();if(!d.exists)throw new Error('user-not-found');if(d.data().password!==p)throw new Error('wrong-password');if(confirm('להישאר מחובר?')){localStorage.setItem('vip_admin_logged','true');localStorage.setItem('vip_admin_user',u);}doLogin(u,d.data().hebrewName);}catch(e){const msg=e.message==='user-not-found'?'משתמש לא קיים':e.message==='wrong-password'?'סיסמה שגויה':'שגיאה בהתחברות';$('login-error').textContent=msg;$('login-error').style.display='block';}});
 ['login-username','login-password'].forEach(id=>$(id).addEventListener('keypress',e=>{if(e.key==='Enter')$('login-button').click();}));
 $('logout-button').addEventListener('click',()=>{if(confirm('להתנתק?')){localStorage.removeItem('vip_admin_logged');localStorage.removeItem('vip_admin_user');location.reload();}});
+$('versions-button').addEventListener('click',()=>{window.location.href='https://amitmatyas-sitemanage.netlify.app/#YR%20Jerseys';});
 
 // NAVIGATION
-document.querySelectorAll('.menu-item').forEach(item=>{item.addEventListener('click',()=>{document.querySelectorAll('.menu-item').forEach(m=>m.classList.remove('active'));document.querySelectorAll('.content-section').forEach(s=>s.classList.remove('active'));item.classList.add('active');const secId=item.dataset.section==='news'?'news-section-admin':`${item.dataset.section}-section`;$(secId).classList.add('active');if(item.dataset.section==='bulk-edit'){updateBulkCatChecks();renderBulkGrid($('bulk-search').value);}if(item.dataset.section==='settings'){renderDealPicker('buy');renderDealPicker('get');loadDeals();}if(item.dataset.section==='news'){updateNewsProductSelect();loadNewsAdmin();}});});
+document.querySelectorAll('.menu-item').forEach(item=>{item.addEventListener('click',()=>{document.querySelectorAll('.menu-item').forEach(m=>m.classList.remove('active'));document.querySelectorAll('.content-section').forEach(s=>s.classList.remove('active'));item.classList.add('active');const secId=item.dataset.section==='news'?'news-section-admin':`${item.dataset.section}-section`;$(secId).classList.add('active');if(item.dataset.section==='bulk-edit'){updateBulkCatChecks();renderBulkGrid($('bulk-search').value);}if(item.dataset.section==='settings'){renderDealPicker('buy');renderDealPicker('get');loadDeals();}if(item.dataset.section==='news'){updateNewsProductSelect();loadNewsAdmin();}if(item.dataset.section==='customers'){populateMcYearSelect();renderMcPicker('buy');renderMcPicker('get');loadMonthlyCoupons();}if(item.dataset.section==='reviews'){updateReviewProductSelect();loadReviews();}});});
 
 async function initSettings(){try{const d=await db.collection('yr_settings').doc('main').get();if(!d.exists)await db.collection('yr_settings').doc('main').set({Shipping:{Method:'fixed',Value:30,FreeThreshold:0},Coupons:[],Categories:[],SubCategories:{},Announcements:[]});}catch(e){console.error(e);}}
 
@@ -1602,7 +1678,183 @@ $('add-deal-btn').addEventListener('click',async()=>{
     await loadDeals();
   }catch(e){alert('שגיאה');console.error(e);}
 });
-  
+
+// ===== MONTHLY CLUB COUPONS ADMIN =====
+function populateMcYearSelect(){
+  const sel=$('mc-year');if(!sel||sel.options.length)return;
+  const y=new Date().getFullYear();
+  let opts='';for(let i=0;i<=100;i++)opts+=`<option value="${y+i}">${y+i}</option>`;
+  sel.innerHTML=opts;
+}
+function onMcKindChange(){
+  const k=$('mc-kind').value;
+  $('mc-amount-fields').style.display=(k==='general'||k==='shipping')?'block':'none';
+  $('mc-bogo-fields').style.display=k==='bogo'?'block':'none';
+}
+function renderMcPicker(type){
+  const mode=document.querySelector(`input[name="mc-${type}-mode"]:checked`).value;
+  const catPicker=$(`mc-${type}-cat-picker`);
+  const prodPicker=$(`mc-${type}-prod-picker`);
+  if(mode==='all'){catPicker.style.display='none';prodPicker.style.display='none';return;}
+  if(mode==='category'){
+    catPicker.style.display='flex';prodPicker.style.display='none';
+    catPicker.innerHTML='';
+    categories.forEach(cat=>{
+      const lbl=document.createElement('label');const cb=document.createElement('input');
+      cb.type='checkbox';cb.value=cat;
+      lbl.appendChild(cb);lbl.appendChild(document.createTextNode(' '+cat));
+      catPicker.appendChild(lbl);
+    });
+  } else {
+    catPicker.style.display='none';prodPicker.style.display='block';
+    prodPicker.innerHTML='';
+    products.forEach(p=>{
+      const lbl=document.createElement('label');
+      lbl.style.cssText='display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #f0f0f0;cursor:pointer;font-size:.9em';
+      const cb=document.createElement('input');cb.type='checkbox';cb.value=p.id;
+      const img=document.createElement('img');img.src=p.image;img.style.cssText='width:34px;height:34px;object-fit:cover;border-radius:4px;border:1px solid #ddd;flex-shrink:0';
+      lbl.appendChild(cb);lbl.appendChild(img);lbl.appendChild(document.createTextNode(p.name));
+      prodPicker.appendChild(lbl);
+    });
+  }
+}
+document.querySelectorAll('input[name="mc-buy-mode"]').forEach(r=>r.addEventListener('change',()=>renderMcPicker('buy')));
+document.querySelectorAll('input[name="mc-get-mode"]').forEach(r=>r.addEventListener('change',()=>renderMcPicker('get')));
+function getMcSelection(type){
+  const mode=document.querySelector(`input[name="mc-${type}-mode"]:checked`).value;
+  if(mode==='all')return{mode:'all',ids:[]};
+  if(mode==='category'){
+    const ids=Array.from($(`mc-${type}-cat-picker`).querySelectorAll('input:checked')).map(cb=>cb.value);
+    return{mode:'category',ids};
+  }
+  const ids=Array.from($(`mc-${type}-prod-picker`).querySelectorAll('input:checked')).map(cb=>cb.value);
+  return{mode:'specific',ids};
+}
+function mcMonthName(m){return['','ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'][m]||'';}
+function mcDesc(c){
+  if(c.Kind==='general')return c.AmountType==='percentage'?`${c.Value}% הנחה על ההזמנה`:`${c.Value}₪ הנחה על ההזמנה`;
+  if(c.Kind==='shipping')return c.AmountType==='percentage'?`${c.Value}% הנחה על המשלוח`:`${c.Value}₪ הנחה על המשלוח`;
+  if(c.Kind==='bogo')return`קנה ${c.BuyQty} קבל ${c.GetQty} במתנה`;
+  return'';
+}
+async function loadMonthlyCoupons(){
+  try{
+    const d=await db.collection('yr_settings').doc('main').get();
+    const list=(d.data()&&d.data().MonthlyClubCoupons)||[];
+    const el=$('mc-list');el.innerHTML='';
+    if(!list.length){el.innerHTML='<p style="color:#888">אין קופונים חודשיים מתוזמנים.</p>';return;}
+    const sorted=list.map((c,idx)=>({c,idx})).sort((a,b)=>(a.c.Year-b.c.Year)||(a.c.Month-b.c.Month));
+    sorted.forEach(({c,idx})=>{
+      const minTxt=c.MinOrderAmount>0?` | מעל ${c.MinOrderAmount}₪`:'';
+      const item=document.createElement('div');item.className='list-item';item.style.cssText='flex-direction:column;align-items:stretch;';
+      item.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+        <div><strong>${mcMonthName(c.Month)} ${c.Year}</strong> — <strong>${c.Code}</strong>: ${mcDesc(c)}${minTxt}</div>
+        <div class="list-item-actions">
+          <button class="btn btn-danger" onclick="deleteMonthlyCoupon(${idx})">🗑 מחק</button>
+        </div>
+      </div>`;
+      el.appendChild(item);
+    });
+  }catch(e){console.error(e);}
+}
+window.deleteMonthlyCoupon=async function(idx){
+  if(!confirm('למחוק קופון חודשי זה?'))return;
+  try{
+    const ref=db.collection('yr_settings').doc('main');
+    const d=await ref.get();const list=d.data().MonthlyClubCoupons||[];
+    list.splice(idx,1);
+    await ref.update({MonthlyClubCoupons:list});
+    alert('נמחק!');await loadMonthlyCoupons();
+  }catch(e){alert('שגיאה');console.error(e);}
+};
+$('add-mc-btn').addEventListener('click',async()=>{
+  const month=parseInt($('mc-month').value),year=parseInt($('mc-year').value),code=$('mc-code').value.trim(),kind=$('mc-kind').value;
+  if(!code)return alert('הזן קוד קופון');
+  const coup={Month:month,Year:year,Code:code,Kind:kind};
+  if(kind==='general'||kind==='shipping'){
+    coup.AmountType=$('mc-amount-type').value;
+    coup.Value=parseFloat($('mc-value').value)||0;
+    coup.MinOrderAmount=parseFloat($('mc-min-amount').value)||0;
+  } else {
+    coup.BuyQty=parseInt($('mc-buy-qty').value)||1;
+    coup.GetQty=parseInt($('mc-get-qty').value)||1;
+    coup.BuySelection=getMcSelection('buy');
+    coup.GetSelection=getMcSelection('get');
+  }
+  try{
+    const ref=db.collection('yr_settings').doc('main');
+    const d=await ref.get();
+    const list=(d.data()&&d.data().MonthlyClubCoupons)||[];
+    list.push(coup);
+    await ref.update({MonthlyClubCoupons:list});
+    alert('קופון חודשי נוסף!');
+    $('mc-code').value='';$('mc-value').value='';$('mc-min-amount').value='';
+    document.querySelector('input[name="mc-buy-mode"][value="all"]').checked=true;
+    document.querySelector('input[name="mc-get-mode"][value="all"]').checked=true;
+    renderMcPicker('buy');renderMcPicker('get');
+    await loadMonthlyCoupons();
+  }catch(e){alert('שגיאה');console.error(e);}
+});
+
+// ===== REVIEWS ADMIN =====
+function updateReviewProductSelect(){
+  const sel=$('rev-product');if(!sel)return;
+  const cur=sel.value;
+  sel.innerHTML='<option value="">ללא קישור</option>'+products.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+  sel.value=cur;
+}
+let revImages=[];
+$('rev-img-input').addEventListener('change',async function(){
+  const st=$('rev-img-status'),pv=$('rev-img-preview');
+  const files=Array.from(this.files).slice(0,4);
+  if(!files.length)return;
+  st.textContent=`ממיר ${files.length} תמונות...`;st.style.color='#f39c12';pv.innerHTML='';revImages=[];
+  for(let i=0;i<files.length;i++){
+    if(files[i].size>500*1024){st.textContent=`שגיאה: תמונה ${i+1} גדולה מדי (מקס 500KB)`;st.style.color='#dc3545';revImages=[];return;}
+    const b=await toBase64(files[i]);revImages.push(b);
+    const img=document.createElement('img');img.src=b;img.style.cssText='width:58px;height:58px;object-fit:cover;border-radius:5px;border:2px solid #ddd';pv.appendChild(img);
+  }
+  st.textContent=`✓ ${revImages.length} מוכנות`;st.style.color='#27ae60';
+});
+$('add-review-btn').addEventListener('click',async()=>{
+  const name=$('rev-name').value.trim(),rating=parseInt($('rev-rating').value),text=$('rev-text').value.trim(),productId=$('rev-product').value||null;
+  if(!name||!text)return alert('מלא שם ותוכן ביקורת');
+  const product=productId?products.find(p=>p.id===productId):null;
+  const data={name,rating,text,productId,productName:product?product.name:null,images:revImages.slice(),createdAt:firebase.firestore.FieldValue.serverTimestamp()};
+  try{
+    await db.collection('yr_reviews').add(data);
+    alert('ביקורת נוספה!');
+    $('rev-name').value='';$('rev-text').value='';$('rev-product').value='';$('rev-img-input').value='';$('rev-img-preview').innerHTML='';$('rev-img-status').textContent='';revImages=[];
+    await loadReviews();
+  }catch(e){alert('שגיאה');console.error(e);}
+});
+async function loadReviews(){
+  try{
+    const snap=await db.collection('yr_reviews').orderBy('createdAt','desc').get();
+    const list=$('reviews-list');list.innerHTML='';
+    if(snap.empty){list.innerHTML='<p style="color:#888">אין ביקורות עדיין.</p>';return;}
+    snap.docs.forEach(doc=>{
+      const r=doc.data();
+      const stars='★'.repeat(r.rating||5)+'☆'.repeat(5-(r.rating||5));
+      const imgs=(r.images||[]).map(src=>`<img src="${src}" style="width:54px;height:54px;object-fit:cover;border-radius:5px;border:2px solid #eee;">`).join('');
+      const item=document.createElement('div');item.className='list-item';item.style.cssText='flex-direction:column;align-items:stretch;';
+      item.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap">
+        <div>
+          <strong>${r.name||'-'}</strong> <span style="color:#f39c12">${stars}</span>${r.productName?` <span style="font-size:.8em;color:#888">| ${r.productName}</span>`:''}<br>
+          <span style="font-size:.9em;color:#444">${r.text||''}</span>
+          ${imgs?`<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">${imgs}</div>`:''}
+        </div>
+        <div class="list-item-actions"><button class="btn btn-danger" onclick="deleteReview('${doc.id}')">🗑 מחק</button></div>
+      </div>`;
+      list.appendChild(item);
+    });
+  }catch(e){$('reviews-list').innerHTML='<p style="color:#dc3545">שגיאה בטעינת ביקורות.</p>';console.error(e);}
+}
+window.deleteReview=async function(id){
+  if(!confirm('למחוק ביקורת זו?'))return;
+  try{await db.collection('yr_reviews').doc(id).delete();alert('נמחקה!');await loadReviews();}catch(e){alert('שגיאה');console.error(e);}
+};
+
 // ===== NEWS ADMIN =====
 async function loadNewsAdmin(){
   try{
@@ -2288,12 +2540,6 @@ function evOmRecalcTotal() {
   document.getElementById('ev-om-edit-total').value = Math.max(0, subtotal + ship - disc).toFixed(2);
 }
 
-function evOmGetEventProducts() {
-  // returns store products assigned to event + exclusive products already loaded
-  const storeProds = (currentEventData?.productIds || []).map(id => products.find(p => p.id === id)).filter(Boolean);
-  return storeProds;
-}
-
 function evOmRenderEditItems() {
   const list = document.getElementById('ev-om-edit-items-list');
   list.innerHTML = '';
@@ -2516,10 +2762,6 @@ document.getElementById('ev-om-delete-btn').addEventListener('click', async () =
   if (!currentEvOrderId || !confirm('למחוק הזמנה זו לצמיתות?')) return;
   try { await db.collection('yr_event_orders').doc(currentEvOrderId).delete(); closeModal('event-order-modal'); loadEvOrders(); } catch(e) { alert('שגיאה'); }
 });
-  
-  async function loadMemberAnnouncements(){try{const d=await db.collection('yr_settings').doc('main').get();const list=(d.data()&&d.data().MemberAnnouncements)||[];const el=$('member-ann-list');el.innerHTML='';if(!list.length){el.innerHTML='<p style="color:#888">אין הודעות לחברי מועדון.</p>';return;}list.forEach((ann,idx)=>{const item=document.createElement('div');item.className='list-item';item.innerHTML=`<span>🔒 ${ann}</span><div class="list-item-actions"><button class="btn btn-danger" onclick="deleteMemberAnn(${idx})">🗑</button></div>`;el.appendChild(item);});}catch(e){console.error(e);}}
-window.deleteMemberAnn=async function(idx){if(!confirm('למחוק?'))return;const d=await db.collection('yr_settings').doc('main').get();const list=(d.data()&&d.data().MemberAnnouncements)||[];list.splice(idx,1);await db.collection('yr_settings').doc('main').update({MemberAnnouncements:list});loadMemberAnnouncements();};
-$('add-member-ann-btn').addEventListener('click',async()=>{const t=$('member-ann-text').value.trim();if(!t)return alert('הזן הודעה');const d=await db.collection('yr_settings').doc('main').get();const list=(d.data()&&d.data().MemberAnnouncements)||[];if(list.length>=2)return alert('מקסימום 2 הודעות לחברי מועדון');list.push(t);await db.collection('yr_settings').doc('main').update({MemberAnnouncements:list});$('member-ann-text').value='';loadMemberAnnouncements();});
 </script>
 </body>
 </html>
