@@ -156,16 +156,6 @@
         .chip.blue  { background: #e8f0fe; color: #1a56db; }
         .chip.purple { background: #f5eeff; color: #8e44ad; }
 
-        /* Leads */
-        .lead-box {
-            background: white; border: 1px solid #eee; border-radius: 10px;
-            padding: 14px; margin-bottom: 10px;
-        }
-        .lead-header {
-            display: flex; justify-content: space-between;
-            font-size: 0.8rem; color: #666; margin-bottom: 6px;
-        }
-        .lead-msg { font-size: 0.93rem; line-height: 1.5; white-space: pre-wrap; }
 
         .message { padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center; display: none; font-weight: 600; }
         .error { background: #ffeaea; color: #c0392b; display: block; }
@@ -202,11 +192,6 @@
                 <label>טלפון *</label>
                 <input type="tel" id="field-phone" required>
             </div>
-            <div class="form-group">
-                <label>סיסמה חדשה (אופציונלי)</label>
-                <input type="password" id="field-pass" minlength="6" placeholder="לפחות 6 תווים">
-            </div>
-
             <div class="address-section">
                 <div class="address-row">
                     <div class="form-group" style="flex:3">
@@ -244,39 +229,58 @@
                     <div class="stat-value" id="stat-points">0</div>
                     <div class="stat-sub">שווי: <span id="stat-points-value">0.00</span>₪</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-label">סה"כ הזמנות</div>
-                    <div class="stat-value" id="stat-orders">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">סה"כ הוצאה</div>
-                    <div class="stat-value" id="stat-spent">₪0</div>
-                </div>
             </div>
 
             <h3 style="margin-bottom:15px">🛍️ הזמנות אחרונות</h3>
             <div id="orders-container"></div>
-
-            <h3 style="margin-top:25px; margin-bottom:15px">💬 פניות שירות</h3>
-            <div id="leads-container"></div>
         </div>
     </div>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+<link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
 
 <script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyDLHENaXTeorjL87sExB1EJrH7mrEnNYOA",
-        authDomain: "timetable-titus.firebaseapp.com",
-        projectId: "timetable-titus",
-        storageBucket: "timetable-titus.firebasestorage.app",
-        messagingSenderId: "199146911555",
-        appId: "1:199146911155:web:5d9436d716dfc6de7361f6"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+    // גישה ישירה ל-Firestore דרך REST – בלי להוריד את ה-SDK
+    const FS = (function () {
+        const BASE = 'https://firestore.googleapis.com/v1/projects/timetable-titus/databases/(default)/documents';
+        const K = 'AIzaSyDLHENaXTeorjL87sExB1EJrH7mrEnNYOA';
+        function val(v) {
+            if ('stringValue' in v) return v.stringValue;
+            if ('integerValue' in v) return Number(v.integerValue);
+            if ('doubleValue' in v) return v.doubleValue;
+            if ('booleanValue' in v) return v.booleanValue;
+            if ('timestampValue' in v) { const d = new Date(v.timestampValue); return { toDate: () => d }; }
+            if ('arrayValue' in v) return (v.arrayValue.values || []).map(val);
+            if ('mapValue' in v) return fields(v.mapValue.fields);
+            return null;
+        }
+        function fields(f) { const o = {}; for (const k in (f || {})) o[k] = val(f[k]); return o; }
+        async function call(url, opts) {
+            const r = await fetch(url, opts);
+            if (!r.ok) throw new Error(r.status);
+            return r.json();
+        }
+        return {
+            // שאילתת שוויון על שדה אחד
+            async where(col, field, value, limit) {
+                const q = { from: [{ collectionId: col }], where: { fieldFilter: { field: { fieldPath: field }, op: 'EQUAL', value: { stringValue: value } } } };
+                if (limit) q.limit = limit;
+                const rows = await call(`${BASE}:runQuery?key=${K}`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ structuredQuery: q })
+                });
+                return rows.filter(r => r.document).map(r => ({ id: r.document.name.split('/').pop(), ...fields(r.document.fields) }));
+            },
+            // עדכון שדות טקסט בלבד
+            update(col, id, data) {
+                const mask = Object.keys(data).map(k => 'updateMask.fieldPaths=' + encodeURIComponent(k)).join('&');
+                const body = { fields: {} };
+                for (const k in data) body.fields[k] = { stringValue: data[k] };
+                return call(`${BASE}/${col}/${id}?${mask}&currentDocument.exists=true&key=${K}`, {
+                    method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+                });
+            }
+        };
+    })();
 
     let userData = null;
 
@@ -314,7 +318,6 @@
 
     function getPaymentChip(order) {
         if (order.paymentType === 'bit') return '<span class="chip blue">💳 ביט</span>';
-        if (order.paymentType === 'paypal') return '<span class="chip">🅿️ PayPal</span>';
         return '';
     }
 
@@ -328,13 +331,13 @@
         const email = decodeURIComponent(hash);
 
         try {
-            const snap = await db.collection('yr_ClubMembers').where('email', '==', email).limit(1).get();
-            if (snap.empty) {
+            const members = await FS.where('yr_ClubMembers', 'email', email, 1);
+            if (!members.length) {
                 document.getElementById('loading-state').innerHTML = '<div class="message error">לקוח לא נמצא</div>';
                 return;
             }
 
-            userData = { id: snap.docs[0].id, ...snap.docs[0].data() };
+            userData = members[0];
 
             document.getElementById('user-greeting').textContent = userData.name || '';
             document.getElementById('field-name').value  = userData.name  || '';
@@ -343,8 +346,6 @@
             const points = userData.points || 0;
             document.getElementById('stat-points').textContent = points;
             document.getElementById('stat-points-value').textContent = (typeof points === 'number' ? points : 0).toFixed(2);
-            document.getElementById('stat-orders').textContent = userData.orderCount || 0;
-            document.getElementById('stat-spent').textContent  = '₪' + (userData.totalSpent || 0).toFixed(0);
 
             // Parse address
             if (userData.address) {
@@ -375,7 +376,6 @@
             document.getElementById('main-content').style.display  = 'block';
 
             loadOrders(userData.id);
-            loadLeads(userData.email);
 
         } catch (e) {
             console.error(e);
@@ -386,13 +386,13 @@
     async function loadOrders(memberId) {
         const container = document.getElementById('orders-container');
         try {
-            const snap = await db.collection('yr_orders').where('clubMemberId', '==', memberId).get();
-            if (snap.empty) {
+            const found = await FS.where('yr_orders', 'clubMemberId', memberId);
+            if (!found.length) {
                 container.innerHTML = '<p style="color:#999; font-size:0.9rem;">אין הזמנות.</p>';
                 return;
             }
 
-            const orders = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+            const orders = found
                 .sort((a, b) => (b.orderDate?.toDate() || 0) - (a.orderDate?.toDate() || 0));
 
             container.innerHTML = '';
@@ -487,41 +487,6 @@
         }
     }
 
-    async function loadLeads(email) {
-        const container = document.getElementById('leads-container');
-        try {
-            const snap = await db.collection('yr_contact_leads').where('email', '==', email).get();
-            if (snap.empty) {
-                container.innerHTML = '<p style="color:#999; font-size:0.9rem;">אין פניות.</p>';
-                return;
-            }
-
-            const leads = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }))
-                .sort((a, b) => (b.createdAt?.toDate() || 0) - (a.createdAt?.toDate() || 0));
-
-            container.innerHTML = leads.map(lead => {
-                const date = lead.createdAt ? lead.createdAt.toDate().toLocaleDateString('he-IL') : 'לא ידוע';
-                const isClosed = lead.status === 'closed';
-                const closedDate = isClosed && lead.closedAt ? fmtDate(lead.closedAt) : null;
-                return `
-                    <div class="lead-box">
-                        <div class="lead-header">
-                            <span>פנייה מיום ${date}</span>
-                            <span style="color:${isClosed ? 'green' : '#e67e22'}; font-weight:700;">
-                                ${isClosed ? '✓ סגור' + (closedDate ? ` (${closedDate})` : '') : '⏳ בטיפול'}
-                            </span>
-                        </div>
-                        <div class="lead-msg">${lead.message || ''}</div>
-                        ${lead.linkedOrderId ? `<div style="font-size:0.78rem;color:#27ae60;margin-top:6px;font-weight:600;">🔗 מקושר להזמנה #${lead.linkedOrderId.substring(0,6).toUpperCase()}</div>` : ''}
-                    </div>
-                `;
-            }).join('');
-        } catch (e) {
-            container.innerHTML = '<p style="color:red;">שגיאה בטעינת פניות</p>';
-            console.error(e);
-        }
-    }
-
     document.getElementById('update-form').onsubmit = async (e) => {
         e.preventDefault();
         const btn = document.getElementById('save-btn');
@@ -546,10 +511,7 @@
                 address: fullAddress
             };
 
-            const pass = document.getElementById('field-pass').value;
-            if (pass && pass.length >= 6) upData.password = pass;
-
-            await db.collection('yr_ClubMembers').doc(userData.id).update(upData);
+            await FS.update('yr_ClubMembers', userData.id, upData);
 
             // Update local data
             userData = { ...userData, ...upData };
@@ -564,7 +526,7 @@
         }
     };
 
-    window.onload = init;
+    init();
 </script>
 
 </body>

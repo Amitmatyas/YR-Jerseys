@@ -244,6 +244,35 @@ tbody td:last-child { text-align: left; font-weight: 600; }
   .totals-box { min-width: 100%; }
 }
 </style>
+<script>
+// טעינה מוקדמת דרך REST – בלי להמתין להורדת ה-SDK של Firebase
+window.__fs = (function () {
+    var BASE = 'https://firestore.googleapis.com/v1/projects/timetable-titus/databases/(default)/documents/', K = 'AIzaSyDLHENaXTeorjL87sExB1EJrH7mrEnNYOA';
+    function val(v) {
+        if ('stringValue' in v) return v.stringValue;
+        if ('integerValue' in v) return Number(v.integerValue);
+        if ('doubleValue' in v) return v.doubleValue;
+        if ('booleanValue' in v) return v.booleanValue;
+        if ('timestampValue' in v) { var d = new Date(v.timestampValue); return { toDate: function () { return d; } }; }
+        if ('arrayValue' in v) return (v.arrayValue.values || []).map(val);
+        if ('mapValue' in v) return fields(v.mapValue.fields);
+        return null;
+    }
+    function fields(f) { var o = {}; for (var k in (f || {})) o[k] = val(f[k]); return o; }
+    return {
+        doc: function (path) {
+            return fetch(BASE + path + '?key=' + K).then(function (r) {
+                if (r.status === 404) return null;
+                if (!r.ok) throw new Error(r.status);
+                return r.json();
+            }).then(function (j) { return j && fields(j.fields); });
+        }
+    };
+})();
+window.__orderReq = location.hash.length > 1 ? window.__fs.doc('yr_event_orders/' + decodeURIComponent(location.hash.slice(1))) : null;
+if (window.__orderReq) window.__orderReq.catch(function () {});
+</script>
+<link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
 </head>
 <body>
 
@@ -335,21 +364,8 @@ tbody td:last-child { text-align: left; font-weight: 600; }
   </div>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 <script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyDLHENaXTeorjL87sExB1EJrH7mrEnNYOA",
-    authDomain: "timetable-titus.firebaseapp.com",
-    projectId: "timetable-titus",
-    storageBucket: "timetable-titus.firebasestorage.app",
-    messagingSenderId: "199146911555",
-    appId: "1:199146911555:web:5d9436d716dfc6de7361f6"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-
-  function fmt(n) { return '₪' + (parseFloat(n) || 0).toFixed(2); }
+function fmt(n) { return '₪' + (parseFloat(n) || 0).toFixed(2); }
 
   function showState(msg, type) {
     document.getElementById('state-box').innerHTML = `<div class="message ${type}">${msg}</div>`;
@@ -391,10 +407,8 @@ tbody td:last-child { text-align: left; font-weight: 600; }
     showState('טוען חשבונית...', 'loading');
 
     try {
-      const doc = await db.collection('yr_event_orders').doc(hash).get();
-      if (!doc.exists) { showState('הזמנה לא נמצאה', 'error'); return; }
-
-      const o = doc.data();
+      const o = await window.__orderReq;
+      if (!o) { showState('הזמנה לא נמצאה', 'error'); return; }
 
       // Event name
       document.getElementById('inv-event-name').textContent = o.eventName || 'אירוע';
@@ -484,7 +498,7 @@ tbody td:last-child { text-align: left; font-weight: 600; }
     });
   }
 
-  window.onload = init;
+  init();
 </script>
 </body>
 </html>
